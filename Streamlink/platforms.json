@@ -1,0 +1,142 @@
+{
+  "_aide": "Une entrée par plateforme. input : channel (nom de chaîne), youtube (ID ou URL de vidéo), video (ID de vidéo), none (rien à saisir), url (n'importe quel lien). {arg} est remplacé par ce qui est saisi. args = options Streamlink ajoutées à chaque lancement. color / text_color = couleur d'accent de la plateforme et couleur du texte posé dessus (format #RRGGBB). live_check = façon de savoir si une chaîne favorite est en direct : twitch (requête rapide), streamlink (streamlink --json, plus lent) ou none.",
+  "platforms": [
+    {
+      "id": "twitch",
+      "name": "Twitch",
+      "input": "channel",
+      "url": "https://www.twitch.tv/{arg}",
+      "hosts": [
+        "twitch.tv"
+      ],
+      "args": [
+        "--twitch-disable-ads"
+      ],
+      "qualities": [
+        "best",
+        "1080p60",
+        "720p60",
+        "720p",
+        "480p",
+        "360p",
+        "160p",
+        "audio_only",
+        "worst"
+      ],
+      "default_quality": "best",
+      "color": "#9146FF",
+      "text_color": "#FFFFFF",
+      "live_check": "twitch"
+    },
+    {
+      "id": "kick",
+      "name": "Kick",
+      "input": "channel",
+      "url": "https://kick.com/{arg}",
+      "hosts": [
+        "kick.com"
+      ],
+      "args": [],
+      "qualities": [
+        "best",
+        "1080p60",
+        "720p60",
+        "480p30",
+        "360p30",
+        "160p30",
+        "worst"
+      ],
+      "default_quality": "best",
+      "color": "#53FC18",
+      "text_color": "#0B0D0A",
+      "live_check": "streamlink"
+    },
+    {
+      "id": "youtube",
+      "name": "YouTube",
+      "input": "youtube",
+      "url": "https://www.youtube.com/watch?v={arg}",
+      "hosts": [
+        "youtube.com",
+        "youtu.be"
+      ],
+      "args": [],
+      "qualities": [
+        "best",
+        "1080p",
+        "720p",
+        "480p",
+        "360p",
+        "worst"
+      ],
+      "default_quality": "1080p",
+      "color": "#D91A1A",
+      "text_color": "#FFFFFF",
+      "live_check": "none"
+    },
+    {
+      "id": "dailymotion",
+      "name": "Dailymotion",
+      "input": "video",
+      "url": "https://www.dailymotion.com/video/{arg}",
+      "hosts": [
+        "dailymotion.com",
+        "dai.ly"
+      ],
+      "args": [],
+      "qualities": [
+        "best",
+        "1080p",
+        "720p",
+        "480p",
+        "380p",
+        "240p",
+        "worst"
+      ],
+      "default_quality": "best",
+      "color": "#0A6CFF",
+      "text_color": "#FFFFFF",
+      "live_check": "none"
+    },
+    {
+      "id": "steamtv",
+      "name": "Steam TV",
+      "input": "none",
+      "url": "https://steam.tv",
+      "history_name": "steam.tv",
+      "hosts": [
+        "steam.tv"
+      ],
+      "args": [],
+      "qualities": [
+        "best",
+        "worst"
+      ],
+      "default_quality": "best",
+      "color": "#66C0F4",
+      "text_color": "#0B1A26",
+      "live_check": "none"
+    },
+    {
+      "id": "url",
+      "name": "Direct link",
+      "input": "url",
+      "url": "{arg}",
+      "hosts": [],
+      "args": [],
+      "qualities": [
+        "best",
+        "1080p",
+        "720p",
+        "480p",
+        "worst",
+        "audio_only"
+      ],
+      "default_quality": "best",
+      "color": "#6B7180",
+      "text_color": "#FFFFFF",
+      "name_key": "platform_url",
+      "live_check": "none"
+    }
+  ]
+}

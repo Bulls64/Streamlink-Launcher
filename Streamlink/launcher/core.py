@@ -1,0 +1,779 @@
+"""Logique sans interface : configuration, plateformes, saisie, historique, favoris, lancement."""
+import os
+import re
+import sys
+import json
+import queue
+import shutil
+import locale
+import threading
+import subprocess
+from datetime import datetime
+from pathlib import Path
+from urllib.parse import urlparse, parse_qs
+
+# ---------------------
+# Chemins (tout est relatif au dossier du lanceur)
+# ---------------------
+# Version empaquetée (.exe) : les données restent à côté de l'exécutable, les ressources sont embarquées.
+FROZEN = bool(getattr(sys, "frozen", False))
+BASE_DIR = Path(sys.executable).resolve().parent if FROZEN else Path(__file__).resolve().parent.parent
+RES_DIR = Path(getattr(sys, "_MEIPASS", BASE_DIR))
+CONFIG_FILE = BASE_DIR / "config.json"
+PLATFORMS_FILE = BASE_DIR / "platforms.json"
+LANG_DIR = BASE_DIR / "lang" if (BASE_DIR / "lang").is_dir() else RES_DIR / "lang"  # dossier lang/ modifiable prioritaire
+DEFAULT_FOLDER = BASE_DIR / "streams"
+DATA_FOLDER = DEFAULT_FOLDER
+HISTORY_FILE = DATA_FOLDER / "history.json"
+FAV_FILE = DATA_FOLDER / "favorites.json"
+
+SCRIPT_EXTENSIONS = (".bat", ".cmd", ".ps1", ".exe", ".py", ".lnk")
+STREAMLINK_INSTALL_URL = "https://streamlink.github.io/install.html"
+HISTORY_LIMIT = 200
+
+DEFAULT_CONFIG = {
+    "language": None,          # None = langue du système
+    "theme": "auto",           # auto, light, dark
+    "streamlink_path": "",     # vide = détection automatique
+    "player": "default",       # default, vlc, mpv, potplayer, custom
+    "player_path": "",
+    "player_args": "",
+    "show_scripts": False,
+    "scripts_folder": str(DEFAULT_FOLDER),
+    "qualities": {},
+    "last_platform": "twitch",
+    "geometry": "",
+    "live_check": True,        # vérifier qui est en direct parmi les favoris
+    "live_interval": 5,        # minutes
+    "live_notify": True,       # notification Windows au début d'un live
+    "tray": True,              # fermer la fenêtre = réduire dans la zone de notification (Windows)
+    "hotkey": True,            # raccourci global qui ouvre le mode mini (Windows)
+    "hotkey_combo": "ctrl+alt+s",
+    "autostart": False,        # lancer au démarrage de Windows, réduit
+    "tray_hint_shown": False,
+    "update_check": True,      # vérifier au démarrage si Streamlink est à jour
+}
+
+LIVE_INTERVALS = [2, 5, 10, 15, 30]
+# Méthode de vérification par défaut (si platforms.json ne précise pas "live_check")
+LIVE_METHODS = {"twitch": "twitch", "kick": "streamlink"}
+
+# Couleurs par défaut (utilisées si platforms.json n'en donne pas)
+PLATFORM_STYLE = {
+    "twitch": {"color": "#9146FF", "text_color": "#FFFFFF"},
+    "kick": {"color": "#53FC18", "text_color": "#0B0D0A"},
+    "youtube": {"color": "#D91A1A", "text_color": "#FFFFFF"},
+    "dailymotion": {"color": "#0A6CFF", "text_color": "#FFFFFF"},
+    "steamtv": {"color": "#66C0F4", "text_color": "#0B1A26"},
+    "url": {"color": "#6B7180", "text_color": "#FFFFFF", "name_key": "platform_url"},
+}
+NEUTRAL_STYLE = {"color": "#6B7180", "text_color": "#FFFFFF"}
+
+DEFAULT_PLATFORMS = [
+    {"id": "twitch", "name": "Twitch", "input": "channel", "url": "https://www.twitch.tv/{arg}",
+     "hosts": ["twitch.tv"], "args": ["--twitch-disable-ads"],
+     "qualities": ["best", "1080p60", "720p60", "720p", "480p", "360p", "160p", "audio_only", "worst"],
+     "default_quality": "best", "color": "#9146FF", "text_color": "#FFFFFF"},
+    {"id": "kick", "name": "Kick", "input": "channel", "url": "https://kick.com/{arg}",
+     "hosts": ["kick.com"], "args": [],
+     "qualities": ["best", "1080p60", "720p60", "480p30", "360p30", "160p30", "worst"],
+     "default_quality": "best", "color": "#53FC18", "text_color": "#0B0D0A"},
+    {"id": "youtube", "name": "YouTube", "input": "youtube", "url": "https://www.youtube.com/watch?v={arg}",
+     "hosts": ["youtube.com", "youtu.be"], "args": [],
+     "qualities": ["best", "1080p", "720p", "480p", "360p", "worst"], "default_quality": "1080p",
+     "color": "#D91A1A", "text_color": "#FFFFFF"},
+    {"id": "dailymotion", "name": "Dailymotion", "input": "video", "url": "https://www.dailymotion.com/video/{arg}",
+     "hosts": ["dailymotion.com", "dai.ly"], "args": [],
+     "qualities": ["best", "1080p", "720p", "480p", "380p", "240p", "worst"], "default_quality": "best",
+     "color": "#0A6CFF", "text_color": "#FFFFFF"},
+    {"id": "steamtv", "name": "Steam TV", "input": "none", "url": "https://steam.tv", "history_name": "steam.tv",
+     "hosts": ["steam.tv"], "args": [], "qualities": ["best", "worst"], "default_quality": "best",
+     "color": "#66C0F4", "text_color": "#0B1A26"},
+    {"id": "url", "name": "Direct link", "name_key": "platform_url", "input": "url", "url": "{arg}",
+     "hosts": [], "args": [], "qualities": ["best", "1080p", "720p", "480p", "worst", "audio_only"],
+     "default_quality": "best", "color": "#6B7180", "text_color": "#FFFFFF"},
+]
+
+PLAYERS = ["default", "mpv", "vlc", "potplayer", "custom"]
+PLAYER_NAMES = {"vlc": "VLC", "mpv": "mpv", "potplayer": "PotPlayer"}
+PLAYER_CANDIDATES = {
+    "vlc": ["vlc", r"C:\Program Files\VideoLAN\VLC\vlc.exe", r"C:\Program Files (x86)\VideoLAN\VLC\vlc.exe"],
+    "mpv": ["mpv", r"C:\Program Files\mpv\mpv.exe"],
+    "potplayer": ["PotPlayerMini64", r"C:\Program Files\DAUM\PotPlayer\PotPlayerMini64.exe",
+                  r"C:\Program Files (x86)\DAUM\PotPlayer\PotPlayerMini.exe"],
+}
+STREAMLINK_CANDIDATES = [
+    "streamlink",
+    r"C:\Program Files\Streamlink\bin\streamlink.exe",
+    r"C:\Program Files (x86)\Streamlink\bin\streamlink.exe",
+    os.path.expandvars(r"%LOCALAPPDATA%\Programs\Streamlink\bin\streamlink.exe"),
+]
+
+
+# ---------------------
+# JSON
+# ---------------------
+def load_json(path, default):
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return default
+
+
+def save_json(path, data):
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print("Error saving JSON:", e)
+
+
+def load_config():
+    cfg = dict(DEFAULT_CONFIG)
+    saved = load_json(CONFIG_FILE, {})
+    if isinstance(saved, dict):
+        cfg.update(saved)
+    cfg["qualities"] = dict(cfg.get("qualities") or {})
+    if cfg.get("theme") not in ("auto", "light", "dark"):
+        cfg["theme"] = "auto"
+    if cfg.get("live_interval") not in LIVE_INTERVALS:
+        cfg["live_interval"] = DEFAULT_CONFIG["live_interval"]
+    return cfg
+
+
+def save_config(cfg):
+    save_json(CONFIG_FILE, cfg)
+
+
+# ---------------------
+# Langues
+# ---------------------
+def detect_system_language():
+    try:
+        name = locale.getlocale()[0] or ""
+        if os.name == "nt":
+            import ctypes
+            name = locale.windows_locale.get(ctypes.windll.kernel32.GetUserDefaultUILanguage(), name)
+        return "fr" if name.lower().startswith("fr") else "en"
+    except Exception:
+        return "fr"
+
+
+def available_languages():
+    """{code: nom affiché} d'après les fichiers présents dans lang/."""
+    langs = {}
+    for f in sorted(LANG_DIR.glob("*.json")):
+        langs[f.stem] = load_json(f, {}).get("_language_name", f.stem)
+    return langs or {"fr": "Français"}
+
+
+class I18n:
+    def __init__(self, lang):
+        self.set(lang)
+
+    def set(self, lang):
+        self.lang = lang
+        self.strings = load_json(LANG_DIR / f"{lang}.json", {})
+        self.fallback = load_json(LANG_DIR / "fr.json", {}) if lang != "fr" else {}
+
+    def get(self, key, default=None):
+        return self.strings.get(key, self.fallback.get(key, default))
+
+    def __call__(self, key, /, **kwargs):  # « / » : une variable {key} reste possible dans les textes
+        text = self.strings.get(key) or self.fallback.get(key) or key
+        try:
+            return text.format(**kwargs)
+        except Exception:
+            return text
+
+    def format_date(self, value, now=None):
+        """'2026-06-20 22:35:26' -> 'Aujourd'hui, 22:35' / '20 juin, 22:35' / '20 oct. 2025'."""
+        try:
+            d = datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+        except Exception:
+            return value or ""
+        now = now or datetime.now()
+        months = self.get("months_short") or ["jan.", "fév.", "mars", "avr.", "mai", "juin",
+                                               "juil.", "août", "sept.", "oct.", "nov.", "déc."]
+        hm = d.strftime("%H:%M")
+        delta = (now.date() - d.date()).days
+        if delta == 0:
+            return self("date_today", time=hm)
+        if delta == 1:
+            return self("date_yesterday", time=hm)
+        if d.year == now.year:
+            return self("date_same_year", day=d.day, month=months[d.month - 1], time=hm)
+        return self("date_other_year", day=d.day, month=months[d.month - 1], year=d.year)
+
+
+# ---------------------
+# Plateformes
+# ---------------------
+HEX_RE = re.compile(r"^#[0-9A-Fa-f]{6}$")
+
+
+def load_platforms():
+    """Renvoie (liste des plateformes, message d'erreur éventuel)."""
+    error = None
+    if PLATFORMS_FILE.exists():
+        try:
+            with open(PLATFORMS_FILE, "r", encoding="utf-8") as f:
+                raw = json.load(f).get("platforms", [])
+        except Exception as e:
+            raw, error = [], str(e)
+    else:
+        raw = DEFAULT_PLATFORMS
+        save_json(PLATFORMS_FILE, {"platforms": DEFAULT_PLATFORMS})
+
+    platforms, seen = [], set()
+    for p in raw:
+        if not isinstance(p, dict) or not p.get("id") or not p.get("name") or not p.get("url") or p["id"] in seen:
+            continue
+        p = dict(p)
+        style = PLATFORM_STYLE.get(p["id"], NEUTRAL_STYLE)
+        p.setdefault("input", "channel")
+        p.setdefault("hosts", [])
+        p.setdefault("args", [])
+        p["qualities"] = p.get("qualities") or ["best", "worst"]
+        p.setdefault("default_quality", p["qualities"][0])
+        for key in ("color", "text_color"):
+            if not HEX_RE.match(str(p.get(key, ""))):
+                p[key] = style[key]
+        if "name_key" in style:
+            p.setdefault("name_key", style["name_key"])
+        seen.add(p["id"])
+        platforms.append(p)
+    if not platforms:
+        platforms = [dict(p) for p in DEFAULT_PLATFORMS]
+    return platforms, error
+
+
+def platform_from_script(script_name):
+    """Ancien format (avant le lot 2) : retrouve la plateforme d'après le nom du .bat."""
+    stem = Path(script_name or "").stem.lower()
+    for prefix, pid in (("twitch", "twitch"), ("kick", "kick"), ("youtube", "youtube"), ("yt", "youtube"),
+                        ("steam", "steamtv"), ("dailymotion", "dailymotion")):
+        if stem.startswith(prefix):
+            return pid
+    return None
+
+
+def list_scripts(folder):
+    try:
+        return sorted((f for f in os.listdir(folder) if f.lower().endswith(SCRIPT_EXTENSIONS)), key=str.lower)
+    except OSError:
+        return []
+
+
+# ---------------------
+# Validation des entrées
+# ---------------------
+class InputError(Exception):
+    def __init__(self, key):
+        super().__init__(key)
+        self.key = key
+
+
+CHANNEL_RE = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
+VIDEO_ID_RE = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
+YOUTUBE_ID_RE = re.compile(r"^[A-Za-z0-9_-]{6,20}$")
+URL_RE = re.compile(r"^https?://[^\s\"'<>]{3,2000}$", re.IGNORECASE)
+QUALITY_RE = re.compile(r"^[A-Za-z0-9_+,-]{1,100}$")
+SCRIPT_ARG_RE = re.compile(r"^[A-Za-z0-9_.-]{1,200}$")
+
+
+def _host_matches(url, hosts):
+    host = urlparse(url).netloc.lower().split(":")[0]
+    return any(host == h or host.endswith("." + h) for h in hosts)
+
+
+def _as_url(text, hosts):
+    """Transforme 'twitch.tv/xxx' en URL complète ; renvoie None si ce n'est pas une URL."""
+    if "://" in text:
+        return text
+    low = text.lower()
+    if any(low.startswith(h) or low.startswith("www." + h) or low.startswith("m." + h) for h in hosts):
+        return "https://" + text
+    return None
+
+
+def _youtube_id(url):
+    parsed = urlparse(url)
+    if parsed.netloc.lower().endswith("youtu.be"):
+        return parsed.path.strip("/").split("/")[0]
+    query = parse_qs(parsed.query)
+    if "v" in query:
+        return query["v"][0]
+    parts = [p for p in parsed.path.split("/") if p]
+    if len(parts) >= 2 and parts[0] in ("shorts", "live", "embed"):
+        return parts[1]
+    return ""
+
+
+def resolve_target(platform, raw):
+    """Renvoie (url à donner à Streamlink, valeur à garder dans l'historique).
+    Lève InputError si la saisie est vide ou invalide."""
+    kind = platform["input"]
+    hosts = platform.get("hosts", [])
+    text = (raw or "").strip()
+
+    if kind == "none":
+        return platform["url"], platform.get("history_name") or platform["name"]
+    if not text:
+        raise InputError("err_empty")
+    if kind == "url":
+        if not URL_RE.match(text):
+            raise InputError("err_url")
+        return text, text
+
+    full = _as_url(text, hosts)
+    if full and not URL_RE.match(full):
+        raise InputError("err_url")
+
+    if kind == "youtube":
+        arg = _youtube_id(full) if full else re.split(r"[&?#]", text, maxsplit=1)[0]
+        valid = bool(YOUTUBE_ID_RE.match(arg))
+        error = "err_youtube"
+    elif kind == "video":
+        if full:
+            parts = [p for p in urlparse(full).path.split("/") if p]
+            arg = parts[parts.index("video") + 1] if "video" in parts[:-1] else (parts[-1] if parts else "")
+        else:
+            arg = text
+        valid = bool(VIDEO_ID_RE.match(arg))
+        error = "err_video"
+    else:  # channel
+        parts = [p for p in urlparse(full).path.split("/") if p] if full else [text]
+        arg = parts[0] if len(parts) == 1 else ""
+        valid = bool(CHANNEL_RE.match(arg))
+        error = "err_channel"
+
+    if valid:
+        return platform["url"].replace("{arg}", arg), arg
+    if full and _host_matches(full, hosts) and urlparse(full).path.strip("/"):
+        return full, full
+    raise InputError(error)
+
+
+def detect_platform_in_text(platforms, text):
+    """Si le texte est un lien, renvoie l'id de la plateforme correspondante (ou du lien direct)."""
+    text = (text or "").strip()
+    if not text:
+        return None
+    for p in platforms:
+        hosts = p.get("hosts") or []
+        if p["input"] == "url" or not hosts:
+            continue
+        full = _as_url(text, hosts)
+        if full and _host_matches(full, hosts):
+            return p["id"]
+    if URL_RE.match(text):
+        generic = next((p for p in platforms if p["input"] == "url"), None)
+        return generic["id"] if generic else None
+    return None
+
+
+def build_script_command(path, arg):
+    """Commande pour un script personnalisé (liste, sans shell=True)."""
+    path = str(path)
+    args = [arg] if arg else []
+    ext = Path(path).suffix.lower()
+    if ext in (".bat", ".cmd"):
+        return ["cmd", "/c", path, *args]
+    if ext == ".ps1":
+        return ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", path, *args]
+    if ext == ".py":
+        python = (shutil.which("py") or shutil.which("python")) if FROZEN else sys.executable
+        return [python, path, *args] if python else None
+    if ext == ".exe":
+        return [path, *args]
+    return None  # .lnk : ouvert via os.startfile, sans argument
+
+
+def find_executable(candidates):
+    for c in candidates:
+        if not c:
+            continue
+        found = shutil.which(c)
+        if found:
+            return found
+        if os.path.isfile(c):
+            return c
+    return None
+
+
+def find_streamlink(configured=""):
+    if configured:
+        return configured if os.path.isfile(configured) or shutil.which(configured) else None
+    return find_executable(STREAMLINK_CANDIDATES)
+
+
+def find_player(player):
+    return find_executable(PLAYER_CANDIDATES.get(player, []))
+
+
+def player_options(cfg):
+    """Options --player / --player-args. Renvoie (options, joueur introuvable ou None)."""
+    opts, missing = [], None
+    player = cfg.get("player", "default")
+    if player != "default":
+        path = cfg.get("player_path") or find_player(player)
+        if path:
+            opts += ["--player", path]
+        else:
+            missing = player
+    args = (cfg.get("player_args") or "").strip()
+    if args:
+        opts += ["--player-args", args]
+    return opts, missing
+
+
+# ---------------------
+# Historique et favoris
+# ---------------------
+def target_key(entry):
+    """Clé de plateforme (ou de script) d'une entrée d'historique/favori."""
+    if entry.get("platform"):
+        return entry["platform"]
+    script = entry.get("script")
+    if script:
+        return platform_from_script(script) or ("script:" + script.lower())
+    return None
+
+
+def now_str():
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
+class Store:
+    def __init__(self):
+        DATA_FOLDER.mkdir(parents=True, exist_ok=True)
+        h = load_json(HISTORY_FILE, {"history": []})
+        f = load_json(FAV_FILE, {"favorites": []})
+        self.history = [e for e in (h.get("history") if isinstance(h, dict) else []) or [] if isinstance(e, dict)]
+        self.favorites = [e for e in (f.get("favorites") if isinstance(f, dict) else []) or [] if isinstance(e, dict)]
+        self._migrate_favorites()
+
+    def _migrate_favorites(self):
+        """Anciens favoris sans plateforme : on la retrouve dans l'historique, sinon Twitch (comportement d'avant)."""
+        changed = False
+        for fav in self.favorites:
+            if fav.get("platform") or fav.get("script"):
+                continue
+            key = next((target_key(e) for e in self.history
+                        if e.get("channel") == fav.get("channel") and target_key(e)
+                        and not target_key(e).startswith("script:")), None)
+            fav["platform"] = key or "twitch"
+            changed = True
+        if changed:
+            self.save_favorites()
+
+    def save_history(self):
+        save_json(HISTORY_FILE, {"history": self.history})
+
+    def save_favorites(self):
+        save_json(FAV_FILE, {"favorites": self.favorites})
+
+    def add_history(self, entry):
+        entry = dict(entry, date=now_str())
+        self.history.insert(0, entry)
+        del self.history[HISTORY_LIMIT:]
+        self.save_history()
+        return entry
+
+    def remove_history(self, entry):
+        if entry in self.history:
+            self.history.remove(entry)
+            self.save_history()
+
+    def clear_history(self):
+        self.history = []
+        self.save_history()
+
+    def recents(self, count):
+        """Dernières entrées, sans doublon (même chaîne sur la même plateforme)."""
+        seen, out = set(), []
+        for e in self.history:
+            key = (e.get("channel", ""), target_key(e))
+            if key in seen:
+                continue
+            seen.add(key)
+            out.append(e)
+            if len(out) >= count:
+                break
+        return out
+
+    def is_favorite(self, entry):
+        key = (entry.get("channel"), target_key(entry))
+        return any((f.get("channel"), target_key(f)) == key for f in self.favorites)
+
+    def add_favorite(self, entry):
+        if self.is_favorite(entry):
+            return None
+        entry = dict(entry, added=now_str())
+        self.favorites.insert(0, entry)
+        self.save_favorites()
+        return entry
+
+    def remove_favorite(self, entry):
+        if entry in self.favorites:
+            index = self.favorites.index(entry)
+            self.favorites.remove(entry)
+            self.save_favorites()
+            return index
+        return None
+
+    def restore_favorite(self, entry, index):
+        self.favorites.insert(max(0, min(index, len(self.favorites))), entry)
+        self.save_favorites()
+
+    def suggestions(self, text, limit=5):
+        """Favoris puis historique dont le nom contient le texte (le début d'abord)."""
+        q = (text or "").strip().lower()
+        if not q:
+            return []
+        out, seen = [], set()
+        for source, items in (("favorite", self.favorites), ("history", self.history)):
+            ranked = sorted((e for e in items if q in (e.get("channel") or "").lower()),
+                            key=lambda e: not (e.get("channel") or "").lower().startswith(q))
+            for e in ranked:
+                key = (e.get("channel"), target_key(e))
+                if key in seen or (e.get("channel") or "").lower() == q:
+                    continue
+                seen.add(key)
+                out.append((source, e))
+                if len(out) >= limit:
+                    return out
+        return out
+
+
+# ---------------------
+# Streamlink est-il à jour ?
+# ---------------------
+PYPI_URL = "https://pypi.org/pypi/streamlink/json"
+WINDOWS_BUILDS_URL = "https://github.com/streamlink/windows-builds/releases/latest"
+PIP_UPGRADE_CMD = "python -m pip install --upgrade streamlink"
+VERSION_RE = re.compile(r"(\d+)\.(\d+)(?:\.(\d+))?")
+
+
+def parse_version(text):
+    """'streamlink 7.1.3' / '7.1.3-1' / '8.0.0+12.gabc' -> (7, 1, 3). None si introuvable."""
+    m = VERSION_RE.search(text or "")
+    if not m:
+        return None
+    return tuple(int(x or 0) for x in m.groups())
+
+
+def version_text(text):
+    v = parse_version(text)
+    return ".".join(map(str, v)) if v else None
+
+
+def streamlink_version(path, timeout=20):
+    """Version installée (ex. '7.1.3'), ou None si Streamlink ne répond pas."""
+    flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+    out = subprocess.run([path, "--version"], capture_output=True, text=True, encoding="utf-8", errors="replace",
+                         timeout=timeout, creationflags=flags,
+                         env=dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1"))
+    return version_text((out.stdout or "") + " " + (out.stderr or ""))
+
+
+def _http_get_json(url, timeout):
+    import urllib.request  # chargé seulement au besoin
+    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        return json.loads(resp.read().decode("utf-8"))
+
+
+def latest_streamlink_version(timeout=8):
+    """Dernière version stable publiée (PyPI, source officielle des versions de Streamlink)."""
+    data = _http_get_json(PYPI_URL, timeout)
+    return version_text(((data or {}).get("info") or {}).get("version"))
+
+
+def install_kind(path):
+    """'windows' pour l'installateur officiel (…\\Streamlink\\bin\\streamlink.exe), sinon 'pip'."""
+    p = (path or "").replace("/", "\\").lower()
+    return "windows" if "\\streamlink\\bin\\" in p or p.endswith("\\streamlink\\bin") else "pip"
+
+
+def check_streamlink_update(streamlink_path=""):
+    """Renvoie {path, installed, latest, update, kind, error} ; 'update' vaut None si on ne peut pas conclure."""
+    path = find_streamlink(streamlink_path)
+    result = {"path": path, "installed": None, "latest": None, "update": None, "kind": install_kind(path),
+              "error": None}
+    if not path:
+        result["error"] = "missing"
+        return result
+    try:
+        result["installed"] = streamlink_version(path)
+    except Exception:
+        result["installed"] = None
+    try:
+        result["latest"] = latest_streamlink_version()
+    except Exception:
+        result["error"] = "network"
+    if result["installed"] and result["latest"]:
+        result["update"] = parse_version(result["latest"]) > parse_version(result["installed"])
+    elif not result["error"]:
+        result["error"] = "version"
+    return result
+
+
+# ---------------------
+# Qui est en direct ?
+# ---------------------
+TWITCH_GQL_URL = "https://gql.twitch.tv/gql"
+TWITCH_CLIENT_ID = "kimne78kx3ncx6brgo4mv6wki5h1ko"  # identifiant public du site web Twitch (utilisé aussi par Streamlink)
+TWITCH_LOGIN_RE = re.compile(r"^[A-Za-z0-9_]{1,25}$")
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) StreamlinkLauncher"
+
+
+def live_method(platform):
+    """'twitch', 'streamlink' ou 'none'."""
+    method = platform.get("live_check") or LIVE_METHODS.get(platform["id"], "none")
+    return method if method in ("twitch", "streamlink") else "none"
+
+
+def _http_json(url, payload, headers, timeout):
+    import urllib.request  # chargé seulement au besoin (économise la mémoire au démarrage)
+    req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers=headers, method="POST")
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        return json.loads(resp.read().decode("utf-8"))
+
+
+def twitch_live(logins, timeout=8):
+    """Une seule requête pour toutes les chaînes Twitch : {login: info}."""
+    logins = sorted({l.lower() for l in logins if TWITCH_LOGIN_RE.match(l or "")})
+    result = {}
+    query = ("query($logins:[String!]){users(logins:$logins){login stream{title viewersCount "
+             "game{displayName}}}}")
+    for i in range(0, len(logins), 100):
+        chunk = logins[i:i + 100]
+        data = _http_json(TWITCH_GQL_URL, {"query": query, "variables": {"logins": chunk}},
+                          {"Client-ID": TWITCH_CLIENT_ID, "Content-Type": "application/json",
+                           "User-Agent": USER_AGENT}, timeout)
+        users = ((data or {}).get("data") or {}).get("users")
+        if users is None:
+            raise ValueError("réponse Twitch inattendue")
+        found = {}
+        for u in users:
+            if u and u.get("login"):
+                s = u.get("stream")
+                found[u["login"].lower()] = {
+                    "live": bool(s),
+                    "title": (s or {}).get("title"),
+                    "game": ((s or {}).get("game") or {}).get("displayName"),
+                    "viewers": (s or {}).get("viewersCount"),
+                }
+        for login in chunk:
+            result[login] = found.get(login, {"live": False, "title": None, "game": None, "viewers": None})
+    return result
+
+
+def streamlink_live(streamlink, url, timeout=30):
+    """Vérifie via 'streamlink --json URL'. Renvoie info, ou None si inconnu (plugin absent, erreur réseau…)."""
+    flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+    out = subprocess.run([streamlink, "--json", url], capture_output=True, text=True, encoding="utf-8",
+                         errors="replace", timeout=timeout, creationflags=flags,
+                         env=dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1"))
+    try:
+        data = json.loads(out.stdout or "{}")
+    except ValueError:
+        return None
+    if data.get("streams"):
+        meta = data.get("metadata") or {}
+        return {"live": True, "title": meta.get("title"), "game": meta.get("category"), "viewers": None}
+    error = (data.get("error") or "").lower()
+    if "no playable streams" in error:
+        return {"live": False, "title": None, "game": None, "viewers": None}
+    return None
+
+
+def check_live(entries, platforms, streamlink_path=""):
+    """entries : [(chaîne, id_plateforme)]. Renvoie {(chaîne en minuscules, id): info ou None}."""
+    by_id = {p["id"]: p for p in platforms}
+    results = {}
+    twitch = [(ch, pid) for ch, pid in entries if pid in by_id and live_method(by_id[pid]) == "twitch"]
+    if twitch:
+        try:
+            states = twitch_live([ch for ch, _ in twitch])
+            for ch, pid in twitch:
+                results[(ch.lower(), pid)] = states.get(ch.lower())
+        except Exception:
+            for ch, pid in twitch:
+                results[(ch.lower(), pid)] = None
+    others = [(ch, pid) for ch, pid in entries if pid in by_id and live_method(by_id[pid]) == "streamlink"]
+    streamlink = find_streamlink(streamlink_path) if others else None
+    for ch, pid in others:
+        info = None
+        if streamlink:
+            try:
+                url, _ = resolve_target(by_id[pid], ch)
+                info = streamlink_live(streamlink, url)
+            except Exception:
+                info = None
+        results[(ch.lower(), pid)] = info
+    return results
+
+
+# ---------------------
+# Streams en cours
+# ---------------------
+class StreamManager:
+    """Lance Streamlink, lit sa sortie dans des threads et la transmet via une file."""
+
+    def __init__(self):
+        self.streams = []
+        self.events = queue.Queue()
+
+    def start(self, command, info):
+        env = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1")
+        flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+        proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                stdin=subprocess.DEVNULL, text=True, encoding="utf-8", errors="replace",
+                                env=env, creationflags=flags)
+        stream = dict(info, proc=proc, started=datetime.now())
+        self.streams.append(stream)
+        threading.Thread(target=self._read, args=(stream,), daemon=True).start()
+        return stream
+
+    def _read(self, stream):
+        proc = stream["proc"]
+        try:
+            for line in proc.stdout:
+                line = line.rstrip()
+                if line:
+                    self.events.put(("line", stream, line))
+        except Exception:
+            pass
+        self.events.put(("end", stream, proc.wait()))
+
+    def poll(self):
+        out = []
+        try:
+            while True:
+                event = self.events.get_nowait()
+                if event[0] == "end" and event[1] in self.streams:
+                    self.streams.remove(event[1])
+                out.append(event)
+        except queue.Empty:
+            pass
+        return out
+
+    def running(self):
+        return [s for s in self.streams if s["proc"].poll() is None]
+
+    def busy(self):
+        return bool(self.streams) or not self.events.empty()
+
+    def stop(self, stream):
+        try:
+            stream["proc"].terminate()
+        except Exception:
+            pass
+
+    def stop_all(self):
+        for s in list(self.streams):
+            self.stop(s)

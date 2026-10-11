@@ -1,0 +1,286 @@
+# Changelog
+
+**[English](#english) · [Français](#français)**
+
+All notable changes to this project are documented in this file.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## English
+
+## [Unreleased]
+
+### Planned
+- Viewing statistics (time per channel, peak hours).
+
+## [1.0.1] - 2026-10-11
+
+### Fixed
+- **The global shortcut crashed the application on Windows.** The tray/shortcut window called Tkinter from inside Windows message processing, which corrupted Python's internal state ("PyEval_RestoreThread: GIL is released"). With `pythonw` or the `.exe`, the app closed silently. Clicking the tray icon triggered the same crash. Windows events are now queued and handled from the Tk event loop.
+- **Mini mode never appeared on Windows.** It bound a Linux-only key name (`ISO_Left_Tab`), which raised an error halfway through opening the window.
+- Mini mode could close immediately when Windows refused to bring it to the foreground. It is now forced to the foreground, and it no longer closes before it has received focus.
+- Translation: a `{key}` placeholder conflicted with a parameter name of the translation function.
+
+### Added
+- Choice of global shortcut: <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd>, <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Space</kbd>, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Space</kbd>, <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> or <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>L</kbd>.
+- Shortcut status in the settings (active, or already used by another application), plus a warning when Windows refuses it (error 1409).
+- Diagnostics in the log drawer: shortcut registered, and each shortcut press received.
+
+### Changed
+- Pressing the shortcut while the mini bar is open but not focused brings it back instead of closing it.
+
+## [1.0.0] - 2026-10-11
+
+### Added
+- Standalone Windows executable `Streamlink Launcher.exe`: a single file, no console, no Python required. Built with PyInstaller, with an embedded icon and version information.
+- `packaging/build_exe.bat` script to rebuild the executable.
+- Bilingual `README.md` (English and French) with screenshots.
+
+### Changed
+- In the packaged version, user data (`config.json`, `platforms.json`, `streams/`) stays next to the `.exe`, and translations and the icon are embedded. A `lang/` folder next to the `.exe` takes precedence over the embedded translations.
+- The *Start with Windows* entry is rewritten at each start-up, so it always points to the version actually in use (`.py` or `.exe`).
+
+## [0.7.0] - 2026-10-11
+
+### Added
+- Streamlink update check: compares the installed version (`streamlink --version`) with the latest version published on PyPI.
+- Context-aware Streamlink card in the settings: *up to date*, *update available* (with an **Update** button), *not found* (with an **Install** button).
+- **Update** button: opens the installer download page (Windows install) or copies `python -m pip install --upgrade streamlink` to the clipboard (pip install).
+- *Check for updates at start-up* option, enabled by default, with an orange badge on the settings icon when an update is available.
+
+### Fixed
+- The Streamlink card stayed empty when the settings panel opened.
+
+## [0.6.0] - 2026-10-11
+
+### Added
+- **Mini mode**: a floating Spotlight-style bar opened with a global shortcut. It shows live favorites first, then suggestions as you type. <kbd>Tab</kbd> changes the platform and <kbd>Enter</kbd> launches.
+- **Notification area icon**: closing the window minimizes it to the tray, with streams and live checks still running. The right-click menu offers live favorites, mini mode and *Quit*.
+- Clickable live notifications attached to the tray icon (a click launches the stream).
+- *Start with Windows* option, which starts minimized (`--tray`).
+- Single instance: launching the app again shows the existing window.
+- Multi-size application icon (`app.ico`).
+
+### Fixed
+- The platform pill in mini mode was clipped.
+
+## [0.5.0] - 2026-10-11
+
+### Added
+- **Live status for favorites**: *Live* / *Offline* on cards, live favorites shown first, game and title in the favorites panel.
+- Twitch: a single batched request for all Twitch favorites. Kick: check through `streamlink --json`. The method is set per platform in `platforms.json` (`live_check`).
+- Notifications when a favorite goes live: inside the app (with a **Launch** button), as a Windows notification, and by flashing the taskbar button.
+- *Live* settings: on/off, check frequency (2 to 30 min), Windows notifications.
+
+### Changed
+- At start-up, a single discreet summary is shown instead of one notification per live favorite.
+- A secondary notification never hides an error that is still displayed.
+- The web module is loaded only when it is first needed (about 5 MB less memory at start-up).
+
+## [0.4.0] - 2026-10-11
+
+### Added
+- **Completely redesigned interface**, still pure Tkinter with no dependency:
+  - a smart search field that detects the platform when a link is pasted, with suggestions from favorites and history;
+  - platform pills with an accent color per platform (button, field, window border);
+  - favorite cards (right-click menu), recent streams, and a log drawer with a **Stop** button per stream;
+  - non-blocking notifications with an **Undo** action;
+  - side panels for Settings, History and Favorites.
+- Light, dark or **automatic** theme (follows Windows), dark title bar and rounded corners on Windows 11, sharp rendering at 125/150 % scaling.
+- Windows icon font (Segoe Fluent Icons / MDL2), with drawn icons as a fallback.
+- Code split into modules (`core`, `theme`, `gfx`, `widgets`, `app`).
+
+### Changed
+- Old favorites without a platform get their platform from the history (Twitch by default).
+- Stopping a stream manually is logged as *stopped* instead of an error code.
+
+### Fixed
+- Infinite redraw loop in a field with a badge.
+- `Canvas.lift()` moved drawn items instead of the widget.
+
+## [0.3.0] - 2026-10-11
+
+### Added
+- `platforms.json`: platforms defined in a file (Twitch, Kick, YouTube, **Dailymotion**, Steam TV, **Direct link**). Streamlink is called directly, so the `.bat` files are no longer needed.
+- Streamlink output shown in the application log.
+- Quality selection, remembered per platform, including fallback lists.
+- Video player selection (default, VLC, mpv, PotPlayer, custom) with automatic path detection and player arguments.
+- **French and English** interface (`lang/fr.json`, `lang/en.json`), using the Windows language by default.
+- *Settings* tab: language, theme, Streamlink path with a **Test** button, player, custom scripts.
+
+### Changed
+- Custom `.bat` scripts are still available as an option (*Show .bat scripts*).
+- The application asks for confirmation before quitting while streams are running.
+
+## [0.2.0] - 2026-10-11
+
+### Added
+- Favorites remember their platform.
+- The input label and field adapt to the selected script (Twitch channel, YouTube video ID, nothing for Steam TV).
+- Pasted links are accepted (`twitch.tv/…`, `youtube.com/watch?v=…`, `youtu.be/…`).
+- `config.json` remembers the selected folder.
+
+### Changed
+- Paths are portable: the hard-coded folder `C:\Users\…\streams` was removed, and the app uses its own folder.
+
+### Security
+- Scripts are launched **without `shell=True`**, and user input is validated, which prevents command injection through `&`, `|`, `%`…
+
+### Fixed
+- Old YouTube history entries (`ID&list=…`) are cleaned up when relaunched.
+
+## [0.1.0] - 2025-10-16
+
+### Added
+- First version: a Tkinter window that lists the `.bat` scripts in a folder (Twitch, Kick, YouTube, Steam TV) and runs them with a channel name.
+- Launch history (200 entries) and favorites.
+- Dark mode.
+
+> The date of 0.1.0 is the oldest date found in the application data, not a release date.
+
+---
+
+## Français
+
+## [Non publié]
+
+### Prévu
+- Statistiques de visionnage (temps par chaîne, heures de pointe).
+
+## [1.0.1] - 2026-10-11
+
+### Corrigé
+- **Le raccourci global faisait planter l'application sous Windows.** La fenêtre de l'icône et du raccourci appelait Tkinter pendant le traitement des messages Windows, ce qui corrompait l'état interne de Python (« PyEval_RestoreThread: GIL is released »). Avec `pythonw` ou l'`.exe`, l'application se fermait sans message. Le clic sur l'icône de notification provoquait le même plantage. Les événements Windows passent désormais par une file, traitée depuis la boucle Tk.
+- **Le mode mini ne s'affichait jamais sous Windows.** Il associait un nom de touche propre à Linux (`ISO_Left_Tab`), ce qui provoquait une erreur au milieu de l'ouverture de la fenêtre.
+- Le mode mini pouvait se refermer aussitôt quand Windows refusait de le mettre au premier plan. Il est maintenant mis au premier plan de force, et ne se ferme plus avant d'avoir reçu le focus.
+- Traduction : une variable `{key}` entrait en conflit avec un nom de paramètre de la fonction de traduction.
+
+### Ajouté
+- Choix du raccourci global : <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd>, <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Espace</kbd>, <kbd>Ctrl</kbd>+<kbd>Maj</kbd>+<kbd>Espace</kbd>, <kbd>Alt</kbd>+<kbd>Maj</kbd>+<kbd>S</kbd> ou <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>L</kbd>.
+- État du raccourci dans les Paramètres (actif, ou déjà utilisé par une autre application), et alerte quand Windows le refuse (erreur 1409).
+- Diagnostic dans le tiroir du journal : raccourci enregistré, et chaque appui reçu.
+
+### Modifié
+- Appuyer sur le raccourci quand la barre mini est ouverte mais sans le focus la ramène au premier plan au lieu de la fermer.
+
+## [1.0.0] - 2026-10-11
+
+### Ajouté
+- Exécutable Windows autonome `Streamlink Launcher.exe` : un seul fichier, sans console, sans Python à installer. Construit avec PyInstaller, avec l'icône et les informations de version intégrées.
+- Script `packaging/build_exe.bat` pour recompiler l'exécutable.
+- `README.md` bilingue (anglais et français) avec captures d'écran.
+
+### Modifié
+- Dans la version empaquetée, les données personnelles (`config.json`, `platforms.json`, `streams/`) restent à côté de l'`.exe`, et les traductions et l'icône sont intégrées. Un dossier `lang/` placé à côté de l'`.exe` est prioritaire sur les traductions intégrées.
+- L'entrée *Lancer au démarrage de Windows* est réécrite à chaque démarrage, pour pointer toujours vers la version utilisée (`.py` ou `.exe`).
+
+## [0.7.0] - 2026-10-11
+
+### Ajouté
+- Vérification des mises à jour de Streamlink : compare la version installée (`streamlink --version`) à la dernière version publiée sur PyPI.
+- Carte Streamlink contextuelle dans les Paramètres : *à jour*, *mise à jour disponible* (bouton **Mettre à jour**), *introuvable* (bouton **Installer**).
+- Bouton **Mettre à jour** : ouvre la page de téléchargement de l'installateur (installation Windows) ou copie `python -m pip install --upgrade streamlink` dans le presse-papiers (installation pip).
+- Option *Vérifier les mises à jour au démarrage*, activée par défaut, avec une pastille orange sur l'icône des Paramètres quand une mise à jour est disponible.
+
+### Corrigé
+- La carte Streamlink restait vide à l'ouverture des Paramètres.
+
+## [0.6.0] - 2026-10-11
+
+### Ajouté
+- **Mode mini** : barre flottante façon Spotlight, ouverte avec un raccourci global. Elle affiche d'abord les favoris en direct, puis des suggestions pendant la frappe. <kbd>Tab</kbd> change de plateforme, <kbd>Entrée</kbd> lance.
+- **Icône dans la zone de notification** : fermer la fenêtre la réduit à côté de l'horloge, sans arrêter les streams ni la surveillance des lives. Le menu clic droit propose les favoris en direct, le mode mini et *Quitter*.
+- Notifications de live cliquables, attachées à l'icône (un clic lance le stream).
+- Option *Lancer au démarrage de Windows*, qui démarre réduit (`--tray`).
+- Instance unique : relancer l'application affiche la fenêtre déjà ouverte.
+- Icône de l'application en plusieurs tailles (`app.ico`).
+
+### Corrigé
+- La pastille de plateforme du mode mini était rognée.
+
+## [0.5.0] - 2026-10-11
+
+### Ajouté
+- **Statut en direct des favoris** : *En direct* / *Hors ligne* sur les cartes, favoris en direct affichés en premier, jeu et titre dans le panneau Favoris.
+- Twitch : une seule requête groupée pour tous les favoris Twitch. Kick : vérification via `streamlink --json`. La méthode se règle par plateforme dans `platforms.json` (`live_check`).
+- Notifications quand un favori commence un live : dans l'application (avec un bouton **Lancer**), par une notification Windows, et en faisant clignoter le bouton dans la barre des tâches.
+- Réglages *En direct* : activation, fréquence de vérification (2 à 30 min), notifications Windows.
+
+### Modifié
+- Au démarrage, un seul résumé discret s'affiche au lieu d'une notification par favori en direct.
+- Une notification secondaire ne cache jamais une erreur encore affichée.
+- Le module web n'est chargé qu'à sa première utilisation (environ 5 Mo de mémoire en moins au démarrage).
+
+## [0.4.0] - 2026-10-11
+
+### Ajouté
+- **Interface entièrement repensée**, toujours en Tkinter pur et sans dépendance :
+  - champ de recherche intelligent qui reconnaît la plateforme d'un lien collé, avec des suggestions tirées des favoris et de l'historique ;
+  - pastilles de plateforme, avec une couleur d'accent par plateforme (bouton, champ, bordure de fenêtre) ;
+  - cartes de favoris (menu clic droit), streams récents, et tiroir du journal avec un bouton **Arrêter** par stream ;
+  - notifications non bloquantes avec une action **Annuler** ;
+  - panneaux latéraux Paramètres, Historique et Favoris.
+- Thème clair, sombre ou **automatique** (suit Windows), barre de titre sombre et coins arrondis sous Windows 11, affichage net en mise à l'échelle 125/150 %.
+- Icônes issues de la police Windows (Segoe Fluent Icons / MDL2), avec des icônes dessinées en secours.
+- Code découpé en modules (`core`, `theme`, `gfx`, `widgets`, `app`).
+
+### Modifié
+- Les anciens favoris sans plateforme retrouvent leur plateforme grâce à l'historique (Twitch par défaut).
+- Un stream arrêté manuellement est noté *arrêté* dans le journal, au lieu d'un code d'erreur.
+
+### Corrigé
+- Boucle de redessin infinie dans un champ avec badge.
+- `Canvas.lift()` déplaçait les éléments dessinés au lieu du widget.
+
+## [0.3.0] - 2026-10-11
+
+### Ajouté
+- `platforms.json` : plateformes définies dans un fichier (Twitch, Kick, YouTube, **Dailymotion**, Steam TV, **Lien direct**). Streamlink est appelé directement, les `.bat` ne sont plus nécessaires.
+- Sortie de Streamlink affichée dans le journal de l'application.
+- Choix de la qualité, mémorisé par plateforme, listes de secours comprises.
+- Choix du lecteur vidéo (par défaut, VLC, mpv, PotPlayer, personnalisé), avec détection automatique du chemin et arguments du lecteur.
+- Interface **en français et en anglais** (`lang/fr.json`, `lang/en.json`), dans la langue de Windows par défaut.
+- Onglet *Paramètres* : langue, thème, chemin de Streamlink avec un bouton **Tester**, lecteur, scripts personnalisés.
+
+### Modifié
+- Les scripts `.bat` personnels restent disponibles en option (*Afficher les scripts .bat*).
+- L'application demande confirmation avant de quitter si des streams sont en cours.
+
+## [0.2.0] - 2026-10-11
+
+### Ajouté
+- Les favoris mémorisent leur plateforme.
+- Le libellé et le champ de saisie s'adaptent au script choisi (chaîne Twitch, ID de vidéo YouTube, rien pour Steam TV).
+- Les liens collés sont acceptés (`twitch.tv/…`, `youtube.com/watch?v=…`, `youtu.be/…`).
+- `config.json` mémorise le dossier choisi.
+
+### Modifié
+- Chemins portables : le dossier codé en dur `C:\Users\…\streams` est supprimé, l'application utilise son propre dossier.
+
+### Sécurité
+- Les scripts sont lancés **sans `shell=True`**, et la saisie est validée, ce qui empêche l'injection de commandes via `&`, `|`, `%`…
+
+### Corrigé
+- Les anciennes entrées YouTube de l'historique (`ID&list=…`) sont nettoyées à la relance.
+
+## [0.1.0] - 2025-10-16
+
+### Ajouté
+- Première version : une fenêtre Tkinter qui liste les scripts `.bat` d'un dossier (Twitch, Kick, YouTube, Steam TV) et les lance avec un nom de chaîne.
+- Historique des lancements (200 entrées) et favoris.
+- Mode sombre.
+
+> La date de la 0.1.0 est la plus ancienne date trouvée dans les données de l'application, pas une date de publication.
+
+[Unreleased]: https://github.com/<your-account>/streamlink-launcher/compare/v1.0.1...HEAD
+[Non publié]: https://github.com/<your-account>/streamlink-launcher/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/<your-account>/streamlink-launcher/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/<your-account>/streamlink-launcher/compare/v0.7.0...v1.0.0
+[0.7.0]: https://github.com/<your-account>/streamlink-launcher/compare/v0.6.0...v0.7.0
+[0.6.0]: https://github.com/<your-account>/streamlink-launcher/compare/v0.5.0...v0.6.0
+[0.5.0]: https://github.com/<your-account>/streamlink-launcher/compare/v0.4.0...v0.5.0
+[0.4.0]: https://github.com/<your-account>/streamlink-launcher/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/<your-account>/streamlink-launcher/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/<your-account>/streamlink-launcher/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/<your-account>/streamlink-launcher/releases/tag/v0.1.0
