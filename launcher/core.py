@@ -4,6 +4,7 @@ import re
 import sys
 import json
 import queue
+import logging
 import shutil
 import locale
 import threading
@@ -19,10 +20,38 @@ from urllib.parse import urlparse, parse_qs
 FROZEN = bool(getattr(sys, "frozen", False))
 BASE_DIR = Path(sys.executable).resolve().parent if FROZEN else Path(__file__).resolve().parent.parent
 RES_DIR = Path(getattr(sys, "_MEIPASS", BASE_DIR))
-CONFIG_FILE = BASE_DIR / "config.json"
-PLATFORMS_FILE = BASE_DIR / "platforms.json"
+
+
+def _is_writable(folder):
+    """Vrai si l'on peut créer un fichier dans ce dossier (faux p. ex. dans C:\\Program Files)."""
+    probe = Path(folder) / f".write_test_{os.getpid()}"
+    try:
+        probe.write_bytes(b"")
+        probe.unlink()
+        return True
+    except OSError:
+        return False
+
+
+def _user_data_dir():
+    """Dossier de repli pour les données quand le dossier du lanceur est protégé en écriture."""
+    if os.name == "nt":
+        root = os.environ.get("APPDATA") or str(Path.home() / "AppData" / "Roaming")
+        return Path(root) / "Streamlink Launcher"
+    return Path(os.environ.get("XDG_CONFIG_HOME") or Path.home() / ".config") / "streamlink-launcher"
+
+
+# Version portable par défaut : les données restent à côté du lanceur. Si ce dossier est en lecture seule,
+# elles vont dans %APPDATA%\Streamlink Launcher (au lieu de planter au démarrage).
+PORTABLE = _is_writable(BASE_DIR)
+DATA_ROOT = BASE_DIR if PORTABLE else _user_data_dir()
+CONFIG_FILE = DATA_ROOT / "config.json"
+# platforms.json livré à côté du lanceur reste prioritaire, même en lecture seule
+PLATFORMS_FILE = BASE_DIR / "platforms.json" if PORTABLE or (BASE_DIR / "platforms.json").exists() \
+    else DATA_ROOT / "platforms.json"
+LOG_FILE = DATA_ROOT / "launcher.log"
 LANG_DIR = BASE_DIR / "lang" if (BASE_DIR / "lang").is_dir() else RES_DIR / "lang"  # dossier lang/ modifiable prioritaire
-DEFAULT_FOLDER = BASE_DIR / "streams"
+DEFAULT_FOLDER = DATA_ROOT / "streams"
 DATA_FOLDER = DEFAULT_FOLDER
 HISTORY_FILE = DATA_FOLDER / "history.json"
 FAV_FILE = DATA_FOLDER / "favorites.json"
@@ -113,25 +142,122 @@ STREAMLINK_CANDIDATES = [
 # ---------------------
 # JSON
 # ---------------------
-def load_json(path, default):
+# ---------------------
+# Journal des erreurs (launcher.log, à côté des données ; 2 × 512 Ko maximum)
+# ---------------------
+log = logging.getLogger("streamlink_launcher")
+log.addHandler(logging.NullHandler())
+_log_ready = False
+
+
+def setup_logging():
+    """Active l'écriture de launcher.log. Appelé une fois au démarrage ; sans effet si le dossier est inaccessible."""
+    global _log_ready
+    if _log_ready:
+        return
+    _log_ready = True
+    try:
+        from logging.handlers import RotatingFileHandler
+        LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+        handler = RotatingFileHandler(LOG_FILE, maxBytes=512 * 1024, backupCount=1, encoding="utf-8")
+        handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s", "%Y-%m-%d %H:%M:%S"))
+        log.addHandler(handler)
+        log.setLevel(logging.INFO)
+    except OSError:
+        pass
+
+
+# Problèmes de fichiers à signaler à l'interface : [(clé de traduction, {variables})]
+DATA_ISSUES = []
+_issue_handler = None
+
+
+def set_issue_handler(handler):
+    """L'interface s'inscrit ici pour être prévenue d'un nouveau problème (appelé dans le thread de Tk)."""
+    global _issue_handler
+    _issue_handler = handler
+
+
+def _add_issue(key, **kwargs):
+    issue = (key, kwargs)
+    if issue not in DATA_ISSUES:
+        DATA_ISSUES.append(issue)
+    if _issue_handler:
+        _issue_handler()
+
+
+# ---------------------
+# JSON
+# ---------------------
+def load_json(path, default, recover=False):
+    """Lit un fichier JSON. Absent ou illisible : renvoie default.
+    Avec recover=True (config, favoris, historique), un fichier illisible (fichier tronqué, coupure de courant…) :
+    le fichier est mis de côté en .corrupt, la sauvegarde .bak est utilisée si elle existe, et le problème
+    est signalé (DATA_ISSUES) au lieu d'être écrasé en silence au prochain enregistrement."""
+    path = Path(path)
     try:
         with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
-    except Exception:
+    except FileNotFoundError:
+        return default
+    except OSError as e:  # fichier verrouillé, droits… : on ne touche pas au fichier
+        log.warning("Lecture impossible de %s : %s", path, e)
+        return default
+    except ValueError as e:  # JSON invalide ou tronqué (UnicodeDecodeError compris)
+        log.warning("Fichier illisible %s : %s", path, e)
+        if not recover:
+            return default
+    # Fichier de données présent mais illisible
+    backup = path.with_name(path.name + ".bak")
+    corrupt = path.with_name(f"{path.name}.{datetime.now():%Y%m%d-%H%M%S}.corrupt")
+    try:
+        os.replace(path, corrupt)
+    except OSError as e:
+        log.warning("Impossible de mettre %s de côté : %s", path, e)
+        corrupt = None
+    try:
+        with open(backup, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        _add_issue("data_restored", file=path.name)
+        log.warning("%s restauré depuis %s", path.name, backup.name)
+        save_json(path, data)
+        return data
+    except (OSError, ValueError):
+        _add_issue("data_unreadable", file=path.name, saved=corrupt.name if corrupt else "-")
         return default
 
 
 def save_json(path, data):
+    """Écriture atomique : fichier temporaire puis remplacement. La version précédente est gardée en .bak.
+    Renvoie True si l'écriture a réussi."""
+    path = Path(path)
+    tmp = path.with_name(path.name + ".tmp")
     try:
-        with open(path, "w", encoding="utf-8") as f:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(tmp, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
-    except Exception as e:
-        print("Error saving JSON:", e)
+            f.flush()
+            os.fsync(f.fileno())
+        if path.exists():
+            try:
+                shutil.copy2(path, path.with_name(path.name + ".bak"))
+            except OSError as e:
+                log.warning("Sauvegarde .bak impossible pour %s : %s", path.name, e)
+        os.replace(tmp, path)
+        return True
+    except (OSError, TypeError, ValueError) as e:
+        log.error("Enregistrement impossible de %s : %s", path, e)
+        _add_issue("save_failed", file=path.name)
+        try:
+            tmp.unlink()
+        except OSError:
+            pass
+        return False
 
 
 def load_config():
     cfg = dict(DEFAULT_CONFIG)
-    saved = load_json(CONFIG_FILE, {})
+    saved = load_json(CONFIG_FILE, {}, recover=True)
     if isinstance(saved, dict):
         cfg.update(saved)
     cfg["qualities"] = dict(cfg.get("qualities") or {})
@@ -448,9 +574,12 @@ def now_str():
 
 class Store:
     def __init__(self):
-        DATA_FOLDER.mkdir(parents=True, exist_ok=True)
-        h = load_json(HISTORY_FILE, {"history": []})
-        f = load_json(FAV_FILE, {"favorites": []})
+        try:
+            DATA_FOLDER.mkdir(parents=True, exist_ok=True)
+        except OSError as e:  # dossier inaccessible : on démarre quand même, l'enregistrement le signalera
+            log.error("Dossier de données inaccessible %s : %s", DATA_FOLDER, e)
+        h = load_json(HISTORY_FILE, {"history": []}, recover=True)
+        f = load_json(FAV_FILE, {"favorites": []}, recover=True)
         self.history = [e for e in (h.get("history") if isinstance(h, dict) else []) or [] if isinstance(e, dict)]
         self.favorites = [e for e in (f.get("favorites") if isinstance(f, dict) else []) or [] if isinstance(e, dict)]
         self._migrate_favorites()
@@ -612,7 +741,8 @@ def check_streamlink_update(streamlink_path=""):
         result["installed"] = None
     try:
         result["latest"] = latest_streamlink_version()
-    except Exception:
+    except Exception as e:
+        log.warning("Vérification de mise à jour impossible : %s", e)
         result["error"] = "network"
     if result["installed"] and result["latest"]:
         result["update"] = parse_version(result["latest"]) > parse_version(result["installed"])
@@ -701,7 +831,8 @@ def check_live(entries, platforms, streamlink_path=""):
             states = twitch_live([ch for ch, _ in twitch])
             for ch, pid in twitch:
                 results[(ch.lower(), pid)] = states.get(ch.lower())
-        except Exception:
+        except Exception as e:
+            log.warning("Statut Twitch indisponible : %s", e)
             for ch, pid in twitch:
                 results[(ch.lower(), pid)] = None
     others = [(ch, pid) for ch, pid in entries if pid in by_id and live_method(by_id[pid]) == "streamlink"]
@@ -712,7 +843,8 @@ def check_live(entries, platforms, streamlink_path=""):
             try:
                 url, _ = resolve_target(by_id[pid], ch)
                 info = streamlink_live(streamlink, url)
-            except Exception:
+            except Exception as e:
+                log.warning("Statut de %s (%s) indisponible : %s", ch, pid, e)
                 info = None
         results[(ch.lower(), pid)] = info
     return results
@@ -746,8 +878,8 @@ class StreamManager:
                 line = line.rstrip()
                 if line:
                     self.events.put(("line", stream, line))
-        except Exception:
-            pass
+        except Exception as e:
+            log.warning("Lecture de la sortie de Streamlink interrompue : %s", e)
         self.events.put(("end", stream, proc.wait()))
 
     def poll(self):
@@ -771,8 +903,8 @@ class StreamManager:
     def stop(self, stream):
         try:
             stream["proc"].terminate()
-        except Exception:
-            pass
+        except Exception as e:
+            log.warning("Arrêt du stream impossible : %s", e)
 
     def stop_all(self):
         for s in list(self.streams):

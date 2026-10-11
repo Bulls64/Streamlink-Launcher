@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Tests (${{ matrix.os }}, Python ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        python: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Compile all modules
+        run: python -m compileall -q launcher slink_launcher.py
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+
+  release:
+    name: Build the .exe and publish the release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: tests
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check that the tag matches the version
+        shell: bash
+        run: |
+          VERSION=$(python -c "import launcher; print(launcher.__version__)")
+          if [ "v$VERSION" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match launcher.__version__ ($VERSION)"
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+      - name: Build
+        shell: cmd
+        run: packaging\build_exe.bat
+      - name: Rename the executable
+        shell: bash
+        run: mv "dist/Streamlink Launcher.exe" "dist/StreamlinkLauncher-$VERSION.exe"
+      - name: Release notes from CHANGELOG.md
+        shell: bash
+        run: python packaging/release_notes.py "$VERSION" > release_notes.md
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: Streamlink Launcher ${{ env.VERSION }}
+          body_path: release_notes.md
+          files: dist/StreamlinkLauncher-${{ env.VERSION }}.exe

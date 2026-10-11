@@ -168,7 +168,7 @@ class App(tk.Tk):
     def _restore_geometry(self):
         m = GEOMETRY_RE.match(self.cfg.get("geometry") or "")
         if m:
-            w, h, x, y = int(m.group(1)), int(m.group(2)), int(m.group(3)), int(m.group(4))
+            x, y = int(m.group(3)), int(m.group(4))
             if 0 <= x < self.winfo_screenwidth() - 100 and 0 <= y < self.winfo_screenheight() - 100:
                 self.geometry(self.cfg["geometry"])
                 return
@@ -1218,6 +1218,14 @@ class App(tk.Tk):
             Field(sec, self, self.v_folder, height=40, font=self.fonts.small, action_icon="folder",
                   action_command=self._browse_folder).pack(fill="x")
 
+            sec = self._section(b, t("settings_about"))
+            from . import __version__
+            tk.Label(sec, text=f"Streamlink Launcher {__version__}", font=self.fonts.body, bg=self.c.panel,
+                     fg=self.c.text, anchor="w").pack(anchor="w")
+            self._hint(sec, t("about_data", path=core.DATA_ROOT))
+            Button(sec, self, text=t("btn_open_data"), kind="link", font=self.fonts.small, pad=0, height=32,
+                   command=lambda: self.open_path(str(core.DATA_ROOT))).pack(anchor="w")
+
         def footer(fb):
             Button(fb, self, text=t("btn_edit_platforms"), kind="link", font=self.fonts.small, pad=0, height=40,
                    command=lambda: self.open_path(str(core.PLATFORMS_FILE))).pack(side="left")
@@ -1458,8 +1466,20 @@ class App(tk.Tk):
     # =====================================================
     # Démarrage et fermeture
     # =====================================================
+    def _report_data_issues(self):
+        """Affiche les problèmes de fichiers signalés par core (fichier endommagé, enregistrement impossible)."""
+        t = self.t
+        while core.DATA_ISSUES:
+            key, values = core.DATA_ISSUES.pop(0)
+            text = t(key, **values)
+            self.log(text, "err")
+            self.toast(text, "error", action=(t("action_show_log"), self.show_log), duration=7000)
+
     def _startup_checks(self):
         t = self.t
+        core.set_issue_handler(lambda: self.after(0, self._report_data_issues))
+        if not core.PORTABLE:
+            self.log(t("log_data_folder", path=core.DATA_ROOT), "warn")
         if self.platforms_error:
             self.log(t("log_platforms_error", error=self.platforms_error), "err")
             self.toast(t("toast_platforms_error"), "error", action=(t("action_show_log"), self.show_log))
@@ -1467,6 +1487,7 @@ class App(tk.Tk):
             self.log(t("log_no_streamlink", url=core.STREAMLINK_INSTALL_URL), "err")
             self.toast(t("toast_no_streamlink"), "error", action=(t("action_settings"), self.open_settings),
                        duration=6000)
+        self._report_data_issues()  # en dernier : un fichier endommagé est l'alerte la plus importante
 
     def _save_window_state(self):
         try:
@@ -1496,7 +1517,10 @@ class App(tk.Tk):
 
 
 def main():
+    from . import __version__
     from .theme import enable_dpi_awareness, set_app_id
+    core.setup_logging()
+    core.log.info("Démarrage de Streamlink Launcher %s (données : %s)", __version__, core.DATA_ROOT)
     if not wintray.acquire_single_instance():
         return  # déjà ouvert : sa fenêtre vient d'être affichée
     enable_dpi_awareness()

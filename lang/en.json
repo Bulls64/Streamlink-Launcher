@@ -188,5 +188,13 @@
   "log_hotkey_ok": "Global shortcut {key} active",
   "log_hotkey_failed": "Global shortcut {key} refused by Windows (code {code}): already used by another application?",
   "log_hotkey_received": "Shortcut {key} received",
-  "log_tray_failed": "Could not initialize the notification area and global shortcut"
+  "log_tray_failed": "Could not initialize the notification area and global shortcut",
+
+  "data_restored": "{file} was damaged: restored from its backup",
+  "data_unreadable": "{file} could not be read: set aside as {saved}",
+  "save_failed": "Could not save {file} (details in launcher.log)",
+  "log_data_folder": "The launcher folder is read-only: data is saved in {path}",
+  "settings_about": "About",
+  "about_data": "Data: {path}",
+  "btn_open_data": "Open the data folder"
 }

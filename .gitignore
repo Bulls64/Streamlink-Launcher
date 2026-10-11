@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+
+# Données personnelles du lanceur (créées au premier lancement)
+config.json
+streams/
+*.log
+*.bak
+*.corrupt
+
+# Compilation PyInstaller
+build/
+dist/
+*.spec
+
+# Binaires : publiés dans les Releases GitHub, pas dans Git
+*.exe
+*.zip
+CHANGELOG.pdf

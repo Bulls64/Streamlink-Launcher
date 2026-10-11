@@ -14,6 +14,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Planned
 - Viewing statistics (time per channel, peak hours).
 
+## [1.0.2] - 2026-10-11
+
+### Fixed
+- **The launcher no longer crashes at start-up in a read-only folder** (for example `C:\Program Files`). Data then goes to `%APPDATA%\Streamlink Launcher`, and the log drawer says so.
+- **Favorites, history and settings can no longer be lost silently.** Files are written atomically (temporary file, then replace), and the previous version is kept as `.bak`. A damaged file (power cut during a write) is set aside as `.corrupt` and restored from its backup, with an on-screen warning, instead of being overwritten by an empty list.
+- A failed save is now reported on screen instead of being ignored.
+
+### Added
+- `launcher.log` error log next to the data (2 × 512 KB maximum): network, live check, notification and file errors that used to be ignored.
+- *About* section in the settings: version number, data folder and a button to open it.
+- Unit tests (`tests/`) and a GitHub Actions workflow: tests on Windows and Linux at every push, and the `.exe` built and attached to the release at every `v*` tag.
+- MIT license.
+
+### Changed
+- Repository layout: the sources are at the root, so the README instructions and screenshots work. The `.exe` and the zip are published in the Releases only, no longer in Git.
+- `.bat` scripts are stored with Windows line endings (CRLF).
+
 ## [1.0.1] - 2026-10-11
 
 ### Fixed
@@ -30,7 +47,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 - Pressing the shortcut while the mini bar is open but not focused brings it back instead of closing it.
 
-## [1.0.0] - 2026-10-11
+## 1.0.0 - 2026-10-11
 
 ### Added
 - Standalone Windows executable `Streamlink Launcher.exe`: a single file, no console, no Python required. Built with PyInstaller, with an embedded icon and version information.
@@ -41,7 +58,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - In the packaged version, user data (`config.json`, `platforms.json`, `streams/`) stays next to the `.exe`, and translations and the icon are embedded. A `lang/` folder next to the `.exe` takes precedence over the embedded translations.
 - The *Start with Windows* entry is rewritten at each start-up, so it always points to the version actually in use (`.py` or `.exe`).
 
-## [0.7.0] - 2026-10-11
+## 0.7.0 - 2026-10-11
 
 ### Added
 - Streamlink update check: compares the installed version (`streamlink --version`) with the latest version published on PyPI.
@@ -52,7 +69,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Fixed
 - The Streamlink card stayed empty when the settings panel opened.
 
-## [0.6.0] - 2026-10-11
+## 0.6.0 - 2026-10-11
 
 ### Added
 - **Mini mode**: a floating Spotlight-style bar opened with a global shortcut. It shows live favorites first, then suggestions as you type. <kbd>Tab</kbd> changes the platform and <kbd>Enter</kbd> launches.
@@ -65,7 +82,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Fixed
 - The platform pill in mini mode was clipped.
 
-## [0.5.0] - 2026-10-11
+## 0.5.0 - 2026-10-11
 
 ### Added
 - **Live status for favorites**: *Live* / *Offline* on cards, live favorites shown first, game and title in the favorites panel.
@@ -78,7 +95,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - A secondary notification never hides an error that is still displayed.
 - The web module is loaded only when it is first needed (about 5 MB less memory at start-up).
 
-## [0.4.0] - 2026-10-11
+## 0.4.0 - 2026-10-11
 
 ### Added
 - **Completely redesigned interface**, still pure Tkinter with no dependency:
@@ -99,7 +116,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Infinite redraw loop in a field with a badge.
 - `Canvas.lift()` moved drawn items instead of the widget.
 
-## [0.3.0] - 2026-10-11
+## 0.3.0 - 2026-10-11
 
 ### Added
 - `platforms.json`: platforms defined in a file (Twitch, Kick, YouTube, **Dailymotion**, Steam TV, **Direct link**). Streamlink is called directly, so the `.bat` files are no longer needed.
@@ -113,7 +130,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Custom `.bat` scripts are still available as an option (*Show .bat scripts*).
 - The application asks for confirmation before quitting while streams are running.
 
-## [0.2.0] - 2026-10-11
+## 0.2.0 - 2026-10-11
 
 ### Added
 - Favorites remember their platform.
@@ -130,14 +147,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Fixed
 - Old YouTube history entries (`ID&list=…`) are cleaned up when relaunched.
 
-## [0.1.0] - 2025-10-16
+## 0.1.0 - 2025-10-16
 
 ### Added
 - First version: a Tkinter window that lists the `.bat` scripts in a folder (Twitch, Kick, YouTube, Steam TV) and runs them with a channel name.
 - Launch history (200 entries) and favorites.
 - Dark mode.
 
-> The date of 0.1.0 is the oldest date found in the application data, not a release date.
+> Versions 0.1.0 to 1.0.0 were never published on GitHub; 1.0.1 is the first release. The date of 0.1.0 is the oldest date found in the application data.
 
 ---
 
@@ -147,6 +164,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Prévu
 - Statistiques de visionnage (temps par chaîne, heures de pointe).
+
+## [1.0.2] - 2026-10-11
+
+### Corrigé
+- **Le lanceur ne plante plus au démarrage dans un dossier protégé en écriture** (par exemple `C:\Program Files`). Les données vont alors dans `%APPDATA%\Streamlink Launcher`, et le tiroir du journal l'indique.
+- **Favoris, historique et réglages ne peuvent plus être perdus sans prévenir.** Les fichiers sont écrits de façon atomique (fichier temporaire, puis remplacement), et la version précédente est gardée en `.bak`. Un fichier endommagé (coupure de courant pendant l'écriture) est mis de côté en `.corrupt` et restauré depuis sa sauvegarde, avec un avertissement à l'écran, au lieu d'être écrasé par une liste vide.
+- Un enregistrement qui échoue est désormais signalé à l'écran au lieu d'être ignoré.
+
+### Ajouté
+- Journal d'erreurs `launcher.log` à côté des données (2 × 512 Ko maximum) : erreurs réseau, de détection du direct, de notification et de fichiers, auparavant ignorées.
+- Section *À propos* dans les Paramètres : numéro de version, dossier des données et bouton pour l'ouvrir.
+- Tests unitaires (`tests/`) et workflow GitHub Actions : tests sous Windows et Linux à chaque push, et `.exe` compilé et joint à la release à chaque tag `v*`.
+- Licence MIT.
+
+### Modifié
+- Organisation du dépôt : les sources sont à la racine, les instructions et captures du README fonctionnent. L'`.exe` et le zip sont publiés uniquement dans les Releases, plus dans Git.
+- Les scripts `.bat` sont stockés avec les fins de ligne Windows (CRLF).
 
 ## [1.0.1] - 2026-10-11
 
@@ -164,7 +198,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Modifié
 - Appuyer sur le raccourci quand la barre mini est ouverte mais sans le focus la ramène au premier plan au lieu de la fermer.
 
-## [1.0.0] - 2026-10-11
+## 1.0.0 - 2026-10-11
 
 ### Ajouté
 - Exécutable Windows autonome `Streamlink Launcher.exe` : un seul fichier, sans console, sans Python à installer. Construit avec PyInstaller, avec l'icône et les informations de version intégrées.
@@ -175,7 +209,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Dans la version empaquetée, les données personnelles (`config.json`, `platforms.json`, `streams/`) restent à côté de l'`.exe`, et les traductions et l'icône sont intégrées. Un dossier `lang/` placé à côté de l'`.exe` est prioritaire sur les traductions intégrées.
 - L'entrée *Lancer au démarrage de Windows* est réécrite à chaque démarrage, pour pointer toujours vers la version utilisée (`.py` ou `.exe`).
 
-## [0.7.0] - 2026-10-11
+## 0.7.0 - 2026-10-11
 
 ### Ajouté
 - Vérification des mises à jour de Streamlink : compare la version installée (`streamlink --version`) à la dernière version publiée sur PyPI.
@@ -186,7 +220,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Corrigé
 - La carte Streamlink restait vide à l'ouverture des Paramètres.
 
-## [0.6.0] - 2026-10-11
+## 0.6.0 - 2026-10-11
 
 ### Ajouté
 - **Mode mini** : barre flottante façon Spotlight, ouverte avec un raccourci global. Elle affiche d'abord les favoris en direct, puis des suggestions pendant la frappe. <kbd>Tab</kbd> change de plateforme, <kbd>Entrée</kbd> lance.
@@ -199,7 +233,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Corrigé
 - La pastille de plateforme du mode mini était rognée.
 
-## [0.5.0] - 2026-10-11
+## 0.5.0 - 2026-10-11
 
 ### Ajouté
 - **Statut en direct des favoris** : *En direct* / *Hors ligne* sur les cartes, favoris en direct affichés en premier, jeu et titre dans le panneau Favoris.
@@ -212,7 +246,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Une notification secondaire ne cache jamais une erreur encore affichée.
 - Le module web n'est chargé qu'à sa première utilisation (environ 5 Mo de mémoire en moins au démarrage).
 
-## [0.4.0] - 2026-10-11
+## 0.4.0 - 2026-10-11
 
 ### Ajouté
 - **Interface entièrement repensée**, toujours en Tkinter pur et sans dépendance :
@@ -233,7 +267,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Boucle de redessin infinie dans un champ avec badge.
 - `Canvas.lift()` déplaçait les éléments dessinés au lieu du widget.
 
-## [0.3.0] - 2026-10-11
+## 0.3.0 - 2026-10-11
 
 ### Ajouté
 - `platforms.json` : plateformes définies dans un fichier (Twitch, Kick, YouTube, **Dailymotion**, Steam TV, **Lien direct**). Streamlink est appelé directement, les `.bat` ne sont plus nécessaires.
@@ -247,7 +281,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Les scripts `.bat` personnels restent disponibles en option (*Afficher les scripts .bat*).
 - L'application demande confirmation avant de quitter si des streams sont en cours.
 
-## [0.2.0] - 2026-10-11
+## 0.2.0 - 2026-10-11
 
 ### Ajouté
 - Les favoris mémorisent leur plateforme.
@@ -264,23 +298,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Corrigé
 - Les anciennes entrées YouTube de l'historique (`ID&list=…`) sont nettoyées à la relance.
 
-## [0.1.0] - 2025-10-16
+## 0.1.0 - 2025-10-16
 
 ### Ajouté
 - Première version : une fenêtre Tkinter qui liste les scripts `.bat` d'un dossier (Twitch, Kick, YouTube, Steam TV) et les lance avec un nom de chaîne.
 - Historique des lancements (200 entrées) et favoris.
 - Mode sombre.
 
-> La date de la 0.1.0 est la plus ancienne date trouvée dans les données de l'application, pas une date de publication.
+> Les versions 0.1.0 à 1.0.0 n'ont jamais été publiées sur GitHub ; la 1.0.1 est la première release. La date de la 0.1.0 est la plus ancienne date trouvée dans les données de l'application.
 
-[Unreleased]: https://github.com/<your-account>/streamlink-launcher/compare/v1.0.1...HEAD
-[Non publié]: https://github.com/<your-account>/streamlink-launcher/compare/v1.0.1...HEAD
-[1.0.1]: https://github.com/<your-account>/streamlink-launcher/compare/v1.0.0...v1.0.1
-[1.0.0]: https://github.com/<your-account>/streamlink-launcher/compare/v0.7.0...v1.0.0
-[0.7.0]: https://github.com/<your-account>/streamlink-launcher/compare/v0.6.0...v0.7.0
-[0.6.0]: https://github.com/<your-account>/streamlink-launcher/compare/v0.5.0...v0.6.0
-[0.5.0]: https://github.com/<your-account>/streamlink-launcher/compare/v0.4.0...v0.5.0
-[0.4.0]: https://github.com/<your-account>/streamlink-launcher/compare/v0.3.0...v0.4.0
-[0.3.0]: https://github.com/<your-account>/streamlink-launcher/compare/v0.2.0...v0.3.0
-[0.2.0]: https://github.com/<your-account>/streamlink-launcher/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/<your-account>/streamlink-launcher/releases/tag/v0.1.0
+[Unreleased]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.0.2...HEAD
+[Non publié]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.0.2
+[1.0.1]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.0.1

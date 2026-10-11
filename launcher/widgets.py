@@ -720,7 +720,6 @@ class Popover:
         if self.cv is None:
             return
         app, c, px, P, cv = self.app, self.app.c, self.app.px, self.app.painter, self.cv
-        f = app.fonts
         cv.delete("all")
         w, h = int(cv.cget("width")), int(cv.cget("height"))
         P.round_rect(cv, 0, 0, w, h, px(10), c.popover, c.border_strong, c.bg)

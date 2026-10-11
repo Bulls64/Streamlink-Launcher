@@ -3,6 +3,7 @@ REM =====================================================
 REM  Crée "Streamlink Launcher.exe" (un seul fichier, sans console)
 REM  Prérequis : Python 3.10+ pour Windows (python.org), avec Tcl/Tk (coché par défaut)
 REM  Usage : double-clic, ou depuis ce dossier : build_exe.bat
+REM  (sur GitHub Actions, la variable CI supprime les pauses)
 REM =====================================================
 cd /d "%~dp0\.."
 
@@ -24,11 +25,11 @@ echo Compilation...
 echo.
 echo Termine : dist\Streamlink Launcher.exe
 echo Copie-le dans ton dossier Streamlink (a cote du dossier streams).
-pause
+if not defined CI pause
 exit /b 0
 
 :erreur
 echo.
 echo La compilation a echoue (voir les messages ci-dessus).
-pause
+if not defined CI pause
 exit /b 1
