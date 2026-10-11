@@ -188,5 +188,13 @@
   "log_hotkey_ok": "Raccourci global {key} actif",
   "log_hotkey_failed": "Raccourci global {key} refusé par Windows (code {code}) : déjà utilisé par une autre application ?",
   "log_hotkey_received": "Raccourci {key} reçu",
-  "log_tray_failed": "Impossible d’initialiser la zone de notification et le raccourci global"
+  "log_tray_failed": "Impossible d’initialiser la zone de notification et le raccourci global",
+
+  "data_restored": "{file} était endommagé : restauré depuis sa sauvegarde",
+  "data_unreadable": "{file} était illisible : mis de côté sous {saved}",
+  "save_failed": "Impossible d'enregistrer {file} (détails dans launcher.log)",
+  "log_data_folder": "Dossier du lanceur protégé en écriture : les données sont enregistrées dans {path}",
+  "settings_about": "À propos",
+  "about_data": "Données : {path}",
+  "btn_open_data": "Ouvrir le dossier des données"
 }

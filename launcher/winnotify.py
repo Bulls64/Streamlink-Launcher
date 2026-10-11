@@ -1,7 +1,10 @@
 """Notifications Windows sans dépendance : toast natif (via Windows PowerShell) et clignotement
 de la barre des tâches. Tout est ignoré silencieusement hors de Windows ou en cas d'échec."""
 import os
+import logging
 import subprocess
+
+_log = logging.getLogger("streamlink_launcher")
 
 # Script lancé seulement au début d'un live (rare) ; le texte passe par des variables d'environnement
 # pour éviter tout problème de guillemets.
@@ -29,7 +32,8 @@ def toast(title, body):
                           "-Command", _TOAST_SCRIPT], env=env, creationflags=flags,
                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, stdin=subprocess.DEVNULL)
         return True
-    except Exception:
+    except Exception as e:
+        _log.warning("Notification Windows impossible : %s", e)
         return False
 
 

@@ -5,7 +5,10 @@ distribue déjà les messages Windows de son thread, donc aucun thread suppléme
 Les actions sont transmises à l'interface via 'callback(nom)' ; tout échec est silencieux.
 """
 import os
+import logging
 import ctypes
+
+_log = logging.getLogger("streamlink_launcher")
 
 if os.name == "nt":
     from ctypes import wintypes
@@ -325,8 +328,8 @@ class Tray:
                 self.icon_shown = False   # l'Explorateur a redémarré : on remet l'icône
                 self.show_icon()
                 return 0
-        except Exception:
-            pass
+        except Exception as e:  # une erreur ici ne doit jamais remonter dans la boucle de messages Windows
+            _log.warning("Message Windows ignoré : %s", e)
         return user32.DefWindowProcW(hwnd, msg, wparam, lparam)
 
 
@@ -409,6 +412,6 @@ def acquire_single_instance():
         if hwnd:
             user32.PostMessageW(hwnd, WM_SHOW_EXISTING, 0, 0)
             return False
-    except Exception:
-        pass
+    except Exception as e:
+        _log.warning("Contrôle d'instance unique impossible : %s", e)
     return True
