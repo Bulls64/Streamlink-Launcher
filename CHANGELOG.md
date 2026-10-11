@@ -11,6 +11,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+- **Spanish, German and Italian translations** (complete interface). The language is chosen in the settings, now a drop-down list since five languages no longer fit side by side; the system language is detected at first launch.
+
 ### Planned
 - Viewing statistics (time per channel, peak hours).
 
@@ -167,6 +170,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## Français
 
 ## [Non publié]
+
+### Ajouté
+- **Traductions en espagnol, allemand et italien** (interface complète). La langue se choisit dans les Paramètres, désormais une liste déroulante car cinq langues ne tiennent plus côte à côte ; la langue du système est détectée au premier lancement.
 
 ### Prévu
 - Statistiques de visionnage (temps par chaîne, heures de pointe).

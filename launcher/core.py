@@ -282,7 +282,8 @@ def detect_system_language():
         if os.name == "nt":
             import ctypes
             name = locale.windows_locale.get(ctypes.windll.kernel32.GetUserDefaultUILanguage(), name)
-        return "fr" if name.lower().startswith("fr") else "en"
+        code = name.lower()[:2]
+        return code if code in ("fr", "es", "de", "it") else "en"
     except Exception:
         return "fr"
 

@@ -1287,8 +1287,14 @@ class App(tk.Tk):
 
         def body(b):
             sec = self._section(b, t("settings_general"), first=True)
-            self._setting_row(sec, t("label_language"), lambda p: Segmented(
-                p, self, list(langs.items()), s["language"], lambda v: s.update(language=v)))
+            if len(langs) <= 3:
+                make_lang = lambda p: Segmented(  # noqa: E731
+                    p, self, list(langs.items()), s["language"], lambda v: s.update(language=v))
+            else:  # 5 langues ne tiennent plus côte à côte dans le panneau : liste déroulante
+                make_lang = lambda p: Select(  # noqa: E731
+                    p, self, list(langs.items()), s["language"], lambda v: s.update(language=v),
+                    height=36, width=130, font=self.fonts.small, popup_width=180)
+            self._setting_row(sec, t("label_language"), make_lang)
             self._setting_row(sec, t("label_theme"), lambda p: Segmented(
                 p, self, [("auto", t("theme_auto")), ("light", t("theme_light")), ("dark", t("theme_dark"))],
                 s["theme"], lambda v: s.update(theme=v)))
