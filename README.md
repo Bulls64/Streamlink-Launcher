@@ -25,7 +25,7 @@ Pure Python + Tkinter, **no third-party dependency**. From source, it starts in 
 - **Notification area**: closing the window keeps it running in the tray, with streams and live checks still active. It can optionally start with Windows.
 - **Log drawer**: Streamlink output, running streams and a *Stop* button for each.
 - **Streamlink update check**: in the settings and optionally at start-up.
-- **Interface**: light, dark or automatic theme (follows Windows), in English and French.
+- **Interface**: light, dark or automatic theme (follows Windows), in English, French, Spanish, German and Italian.
 
 | Light theme | Mini mode | Settings |
 |---|---|---|
@@ -82,7 +82,7 @@ All files are stored next to `slink_launcher.py` or the `.exe`. If that folder i
 | `config.json` | Settings (language, theme, player, live checks, window…) |
 | `platforms.json` | Platforms: URL template, Streamlink options, qualities, accent color, live-check method |
 | `streams/favorites.json`, `streams/history.json` | Your favorites and history (last 200 launches) |
-| `lang/fr.json`, `lang/en.json` | Interface texts. Add a file to add a language |
+| `lang/*.json` (`fr`, `en`, `es`, `de`, `it`) | Interface texts. Add a file to add a language |
 | `launcher.log` | Error log, useful when reporting a problem |
 | `*.bak` | Previous version of each file, used to recover from a damaged file |
 
@@ -189,7 +189,7 @@ Python et Tkinter uniquement, **sans aucune dépendance externe**. Depuis les so
 - **Zone de notification** : fermer la fenêtre laisse le lanceur actif à côté de l'horloge, avec les streams et la surveillance des lives. Il peut aussi démarrer avec Windows (option).
 - **Tiroir du journal** : sortie de Streamlink, streams en cours et un bouton *Arrêter* pour chacun.
 - **Vérification des mises à jour de Streamlink** : dans les réglages, et au démarrage si tu le souhaites.
-- **Interface** : thème clair, sombre ou automatique (suit Windows), en français et en anglais.
+- **Interface** : thème clair, sombre ou automatique (suit Windows), en français, anglais, espagnol, allemand et italien.
 
 | Thème clair | Mode mini | Paramètres |
 |---|---|---|
@@ -246,7 +246,7 @@ Tous les fichiers sont rangés à côté de `slink_launcher.py` ou du `.exe`. Si
 | `config.json` | Réglages (langue, thème, lecteur, lives, fenêtre…) |
 | `platforms.json` | Plateformes : modèle d'URL, options Streamlink, qualités, couleur, méthode de détection du direct |
 | `streams/favorites.json`, `streams/history.json` | Tes favoris et ton historique (200 derniers lancements) |
-| `lang/fr.json`, `lang/en.json` | Textes de l'interface. Ajoute un fichier pour ajouter une langue |
+| `lang/*.json` (`fr`, `en`, `es`, `de`, `it`) | Textes de l'interface. Ajoute un fichier pour ajouter une langue |
 | `launcher.log` | Journal des erreurs, utile pour signaler un problème |
 | `*.bak` | Version précédente de chaque fichier, utilisée pour récupérer un fichier endommagé |
 
