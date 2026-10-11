@@ -196,5 +196,14 @@
   "log_data_folder": "The launcher folder is read-only: data is saved in {path}",
   "settings_about": "About",
   "about_data": "Data: {path}",
-  "btn_open_data": "Open the data folder"
+  "btn_open_data": "Open the data folder",
+  "toast_clip_found": "Copied {platform} link detected",
+  "toast_drop_ok": "{platform} link dropped",
+  "toast_drop_unknown": "No link recognised in what was dropped",
+  "drop_title": "Drop the link here",
+  "drop_sub": "From a browser address bar, selected text or an Internet shortcut (.url)",
+  "mini_clip_hint": "Copied link detected — Enter to launch, or type to replace it",
+  "label_clipboard": "Detect copied links",
+  "hint_clipboard": "Offers to launch a copied stream link when the window is activated, and pre-fills the mini bar",
+  "log_drop_failed": "Drag and drop unavailable (see launcher.log)"
 }

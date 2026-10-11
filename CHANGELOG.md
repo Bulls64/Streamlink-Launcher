@@ -14,6 +14,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Planned
 - Viewing statistics (time per channel, peak hours).
 
+## [1.1.0] - 2026-10-11
+
+### Added
+- **Smart clipboard.** When you come back to the window, the launcher notices a stream link you just copied and offers to launch it from a notification (*Launch* button). Opening the mini bar with the shortcut pre-fills it with the copied link, selected, so you can press <kbd>Enter</kbd> or simply type to replace it. A link is offered only once (copying it again offers it again), never when it is already in the field, and only links are looked at: ordinary text is ignored. It can be turned off in the settings (*Detect copied links*).
+- **Drag and drop.** Drop a link onto the window — from a browser address bar or tab, selected text, or an Internet shortcut (`.url`) / text file — and it fills the field, selects the right platform and offers to launch it. A dashed drop zone appears while you drag. Windows only; no new dependency.
+
 ## [1.0.2] - 2026-10-11
 
 ### Fixed
@@ -165,6 +171,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Prévu
 - Statistiques de visionnage (temps par chaîne, heures de pointe).
 
+## [1.1.0] - 2026-10-11
+
+### Ajouté
+- **Presse-papiers intelligent.** Quand tu reviens sur la fenêtre, le lanceur repère un lien de stream que tu viens de copier et propose de le lancer depuis une notification (bouton *Lancer*). L'ouverture de la barre mini avec le raccourci la pré-remplit avec le lien copié, sélectionné : <kbd>Entrée</kbd> pour lancer, ou tape directement pour le remplacer. Un lien n'est proposé qu'une fois (le recopier le propose de nouveau), jamais s'il est déjà dans le champ, et seuls les liens sont regardés : un texte ordinaire est ignoré. Désactivable dans les Paramètres (*Détecter les liens copiés*).
+- **Glisser-déposer.** Dépose un lien sur la fenêtre — depuis la barre d'adresse ou un onglet d'un navigateur, du texte sélectionné, ou un raccourci Internet (`.url`) / fichier texte — et il remplit le champ, choisit la bonne plateforme et propose de le lancer. Une zone de dépôt en pointillés apparaît pendant le glissement. Windows uniquement ; aucune nouvelle dépendance.
+
 ## [1.0.2] - 2026-10-11
 
 ### Corrigé
@@ -307,7 +319,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 > Les versions 0.1.0 à 1.0.0 n'ont jamais été publiées sur GitHub ; la 1.0.1 est la première release. La date de la 0.1.0 est la plus ancienne date trouvée dans les données de l'application.
 
-[Unreleased]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.0.2...HEAD
-[Non publié]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.1.0...HEAD
+[Non publié]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.1.0
 [1.0.2]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.0.2
 [1.0.1]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.0.1

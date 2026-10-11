@@ -147,6 +147,66 @@ class TestSaveLoad(TempData):
         self.assertEqual([f["channel"] for f in again.favorites], ["a"])  # dernière version saine (.bak)
 
 
+class TestLinks(unittest.TestCase):
+    """Presse-papiers intelligent et glisser-déposer : reconnaissance des liens."""
+
+    def setUp(self):
+        self.platforms = core.DEFAULT_PLATFORMS
+        self.tmp = Path(tempfile.mkdtemp())
+
+    def test_link_in_text(self):
+        f = lambda t: core.link_in_text(self.platforms, t)  # noqa: E731
+        self.assertEqual(f("https://kick.com/xqc"), ("kick", "https://kick.com/xqc"))
+        self.assertEqual(f("twitch.tv/zerator"), ("twitch", "twitch.tv/zerator"))
+        self.assertEqual(f("Regarde ça : https://www.twitch.tv/zerator, vite !"),
+                         ("twitch", "https://www.twitch.tv/zerator"))
+        self.assertEqual(f("https://example.com/live")[0], "url")
+
+    def test_known_platform_wins_over_generic_link(self):
+        text = "https://example.com/a puis https://kick.com/xqc"
+        self.assertEqual(core.link_in_text(self.platforms, text)[0], "kick")
+
+    def test_ignores_plain_text(self):
+        for text in ("", "   ", "bonjour", "du texte avec des mots", "zerator", None):
+            self.assertIsNone(core.link_in_text(self.platforms, text), text)
+
+    def test_ignores_huge_clipboard(self):
+        self.assertIsNone(core.link_in_text(self.platforms, "https://kick.com/xqc " + "x" * core.CLIPBOARD_MAX))
+
+    def test_url_shortcut_file(self):
+        f = self.tmp / "lien.url"
+        f.write_text("[InternetShortcut]\r\nURL=https://www.twitch.tv/zerator\r\n", encoding="utf-8")
+        self.assertEqual(core.link_from_url_file(f), "https://www.twitch.tv/zerator")
+        self.assertEqual(core.links_from_paths(self.platforms, [f]), ("twitch", "https://www.twitch.tv/zerator"))
+
+    def test_url_shortcut_utf16_and_garbage(self):
+        f = self.tmp / "u16.url"
+        f.write_text("[InternetShortcut]\nURL=https://kick.com/xqc\n", encoding="utf-16")
+        self.assertEqual(core.link_from_url_file(f), "https://kick.com/xqc")
+        bad = self.tmp / "bad.url"
+        bad.write_text("URL=javascript:alert(1)", encoding="utf-8")
+        self.assertIsNone(core.link_from_url_file(bad))
+        self.assertIsNone(core.link_from_url_file(self.tmp / "absent.url"))
+
+    def test_dropped_files_skip_unsupported_types(self):
+        img = self.tmp / "a.png"
+        img.write_bytes(b"\x89PNG")
+        txt = self.tmp / "n.txt"
+        txt.write_text("à voir : https://kick.com/xqc", encoding="utf-8")
+        self.assertIsNone(core.links_from_paths(self.platforms, [img]))
+        self.assertEqual(core.links_from_paths(self.platforms, [img, txt]), ("kick", "https://kick.com/xqc"))
+
+    def test_drop_module_is_inert_outside_windows(self):
+        from launcher import windrop
+        target = windrop.DropTarget(0, lambda event: None)
+        if os.name != "nt":
+            self.assertFalse(target.register())
+        target.revoke()
+
+    def test_clipboard_watch_is_on_by_default(self):
+        self.assertTrue(core.DEFAULT_CONFIG["clipboard_watch"])
+
+
 class TestDataFolder(unittest.TestCase):
     def test_writable_probe(self):
         tmp = Path(tempfile.mkdtemp())

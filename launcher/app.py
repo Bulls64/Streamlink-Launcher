@@ -12,6 +12,7 @@ from tkinter import filedialog, messagebox, simpledialog
 from . import core
 from . import winnotify
 from . import wintray
+from . import windrop
 from .mini import MiniBar
 from .gfx import Painter
 from .theme import palette, resolve_theme, Fonts, apply_window_chrome
@@ -47,6 +48,10 @@ class App(tk.Tk):
         self.tray = None
         self._tray_events = deque()  # événements Windows → interface (thread-safe, sans Tk)
         self._balloon_fav = None
+        self._drop_events = deque()  # glisser-déposer OLE → interface (même règle : jamais de Tk dans les rappels)
+        self.drop_target = None
+        self._drop_overlay = None
+        self._clip_seen = None       # (n° de séquence, texte) du presse-papiers déjà examiné
         self.sl_update = None        # dernier résultat de vérification de mise à jour
         self._update_busy = False
         self.query = tk.StringVar()
@@ -86,6 +91,7 @@ class App(tk.Tk):
         self.update_idletasks()
         self.apply_chrome()
         self.setup_tray()
+        self.setup_drop()
         if self.cfg.get("autostart"):
             # Réécrit l'entrée de démarrage : elle pointe toujours vers la version lancée (.py ou .exe)
             wintray.set_autostart(True, os.path.join(str(core.BASE_DIR), "slink_launcher.py"), sys.executable)
@@ -823,10 +829,132 @@ class App(tk.Tk):
             self.close_panel()
 
     def _on_focus_in(self, e):
-        if e.widget is not self or self.cfg["theme"] != "auto":
+        if e.widget is not self:
             return
-        if resolve_theme("auto") != self.mode:
+        if self.cfg["theme"] == "auto" and resolve_theme("auto") != self.mode:
             self.build(reopen="settings" if self.panel_kind == "settings" else None)
+        self.after(150, self.offer_clipboard)
+
+    # =====================================================
+    # Presse-papiers intelligent
+    # =====================================================
+    def _clip_key(self):
+        try:
+            text = self.clipboard_get()
+        except tk.TclError:  # vide, ou contenu qui n'est pas du texte (image, fichiers…)
+            return None, ""
+        return (core.clipboard_sequence(), text), text
+
+    def clipboard_offer(self):
+        """Lien de stream copié et jamais proposé -> (id de plateforme, lien), sinon None.
+
+        Un même contenu n'est proposé qu'une fois (numéro de séquence Windows : recopier le même
+        lien le repropose), et jamais s'il est déjà dans la zone de saisie.
+        """
+        if not self.cfg.get("clipboard_watch"):
+            return None
+        key, text = self._clip_key()
+        if key is None or key == self._clip_seen:
+            return None
+        self._clip_seen = key
+        hit = core.link_in_text(self.platforms, text)
+        if not hit or hit[1] == self.query.get().strip():
+            return None
+        return hit
+
+    def offer_clipboard(self):
+        """Fenêtre principale : propose de lancer le lien copié (bouton dans la notification)."""
+        if self.state() != "normal":
+            return
+        offer = self.clipboard_offer()
+        if not offer:
+            return
+        pid, link = offer
+        name = self.platform_name(self.platform_by_id(pid))
+        self.toast(self.t("toast_clip_found", platform=name), "info",
+                   action=(self.t("btn_launch"), lambda: self.use_link(pid, link, launch=True)),
+                   duration=7000, low_priority=True)
+
+    def use_link(self, pid, link, launch=False):
+        """Met un lien dans la zone de saisie (plateforme sélectionnée) et le lance si demandé."""
+        self.select_platform(pid)
+        self._suppress_suggest = True
+        self.query.set(link)
+        self._suppress_suggest = False
+        if launch:
+            self.launch()
+        else:
+            self.field.focus()
+
+    # =====================================================
+    # Glisser-déposer
+    # =====================================================
+    def setup_drop(self):
+        if os.name != "nt":
+            return
+        try:
+            target = windrop.DropTarget(windrop.toplevel_hwnd(self), self._drop_events.append)
+        except Exception as e:  # ne jamais empêcher le démarrage pour cette fonction
+            core.log.warning("glisser-déposer indisponible : %s", e)
+            return
+        if target.register():
+            self.drop_target = target
+            self.after(100, self._poll_drop)
+        else:
+            self.log(self.t("log_drop_failed"), "warn")
+
+    def _poll_drop(self):
+        while self._drop_events:
+            try:
+                self.handle_drop(self._drop_events.popleft())
+            except Exception as e:
+                self.log(self.t("log_error", error=e), "err")
+        if self.drop_target is not None:
+            self.after(100, self._poll_drop)
+
+    def handle_drop(self, event):
+        kind = event[0]
+        if kind == "enter":
+            self.show_drop_overlay()
+            return
+        self.hide_drop_overlay()
+        if kind == "leave":
+            return
+        hit = (core.link_in_text(self.platforms, event[1]) if kind == "text"
+               else core.links_from_paths(self.platforms, event[1]))
+        if not hit:
+            self.toast(self.t("toast_drop_unknown"), "warn")
+            return
+        pid, link = hit
+        self._clip_seen = self._clip_key()[0]  # ce qui vient d'être déposé n'est pas à reproposer
+        if self.state() in ("iconic", "withdrawn"):
+            self.show_main()
+        self.use_link(pid, link)
+        name = self.platform_name(self.platform_by_id(pid))
+        self.toast(self.t("toast_drop_ok", platform=name), "ok",
+                   action=(self.t("btn_launch"), self.launch), duration=6000)
+
+    def show_drop_overlay(self):
+        self.hide_drop_overlay()
+        c = self.c
+        cv = tk.Canvas(self, bg=c.bg, highlightthickness=0, bd=0)
+        cv.place(x=0, y=0, relwidth=1, relheight=1)
+        cv.update_idletasks()
+        w, h, m = max(cv.winfo_width(), 2), max(cv.winfo_height(), 2), self.px(24)
+        self.painter.dashed_round_rect(cv, m, m, w - m, h - m, self.px(18), c.focus)
+        cv.create_text(w // 2, h // 2 - self.px(12), text=self.t("drop_title"), fill=c.text,
+                       font=self.fonts.panel_title)
+        cv.create_text(w // 2, h // 2 + self.px(18), text=self.t("drop_sub"), fill=c.muted, font=self.fonts.small)
+        tk.Misc.lift(cv)  # Canvas.lift() est tag_raise()
+        self._drop_overlay = cv
+
+    def hide_drop_overlay(self):
+        cv, self._drop_overlay = self._drop_overlay, None
+        if cv is not None:
+            try:
+                cv.destroy()
+            except tk.TclError:
+                pass
 
     # =====================================================
     # Lancement
@@ -889,6 +1017,7 @@ class App(tk.Tk):
             self.log(t("log_error", error=e), "err")
             return False
         self.log(t("log_launching", label=f"{pname} / {name}", quality=quality))
+        self._clip_seen = self._clip_key()[0]  # le lien lancé n'est pas à reproposer
         self.store.add_history({"channel": display, "platform": p["id"]})
         self.toast(t("toast_launching", name=name, platform=pname), "ok")
         self.build_recents()
@@ -1134,7 +1263,7 @@ class App(tk.Tk):
         s = self.settings_state = {k: self.cfg[k] for k in ("language", "theme", "player", "show_scripts",
                                                              "live_check", "live_interval", "live_notify",
                                                              "tray", "hotkey", "autostart", "update_check",
-                                                             "hotkey_combo")}
+                                                             "clipboard_watch", "hotkey_combo")}
         self.v_player_path = tk.StringVar(value=self.cfg["player_path"])
         self.v_player_args = tk.StringVar(value=self.cfg["player_args"])
         self.v_streamlink = tk.StringVar(value=self.cfg["streamlink_path"])
@@ -1207,6 +1336,8 @@ class App(tk.Tk):
             self._update_sl_card(busy=self._update_busy)
             self._switch_row(sec, t("label_update_check"), t("hint_update_check"), s["update_check"],
                              lambda v: s.update(update_check=v))
+            self._switch_row(sec, t("label_clipboard"), t("hint_clipboard"), s["clipboard_watch"],
+                             lambda v: s.update(clipboard_watch=v))
             self._label(sec, t("label_streamlink_path"))
             Field(sec, self, self.v_streamlink, placeholder=t("ph_auto_detect"), height=40, font=self.fonts.small,
                   action_icon="folder", action_command=lambda: self._browse_file(self.v_streamlink)).pack(fill="x")
@@ -1350,7 +1481,7 @@ class App(tk.Tk):
                         scripts_folder=self.v_folder.get().strip() or str(core.DEFAULT_FOLDER),
                         live_check=bool(s["live_check"]), live_interval=int(s["live_interval"]),
                         live_notify=bool(s["live_notify"]), tray=bool(s["tray"]), hotkey=bool(s["hotkey"]),
-                        update_check=bool(s["update_check"]), hotkey_combo=s["hotkey_combo"])
+                        update_check=bool(s["update_check"]), clipboard_watch=bool(s["clipboard_watch"]), hotkey_combo=s["hotkey_combo"])
         if self.sl_update and self.sl_update.get("path") != core.find_streamlink(self.cfg["streamlink_path"]):
             self.sl_update = None  # autre Streamlink choisi : l'ancien résultat ne vaut plus
         autostart_error = False
@@ -1510,6 +1641,9 @@ class App(tk.Tk):
         if self._live_job:
             self.after_cancel(self._live_job)
         self.mini.hide()
+        if self.drop_target is not None:
+            self.drop_target.revoke()
+            self.drop_target = None
         if self.tray is not None:
             self.tray.stop()
         self._save_window_state()

@@ -196,5 +196,14 @@
   "log_data_folder": "Dossier du lanceur protégé en écriture : les données sont enregistrées dans {path}",
   "settings_about": "À propos",
   "about_data": "Données : {path}",
-  "btn_open_data": "Ouvrir le dossier des données"
+  "btn_open_data": "Ouvrir le dossier des données",
+  "toast_clip_found": "Lien {platform} copié détecté",
+  "toast_drop_ok": "Lien {platform} déposé",
+  "toast_drop_unknown": "Aucun lien reconnu dans ce qui a été déposé",
+  "drop_title": "Déposez le lien ici",
+  "drop_sub": "Depuis la barre d'adresse d'un navigateur, du texte ou un raccourci Internet (.url)",
+  "mini_clip_hint": "Lien copié détecté — Entrée pour lancer, ou tapez pour le remplacer",
+  "label_clipboard": "Détecter les liens copiés",
+  "hint_clipboard": "Propose de lancer un lien de stream copié quand la fenêtre s'active, et pré-remplit la barre mini",
+  "log_drop_failed": "Glisser-déposer indisponible (voir launcher.log)"
 }
