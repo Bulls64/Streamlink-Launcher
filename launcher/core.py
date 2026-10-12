@@ -4,6 +4,7 @@ import re
 import sys
 import json
 import queue
+import functools
 import logging
 import shutil
 import locale
@@ -296,6 +297,16 @@ def available_languages():
     return langs or {"fr": "Français"}
 
 
+@functools.lru_cache(maxsize=2048)
+def _parse_date(value):
+    """Date de l'historique -> datetime (None si illisible). Mise en cache : les mêmes dates sont relues
+    à chaque affichage de l'historique, des récents et des suggestions, et strptime est lent."""
+    try:
+        return datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+    except Exception:
+        return None
+
+
 class I18n:
     def __init__(self, lang):
         self.set(lang)
@@ -317,9 +328,8 @@ class I18n:
 
     def format_date(self, value, now=None):
         """'2026-06-20 22:35:26' -> 'Aujourd'hui, 22:35' / '20 juin, 22:35' / '20 oct. 2025'."""
-        try:
-            d = datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
-        except Exception:
+        d = _parse_date(value) if isinstance(value, str) else None
+        if d is None:
             return value or ""
         now = now or datetime.now()
         months = self.get("months_short") or ["jan.", "fév.", "mars", "avr.", "mai", "juin",

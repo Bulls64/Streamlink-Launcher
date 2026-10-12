@@ -15,6 +15,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Export / import of settings and favorites** (Settings → Backup): one JSON file to restore your setup or copy it to another computer. Importing asks whether to add the favorites to the current ones or replace them. Paths specific to the computer (Streamlink, player, scripts folder, window position) are neither exported nor imported, and only known settings with valid values are accepted, so a file received from someone else cannot point to a program to run. A plain `config.json` or `favorites.json` can also be imported.
 - **Spanish, German and Italian translations** (complete interface). The language is chosen in the settings, now a drop-down list since five languages no longer fit side by side; the system language is detected at first launch.
 
+### Changed
+- **Faster interface**: rebuilding the window (theme or language change) is about 35-45 % faster, the History panel opens about 40 % faster, and start-up is a little quicker. Each control is now drawn once at its final size instead of twice, text measurements are remembered, the window icon is computed only where needed, and on Windows the tray, shortcut and drag-and-drop share one 100 ms check instead of two. The display is pixel-identical.
+
 ### Planned
 - Viewing statistics (time per channel, peak hours).
 
@@ -175,6 +178,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Ajouté
 - **Export / import des réglages et des favoris** (Paramètres → Sauvegarde) : un fichier JSON pour restaurer ta configuration ou la copier sur un autre ordinateur. L'import demande s'il faut ajouter les favoris aux actuels ou les remplacer. Les chemins propres à l'ordinateur (Streamlink, lecteur, dossier des scripts, position de la fenêtre) ne sont ni exportés ni importés, et seuls les réglages connus aux valeurs valides sont acceptés : un fichier reçu d'ailleurs ne peut donc pas désigner un programme à lancer. Un simple `config.json` ou `favorites.json` peut aussi être importé.
 - **Traductions en espagnol, allemand et italien** (interface complète). La langue se choisit dans les Paramètres, désormais une liste déroulante car cinq langues ne tiennent plus côte à côte ; la langue du système est détectée au premier lancement.
+
+### Modifié
+- **Interface plus rapide** : la reconstruction de la fenêtre (changement de thème ou de langue) est environ 35 à 45 % plus rapide, le panneau Historique s'ouvre environ 40 % plus vite, et le démarrage est un peu plus court. Chaque composant est maintenant dessiné une seule fois à sa taille finale au lieu de deux, les mesures de texte sont mémorisées, l'icône de la fenêtre n'est calculée finement que sur ses bords, et sous Windows l'icône de notification, le raccourci et le glisser-déposer partagent une seule vérification toutes les 100 ms au lieu de deux. L'affichage est identique au pixel près.
 
 ### Prévu
 - Statistiques de visionnage (temps par chaîne, heures de pointe).

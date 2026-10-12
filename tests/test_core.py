@@ -79,6 +79,16 @@ class TestTranslations(unittest.TestCase):
             self.assertTrue(d.get("_language_name"), f.name)
             self.assertEqual(len(d["months_short"]), 12, f.name)
 
+    def test_format_date(self):
+        from datetime import datetime
+        t = core.I18n("fr")
+        now = datetime(2026, 10, 12, 20, 0, 0)
+        self.assertEqual(t.format_date("2026-10-12 08:05:00", now), "Aujourd’hui, 08:05")
+        self.assertEqual(t.format_date("2026-10-11 23:59:59", now), "Hier, 23:59")
+        self.assertEqual(t.format_date("2025-10-20 22:35:26", now), "20 oct. 2025")
+        for odd in ("pas une date", "", None, ["liste"]):  # valeurs abîmées : rendues telles quelles
+            self.assertEqual(t.format_date(odd, now), odd or "")
+
     def test_placeholder_named_key_is_allowed(self):
         t = core.I18n("fr")
         t.strings = {"x": "Raccourci {key}"}
