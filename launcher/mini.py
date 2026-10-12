@@ -81,7 +81,7 @@ class MiniBar:
         self.chip = Pill(bar, app, app.platform_name(p), dot=p["color"], command=self.next_platform, selected=True,
                          accent=accent)
         self.chip.pack(side="right")
-        self.field = Field(bar, app, self.query, placeholder=self._placeholder(p), icon="search", height=44,
+        self.field = Field(bar, app, self.query, placeholder=app.placeholder_for(p), icon="search", height=44,
                            font=app.fonts.field, bg_key="popover", plain=True, accent=accent)
         self.field.pack(side="left", fill="x", expand=True)
         self.field.set_disabled(p["input"] == "none")
@@ -113,9 +113,7 @@ class MiniBar:
         self._shown_at = time.monotonic()
 
         if offer:
-            self._suppress = True
-            self.query.set(offer[1])
-            self._suppress = False
+            self._set_query(offer[1])
         self.refresh()
         win.deiconify()
         apply_window_chrome(win, c.dark, border=accent[0])
@@ -131,8 +129,12 @@ class MiniBar:
             except tk.TclError:
                 pass
         self.win = None
+        self._set_query("")
+
+    def _set_query(self, text):
+        """Change le texte sans déclencher la détection de plateforme ni les suggestions."""
         self._suppress = True
-        self.query.set("")
+        self.query.set(text)
         self._suppress = False
 
     def _focus(self):
@@ -165,10 +167,6 @@ class MiniBar:
         win.geometry(f"{w}x{h}+{x}+{y}")
 
     # --- plateforme
-    def _placeholder(self, p):
-        kind = p["input"] if p["input"] in ("channel", "youtube", "video", "none", "url") else "channel"
-        return self.app.t("ph_" + kind, name=self.app.platform_name(p))
-
     def set_platform(self, pid):
         if self.win is None or not self.app.platform_by_id(pid):
             return
@@ -178,7 +176,7 @@ class MiniBar:
         self.chip.set_state(text=self.app.platform_name(p), accent=accent)
         self.launch_btn.set_accent(accent)
         self.field.set_accent(accent)
-        self.field.set_placeholder(self._placeholder(p))
+        self.field.set_placeholder(self.app.placeholder_for(p))
         self.field.set_disabled(p["input"] == "none")
         if p["input"] == "none":
             self.win.focus_set()
@@ -205,30 +203,14 @@ class MiniBar:
         self.refresh()
 
     def items(self):
-        app, t = self.app, self.app.t
+        app = self.app
         text = self.query.get().strip()
         if text:
             pairs = app.store.suggestions(text, limit=MAX_ITEMS)
         else:
             favs = sorted(app.store.favorites, key=lambda e: not (app.live_info(e) or {}).get("live"))
             pairs = [("favorite", f) for f in favs[:MAX_ITEMS]]
-        items = []
-        for source, e in pairs:
-            name, color = app.target_label(app.entry_target(e))
-            info = app.live_info(e) or {}
-            channel = e.get("channel", "") or name
-            if info.get("live"):
-                right, right_color = f"{name} · {t('live_on')}", app.c.ok
-            elif source == "favorite":
-                right, right_color = name, None
-            else:
-                right, right_color = f"{name} · {t.format_date(e.get('date', ''))}", None
-            items.append({"label": channel, "value": e, "right": right, "right_dot": color, "right_color": right_color,
-                          "icon": "star_fill" if source == "favorite" else "history",
-                          "icon_color": "#F5C451" if source == "favorite" else None,
-                          "bold": len(text) if text and channel.lower().startswith(text.lower()) else 0,
-                          "query": text})
-        return items
+        return [app.suggestion_item(source, e, text, show_live=True) for source, e in pairs]
 
     def refresh(self):
         if self.win is None:
