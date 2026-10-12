@@ -11,13 +11,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Planned
+- Viewing statistics (time per channel, peak hours).
+
+## [1.2.0] - 2026-10-13
+
 ### Added
 - **Live previews in favorites.** When a Twitch favorite is live, its card on the main screen shows a preview image of the stream with a *LIVE* badge and the viewer count, then the stream title and the game. Previews are refreshed at each live check without flickering, and resized to the card when the window is resized. Kick favorites that are live show the badge, title and game (Kick gives no preview or viewer count). With nobody live, cards keep their compact look. Can be turned off in Settings → Live (*Live previews*); compact cards then show the viewer count instead of *Live*.
 - The viewer count also appears in the Favorites panel, in the mini bar suggestions and in the tray menu. Numbers are shortened according to the language (12.3K, 12,3 k, 12,3 Tsd.…).
 - Images are decoded with GDI+, built into Windows: still no dependency to install.
-
-### Planned
-- Viewing statistics (time per channel, peak hours).
 
 ## [1.1.0] - 2026-10-12
 
@@ -185,13 +187,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Non publié]
 
+### Prévu
+- Statistiques de visionnage (temps par chaîne, heures de pointe).
+
+## [1.2.0] - 2026-10-13
+
 ### Ajouté
 - **Aperçu des lives dans les favoris.** Quand un favori Twitch est en direct, sa carte sur l'écran principal affiche une image d'aperçu du stream avec un badge *EN DIRECT* et le nombre de spectateurs, puis le titre du stream et le jeu. Les aperçus sont mis à jour à chaque vérification sans clignoter, et redimensionnés à la carte quand la fenêtre change de taille. Les favoris Kick en direct affichent le badge, le titre et le jeu (Kick ne fournit ni aperçu ni nombre de spectateurs). Quand personne n'est en direct, les cartes gardent leur aspect compact. Désactivable dans Paramètres → En direct (*Aperçu des lives*) ; les cartes compactes affichent alors le nombre de spectateurs à la place de *En direct*.
 - Le nombre de spectateurs apparaît aussi dans le panneau Favoris, dans les suggestions du mode mini et dans le menu de l'icône de notification. Les nombres sont abrégés selon la langue (12,3 k, 12.3K, 12,3 Tsd.…).
 - Les images sont décodées par GDI+, inclus dans Windows : toujours aucune dépendance à installer.
-
-### Prévu
-- Statistiques de visionnage (temps par chaîne, heures de pointe).
 
 ## [1.1.0] - 2026-10-12
 
@@ -353,8 +357,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 > Les versions 0.1.0 à 1.0.0 n'ont jamais été publiées sur GitHub ; la 1.0.1 est la première release. La date de la 0.1.0 est la plus ancienne date trouvée dans les données de l'application.
 
-[Unreleased]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.1.0...HEAD
-[Non publié]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.2.0...HEAD
+[Non publié]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.2.0
 [1.1.0]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.1.0
 [1.0.2]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.0.2
 [1.0.1]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.0.1
