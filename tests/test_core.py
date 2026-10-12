@@ -58,10 +58,45 @@ class TestVersion(unittest.TestCase):
 class TestTranslations(unittest.TestCase):
     def test_same_keys_in_every_language(self):
         files = sorted((ROOT / "lang").glob("*.json"))
-        self.assertGreaterEqual(len(files), 2)
+        self.assertEqual({f.stem for f in files}, {"fr", "en", "es", "de", "it"})
         keys = [set(json.loads(f.read_text(encoding="utf-8"))) for f in files]
         for f, k in zip(files[1:], keys[1:]):
             self.assertEqual(k, keys[0], f"{f.name} : {sorted(k ^ keys[0])}")
+
+    def test_same_placeholders_in_every_language(self):
+        import re
+        data = {f.stem: json.loads(f.read_text(encoding="utf-8")) for f in (ROOT / "lang").glob("*.json")}
+        for key, ref in data["fr"].items():
+            if not isinstance(ref, str):
+                continue
+            for lang, strings in data.items():
+                self.assertEqual(sorted(re.findall(r"{\w+}", strings[key])), sorted(re.findall(r"{\w+}", ref)),
+                                 f"{lang}.json : {key}")
+
+    def test_no_unused_translation(self):
+        code = "".join(f.read_text(encoding="utf-8") for f in (ROOT / "launcher").glob("*.py"))
+        code += (ROOT / "platforms.json").read_text(encoding="utf-8")
+        dynamic = ("ph_", "player_")  # clés construites : t("ph_" + type), t("player_" + lecteur)
+        keys = json.loads((ROOT / "lang" / "fr.json").read_text(encoding="utf-8"))
+        unused = [k for k in keys if not k.startswith("_") and not k.startswith(dynamic)
+                  and f'"{k}"' not in code and f"'{k}'" not in code]
+        self.assertEqual(unused, [])
+
+    def test_every_language_has_a_name_and_twelve_months(self):
+        for f in (ROOT / "lang").glob("*.json"):
+            d = json.loads(f.read_text(encoding="utf-8"))
+            self.assertTrue(d.get("_language_name"), f.name)
+            self.assertEqual(len(d["months_short"]), 12, f.name)
+
+    def test_format_date(self):
+        from datetime import datetime
+        t = core.I18n("fr")
+        now = datetime(2026, 10, 12, 20, 0, 0)
+        self.assertEqual(t.format_date("2026-10-12 08:05:00", now), "Aujourd’hui, 08:05")
+        self.assertEqual(t.format_date("2026-10-11 23:59:59", now), "Hier, 23:59")
+        self.assertEqual(t.format_date("2025-10-20 22:35:26", now), "20 oct. 2025")
+        for odd in ("pas une date", "", None, ["liste"]):  # valeurs abîmées : rendues telles quelles
+            self.assertEqual(t.format_date(odd, now), odd or "")
 
     def test_placeholder_named_key_is_allowed(self):
         t = core.I18n("fr")
@@ -205,6 +240,78 @@ class TestLinks(unittest.TestCase):
 
     def test_clipboard_watch_is_on_by_default(self):
         self.assertTrue(core.DEFAULT_CONFIG["clipboard_watch"])
+
+
+class TestBackup(TempData):
+    LANGS = {"fr": "Français", "en": "English"}
+    KEYS = ("ctrl+alt+s", "alt+shift+s")
+
+    def parse(self, data):
+        return core.parse_backup(data, self.LANGS, self.KEYS)
+
+    def test_roundtrip_keeps_settings_and_favorites(self):
+        cfg = dict(core.DEFAULT_CONFIG, language="en", theme="dark", live_interval=10,
+                   qualities={"twitch": "720p,best"}, hotkey_combo="alt+shift+s")
+        favs = [{"channel": "zerator", "platform": "twitch", "added": "2026-01-01 10:00:00"}]
+        backup = core.make_backup(cfg, favs, "1.2.0")
+        settings, got = self.parse(json.loads(json.dumps(backup)))
+        self.assertEqual((settings["language"], settings["theme"], settings["live_interval"]), ("en", "dark", 10))
+        self.assertEqual(settings["qualities"], {"twitch": "720p,best"})
+        self.assertEqual(settings["hotkey_combo"], "alt+shift+s")
+        self.assertEqual(got, favs)
+
+    def test_machine_specific_paths_are_never_exported_or_imported(self):
+        cfg = dict(core.DEFAULT_CONFIG, streamlink_path="C:/a.exe", player_path="C:/p.exe",
+                   scripts_folder="C:/s", geometry="1x1+0+0")
+        exported = core.make_backup(cfg, [], "1")["settings"]
+        for key in core.MACHINE_KEYS:
+            self.assertNotIn(key, exported)
+        settings, _ = self.parse({"theme": "dark", "streamlink_path": "C:/evil.exe", "player_path": "x",
+                                  "scripts_folder": "y", "geometry": "z"})
+        self.assertEqual(settings, {"theme": "dark"})
+
+    def test_invalid_values_are_dropped(self):
+        settings, _ = self.parse({"theme": "dark", "language": "xx", "live_interval": 7, "hotkey_combo": "win+x",
+                                  "player": "calc.exe", "player_args": "a\nb", "tray": "yes",
+                                  "live_check": 1, "qualities": {"twitch": "best; rm"}, "unknown": 1})
+        self.assertEqual(settings, {"theme": "dark"})
+
+    def test_accepts_plain_config_and_favorites_files(self):
+        self.assertEqual(self.parse({"theme": "light", "tray": False})[0], {"theme": "light", "tray": False})
+        favs = self.parse({"favorites": [{"channel": "a", "platform": "kick"}, "oops", {"channel": "b"}]})[1]
+        self.assertEqual(favs, [{"channel": "a", "platform": "kick"}])
+
+    def test_unrecognised_content_is_refused(self):
+        for data in ({}, [], "texte", {"foo": 1}, {"format": core.BACKUP_FORMAT}):
+            with self.assertRaises(core.BackupError) as cm:
+                self.parse(data)
+            self.assertEqual(cm.exception.key, "err_backup_invalid")
+
+    def test_read_backup_errors(self):
+        bad = self.tmp / "bad.json"
+        bad.write_text("{pas du json", encoding="utf-8")
+        with self.assertRaises(core.BackupError) as cm:
+            core.read_backup(bad, self.LANGS, self.KEYS)
+        self.assertEqual(cm.exception.key, "err_backup_read")
+        with self.assertRaises(core.BackupError):
+            core.read_backup(self.tmp / "absent.json", self.LANGS, self.KEYS)
+        huge = self.tmp / "huge.json"
+        huge.write_text('{"theme": "dark"}' + " " * core.BACKUP_MAX_BYTES, encoding="utf-8")
+        with self.assertRaises(core.BackupError):
+            core.read_backup(huge, self.LANGS, self.KEYS)
+
+    def test_merge_favorites_skips_duplicates(self):
+        current = [{"channel": "a", "platform": "twitch"}]
+        incoming = [{"channel": "a", "platform": "twitch", "added": "x"}, {"channel": "a", "platform": "kick"},
+                    {"channel": "b", "platform": "twitch"}]
+        merged, added = core.merge_favorites(current, incoming)
+        self.assertEqual(added, 2)
+        self.assertEqual([(f["channel"], f["platform"]) for f in merged],
+                         [("a", "twitch"), ("a", "kick"), ("b", "twitch")])
+
+    def test_favorites_are_capped(self):
+        many = [{"channel": f"c{i}", "platform": "twitch"} for i in range(core.FAVORITES_MAX + 50)]
+        self.assertEqual(len(core.sanitize_favorites(many)), core.FAVORITES_MAX)
 
 
 class TestDataFolder(unittest.TestCase):

@@ -5,12 +5,42 @@ from .gfx import draw_icon
 from .theme import mix, fit_text, accent_ring, readable_on
 
 
+def _schedule_redraw(widget):
+    """Regroupe les redessins dus aux changements de taille : un seul passage, à la fin du calcul de la mise
+    en page. Sans cela, chaque composant était dessiné une fois à sa taille demandée puis une fois à sa taille
+    réelle (deux fois plus de travail à chaque ouverture de panneau)."""
+    app = widget.app
+    pending = app.__dict__.setdefault("_redraw_pending", {})
+    pending[str(widget)] = widget
+    if not app.__dict__.get("_redraw_job"):
+        app._redraw_job = app.after_idle(_flush_redraws, app)
+
+
+def _flush_redraws(app):
+    app._redraw_job = None
+    pending, app._redraw_pending = app._redraw_pending, {}
+    for w in pending.values():
+        try:
+            if w.winfo_exists() and w._size() != w._drawn:
+                w.redraw()
+        except tk.TclError:
+            pass
+
+
 class Widget(tk.Canvas):
-    """Base : redessine à la taille réelle, gère survol, clic, clavier et focus."""
+    """Base : redessine à la taille réelle, gère survol, clic, clavier et focus.
+
+    Zones : un composant à plusieurs parties cliquables redéfinit zone_at(x, y) ; la zone survolée est
+    alors suivie dans self.zone (et redessinée quand elle change). zone_cursor : main uniquement
+    au-dessus d'une zone, flèche ailleurs.
+    """
+
+    zone_cursor = False
 
     def __init__(self, parent, app, width=1, height=1, command=None, bg=None, focusable=None):
         self.app = app
         self.command = command
+        self.zone = None
         self.hover = False
         self.focused = False
         self.disabled = False
@@ -18,7 +48,8 @@ class Widget(tk.Canvas):
         focus = (command is not None) if focusable is None else focusable
         super().__init__(parent, width=width, height=height, bg=bg, highlightthickness=0, bd=0,
                          takefocus=1 if focus else 0, cursor="hand2" if command else "")
-        self.bind("<Configure>", lambda e: self.redraw())
+        self._drawn = None  # taille du dernier dessin
+        self.bind("<Configure>", self._on_configure)
         self.bind("<Enter>", self._enter)
         self.bind("<Leave>", self._leave)
         self.bind("<ButtonRelease-1>", self._release)
@@ -36,14 +67,27 @@ class Widget(tk.Canvas):
 
     def _leave(self, e):
         self.hover = False
+        self._set_zone(None)
         self.redraw()
 
     def _set_focus(self, value):
         self.focused = value
         self.redraw()
 
+    def zone_at(self, x, y):
+        return None
+
+    def _set_zone(self, zone):
+        if zone == self.zone:
+            return False
+        self.zone = zone
+        if self.zone_cursor:
+            self.configure(cursor="hand2" if zone is not None else "")
+        return True
+
     def _motion(self, e):
-        pass
+        if self._set_zone(self.zone_at(e.x, e.y)):
+            self.redraw()
 
     def _release(self, e):
         if self.disabled:
@@ -79,15 +123,24 @@ class Widget(tk.Canvas):
     def icon(self, name, x, y, size, color):
         draw_icon(self, self.app.fonts, name, x, y, size, color)
 
-    def redraw(self):
-        try:
-            w, h = self.winfo_width(), self.winfo_height()
-        except tk.TclError:
-            return
+    def _on_configure(self, e):
+        if (e.width, e.height) != self._drawn:
+            _schedule_redraw(self)
+
+    def _size(self):
+        w, h = self.winfo_width(), self.winfo_height()
         if w <= 1:
             w = int(self.cget("width"))
         if h <= 1:
             h = int(self.cget("height"))
+        return w, h
+
+    def redraw(self):
+        try:
+            w, h = self._size()
+        except tk.TclError:
+            return
+        self._drawn = (w, h)
         self.delete("all")
         self.draw(w, h)
         if self.focused:
@@ -285,21 +338,13 @@ class RecentRow(Widget):
     def __init__(self, parent, app, name, platform, dot, date, on_fill, on_launch, last=False):
         self.name, self.platform, self.dot, self.date = name, platform, dot, date
         self.on_fill, self.on_launch, self.last = on_fill, on_launch, last
-        self.zone = None
         super().__init__(parent, app, width=app.px(400), height=app.px(44), command=on_fill)
 
-    def _motion(self, e):
-        zone = "play" if e.x >= self.winfo_width() - self.px(40) else "row"
-        if zone != self.zone:
-            self.zone = zone
-            self.redraw()
-
-    def _leave(self, e):
-        self.zone = None
-        super()._leave(e)
+    def zone_at(self, x, y):
+        return "play" if x >= self.winfo_width() - self.px(40) else "row"
 
     def on_click(self, e):
-        if e.x >= self.winfo_width() - self.px(40):
+        if self.zone_at(e.x, e.y) == "play":
             self.on_launch()
         else:
             self.on_fill()
@@ -512,10 +557,6 @@ class Select(Widget):
         self.options, self.value = options, value
         self.redraw()
 
-    def set_value(self, value):
-        self.value = value
-        self.redraw()
-
     def open(self):
         if self.app.popover.is_open_for(self):
             self.app.popover.close()
@@ -544,7 +585,6 @@ class Select(Widget):
 class Segmented(Widget):
     def __init__(self, parent, app, options, value, on_change, height=36):
         self.options, self.value, self.on_change = options, value, on_change
-        self.hover_index = None
         f = app.fonts.small_semi
         self.widths = [f.measure(lbl) + app.px(26) for _, lbl in options]
         w = sum(self.widths) + app.px(6) + app.px(2) * (len(options) - 1)
@@ -557,21 +597,12 @@ class Segmented(Widget):
             yield i, x, x + wi
             x += wi + self.px(2)
 
-    def _index_at(self, x):
+    def zone_at(self, x, y):
+        """Index de l'option sous la souris (None entre deux options)."""
         return next((i for i, a, b in self._spans() if a <= x < b), None)
 
-    def _motion(self, e):
-        i = self._index_at(e.x)
-        if i != self.hover_index:
-            self.hover_index = i
-            self.redraw()
-
-    def _leave(self, e):
-        self.hover_index = None
-        super()._leave(e)
-
     def on_click(self, e):
-        i = self._index_at(e.x)
+        i = self.zone_at(e.x, e.y)
         if i is not None and self.options[i][0] != self.value:
             self.value = self.options[i][0]
             self.redraw()
@@ -587,7 +618,7 @@ class Segmented(Widget):
             if sel:
                 self.P.round_rect(self, a, px(3), b, h - px(3), px(7), c.seg_sel,
                                   c.border if not c.dark else c.seg_sel, c.raised)
-            fg = c.text if sel or i == self.hover_index else c.muted
+            fg = c.text if sel or i == self.zone else c.muted
             font = self.app.fonts.small_semi if sel else self.app.fonts.small
             self.create_text((a + b) / 2, h / 2, text=lbl, font=font, fill=fg)
 
@@ -880,10 +911,29 @@ class ScrollArea(tk.Frame):
         self.canvas.configure(yscrollcommand=self.bar.set)
         self.body = tk.Frame(self.canvas, bg=bg)
         self._win = self.canvas.create_window(0, 0, anchor="nw", window=self.body)
-        self.body.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+        self._region_job = None
+        self.body.bind("<Configure>", self._body_changed)
         self.canvas.bind("<Configure>", lambda e: self.canvas.itemconfigure(self._win, width=e.width))
         self.bind("<Enter>", self._bind_wheel)
         self.bind("<Leave>", self._unbind_wheel)
+
+    def _body_changed(self, e):
+        # Une seule mise à jour de la zone de défilement par passage, pas une par ligne ajoutée
+        if self._region_job is None:
+            self._region_job = self.after_idle(self._update_region)
+
+    def _update_region(self):
+        self._region_job = None
+        try:
+            self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+        except tk.TclError:
+            pass
+
+    def destroy(self):
+        if self._region_job is not None:
+            self.after_cancel(self._region_job)
+            self._region_job = None
+        super().destroy()
 
     def _bind_wheel(self, e):
         self.bind_all("<MouseWheel>", self._wheel)
@@ -909,31 +959,20 @@ class ListRow(Widget):
     def __init__(self, parent, app, title, subtitle, dot, actions, on_click=None):
         self.title, self.subtitle, self.dot, self.actions = title, subtitle, dot, actions
         self.on_row = on_click
-        self.zone = None
         super().__init__(parent, app, width=app.px(300), height=app.px(54), command=on_click or (lambda: None))
 
     def _zones(self, w):
         px = self.px
         return [(w - px(22) - k * px(38), name) for k, (name, _cb) in enumerate(self.actions)]
 
-    def _zone_at(self, x):
+    def zone_at(self, x, y):
         for cx, name in self._zones(self.winfo_width()):
             if abs(x - cx) <= self.px(17):
                 return name
         return "row"
 
-    def _motion(self, e):
-        z = self._zone_at(e.x)
-        if z != self.zone:
-            self.zone = z
-            self.redraw()
-
-    def _leave(self, e):
-        self.zone = None
-        super()._leave(e)
-
     def on_click(self, e):
-        z = self._zone_at(e.x)
+        z = self.zone_at(e.x, e.y)
         for name, cb in self.actions:
             if name == z:
                 cb()
@@ -966,9 +1005,10 @@ class ListRow(Widget):
 class StreamRow(Widget):
     """Stream en cours dans le tiroir : nom, détails, bouton Arrêter."""
 
+    zone_cursor = True
+
     def __init__(self, parent, app, name, detail, dot, stop_label, on_stop):
         self.name, self.detail, self.dot, self.stop_label, self.on_stop = name, detail, dot, stop_label, on_stop
-        self.zone = None
         super().__init__(parent, app, width=app.px(300), height=app.px(38), command=None, focusable=False)
 
     def _stop_box(self, w, h):
@@ -976,17 +1016,12 @@ class StreamRow(Widget):
         x1 = w - self.px(6)
         return x1 - tw - self.px(36), self.px(5), x1, h - self.px(5)
 
-    def _motion(self, e):
-        x0, y0, x1, y1 = self._stop_box(self.winfo_width(), self.winfo_height())
-        z = "stop" if x0 <= e.x <= x1 else None
-        if z != self.zone:
-            self.zone = z
-            self.configure(cursor="hand2" if z else "")
-            self.redraw()
+    def zone_at(self, x, y):
+        x0, _y0, x1, _y1 = self._stop_box(self.winfo_width(), self.winfo_height())
+        return "stop" if x0 <= x <= x1 else None
 
     def on_click(self, e):
-        x0, y0, x1, y1 = self._stop_box(self.winfo_width(), self.winfo_height())
-        if x0 <= e.x <= x1:
+        if self.zone_at(e.x, e.y) == "stop":
             self.on_stop()
 
     def draw(self, w, h):
@@ -1032,12 +1067,12 @@ class StatusCard(Widget):
 
     LEVELS = {"ok": ("check", "ok"), "warn": ("warning", "warn"), "update": ("arrow_up", "warn"),
               "busy": ("sync", "muted")}
+    zone_cursor = True
 
     def __init__(self, parent, app, ok, title, detail, button, on_button):
         self.level = "ok" if ok else "warn"
         self.title, self.detail, self.button, self.on_button = title, detail, button, on_button
         self.primary = False
-        self.zone = None
         super().__init__(parent, app, width=app.px(300), height=app.px(60), command=None, focusable=False)
 
     @property
@@ -1056,17 +1091,12 @@ class StatusCard(Widget):
         tw = self.app.fonts.small.measure(self.button)
         return w - self.px(12) - tw - self.px(24), h / 2 - self.px(16), w - self.px(12), h / 2 + self.px(16)
 
-    def _motion(self, e):
+    def zone_at(self, x, y):
         x0, y0, x1, y1 = self._btn(self.winfo_width(), self.winfo_height())
-        z = "btn" if x0 <= e.x <= x1 and y0 <= e.y <= y1 else None
-        if z != self.zone:
-            self.zone = z
-            self.configure(cursor="hand2" if z else "")
-            self.redraw()
+        return "btn" if x0 <= x <= x1 and y0 <= y <= y1 else None
 
     def on_click(self, e):
-        x0, y0, x1, y1 = self._btn(self.winfo_width(), self.winfo_height())
-        if x0 <= e.x <= x1 and y0 <= e.y <= y1:
+        if self.zone_at(e.x, e.y) == "btn":
             self.on_button()
 
     def draw(self, w, h):

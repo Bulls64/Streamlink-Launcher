@@ -1,6 +1,7 @@
 """Fenêtre principale : écran de lancement, tiroir du journal, panneaux latéraux."""
 import os
 import re
+import json
 import sys
 import queue
 import threading
@@ -51,6 +52,7 @@ class App(tk.Tk):
         self._drop_events = deque()  # glisser-déposer OLE → interface (même règle : jamais de Tk dans les rappels)
         self.drop_target = None
         self._drop_overlay = None
+        self._win_events_running = False
         self._clip_seen = None       # (n° de séquence, texte) du presse-papiers déjà examiné
         self.sl_update = None        # dernier résultat de vérification de mise à jour
         self._update_busy = False
@@ -318,6 +320,11 @@ class App(tk.Tk):
         self.cfg["last_platform"] = pid
         self.refresh_target()
 
+    def placeholder_for(self, p):
+        """Texte d'aide du champ selon le type de saisie de la plateforme (fenêtre et mode mini)."""
+        kind = p["input"] if p["input"] in ("channel", "youtube", "video", "none", "url") else "channel"
+        return self.t("ph_" + kind, name=self.platform_name(p))
+
     def refresh_target(self):
         t = self.t
         accent = self.accent
@@ -332,10 +339,8 @@ class App(tk.Tk):
         self.field.set_accent(accent)
         if self.target[0] == "platform":
             p = self.platform_by_id(self.target[1])
-            kind = p["input"]
-            self.field.set_placeholder(t("ph_" + kind if kind in ("channel", "youtube", "video", "none", "url")
-                                         else "ph_channel", name=self.platform_name(p)))
-            self.field.set_disabled(kind == "none")
+            self.field.set_placeholder(self.placeholder_for(p))
+            self.field.set_disabled(p["input"] == "none")
             value = self.quality_for(p)
             options = [(q, q) for q in p["qualities"]]
             if value not in p["qualities"]:
@@ -600,7 +605,7 @@ class App(tk.Tk):
                 self.log(self.t("log_tray_failed"), "err")
                 return
             self.tray = tray
-            self.after(100, self._poll_tray)
+            self._start_win_events()
         self.apply_tray_settings(startup=True)
 
     def apply_tray_settings(self, startup=False):
@@ -647,15 +652,25 @@ class App(tk.Tk):
                               self.t("toast_live_summary", count=count))
         self.tray.set_tooltip(text)
 
-    def _poll_tray(self):
-        """Traite les clics sur l'icône et le raccourci global (file remplie par wintray)."""
-        while self._tray_events:
-            try:
-                self._tray_event(self._tray_events.popleft())
-            except Exception as e:  # une erreur ici ne doit jamais arrêter la surveillance
-                self.log(self.t("log_error", error=e), "err")
-        if self.tray is not None:
-            self.after(100, self._poll_tray)
+    def _start_win_events(self):
+        """Une seule boucle (10 fois par seconde) relit les files de l'icône, du raccourci et du
+        glisser-déposer : deux fois moins de réveils de l'application au repos qu'avec une boucle chacun."""
+        if not self._win_events_running:
+            self._win_events_running = True
+            self.after(100, self._poll_win_events)
+
+    def _poll_win_events(self):
+        """Traite les clics sur l'icône, le raccourci global (file remplie par wintray) et les dépôts (windrop)."""
+        for queue_, handler in ((self._tray_events, self._tray_event), (self._drop_events, self.handle_drop)):
+            while queue_:
+                try:
+                    handler(queue_.popleft())
+                except Exception as e:  # une erreur ici ne doit jamais arrêter la surveillance
+                    self.log(self.t("log_error", error=e), "err")
+        if self.tray is not None or self.drop_target is not None:
+            self.after(100, self._poll_win_events)
+        else:
+            self._win_events_running = False
 
     def _tray_event(self, event):
         if event == "open":
@@ -751,10 +766,14 @@ class App(tk.Tk):
             text = entry.get("channel", "")
         else:
             text = entry.get("channel", "")
+        self.set_query(text)
+        self.field.focus()
+
+    def set_query(self, text):
+        """Remplit la zone de saisie sans ouvrir les suggestions."""
         self._suppress_suggest = True
         self.query.set(text)
         self._suppress_suggest = False
-        self.field.focus()
 
     # =====================================================
     # Saisie et suggestions
@@ -773,19 +792,27 @@ class App(tk.Tk):
         if not hasattr(self, "field") or not self.field.has_focus():
             return
         text = self.query.get().strip()
-        items = []
-        for source, e in self.store.suggestions(text):
-            name, color = self.target_label(self.entry_target(e))
-            channel = e.get("channel", "")
-            fav = source == "favorite"
-            right = name if fav else f"{name} · {self.t.format_date(e.get('date', ''))}"
-            items.append({"label": channel, "value": e, "icon": "star_fill" if fav else "history",
-                          "icon_color": "#F5C451" if fav else None, "right": right, "right_dot": color,
-                          "bold": len(text) if channel.lower().startswith(text.lower()) else 0, "query": text})
+        items = [self.suggestion_item(source, e, text) for source, e in self.store.suggestions(text)]
         if items:
             self.popover.show(self.field, items, self._pick_suggestion, width=self.field.winfo_width())
         elif self.popover.is_open_for(self.field):
             self.popover.close()
+
+    def suggestion_item(self, source, entry, text, show_live=False):
+        """Ligne de suggestion (favori ou historique) pour le menu du champ et le mode mini."""
+        name, color = self.target_label(self.entry_target(entry))
+        channel = entry.get("channel", "") or name
+        fav = source == "favorite"
+        right_color = None
+        if show_live and (self.live_info(entry) or {}).get("live"):
+            right, right_color = f"{name} · {self.t('live_on')}", self.c.ok
+        elif fav:
+            right = name
+        else:
+            right = f"{name} · {self.t.format_date(entry.get('date', ''))}"
+        return {"label": channel, "value": entry, "right": right, "right_dot": color, "right_color": right_color,
+                "icon": "star_fill" if fav else "history", "icon_color": "#F5C451" if fav else None,
+                "bold": len(text) if text and channel.lower().startswith(text.lower()) else 0, "query": text}
 
     def _pick_suggestion(self, item):
         self.fill_from_entry(item["value"])
@@ -878,9 +905,7 @@ class App(tk.Tk):
     def use_link(self, pid, link, launch=False):
         """Met un lien dans la zone de saisie (plateforme sélectionnée) et le lance si demandé."""
         self.select_platform(pid)
-        self._suppress_suggest = True
-        self.query.set(link)
-        self._suppress_suggest = False
+        self.set_query(link)
         if launch:
             self.launch()
         else:
@@ -899,18 +924,9 @@ class App(tk.Tk):
             return
         if target.register():
             self.drop_target = target
-            self.after(100, self._poll_drop)
+            self._start_win_events()
         else:
             self.log(self.t("log_drop_failed"), "warn")
-
-    def _poll_drop(self):
-        while self._drop_events:
-            try:
-                self.handle_drop(self._drop_events.popleft())
-            except Exception as e:
-                self.log(self.t("log_error", error=e), "err")
-        if self.drop_target is not None:
-            self.after(100, self._poll_drop)
 
     def handle_drop(self, event):
         kind = event[0]
@@ -997,6 +1013,9 @@ class App(tk.Tk):
         if not core.QUALITY_RE.match(quality):
             report(t("err_quality"), "warn")
             return False
+        # Le lien lancé n'est pas à reproposer. Lu AVANT de démarrer le processus : sous X11, lire le presse-papiers
+        # traite des événements, et une notification d'échec pourrait sinon être recouverte par « Lancement ».
+        self._clip_seen = self._clip_key()[0]
         opts, missing = core.player_options(self.cfg)
         if missing:
             self.log(t("log_player_not_found", player=core.PLAYER_NAMES.get(missing, missing)), "warn")
@@ -1017,7 +1036,6 @@ class App(tk.Tk):
             self.log(t("log_error", error=e), "err")
             return False
         self.log(t("log_launching", label=f"{pname} / {name}", quality=quality))
-        self._clip_seen = self._clip_key()[0]  # le lien lancé n'est pas à reproposer
         self.store.add_history({"channel": display, "platform": p["id"]})
         self.toast(t("toast_launching", name=name, platform=pname), "ok")
         self.build_recents()
@@ -1204,6 +1222,9 @@ class App(tk.Tk):
         area.pack(fill="both", expand=True, padx=(px(24), px(6)), pady=(0, px(8)))
         body = tk.Frame(area.body, bg=c.panel)
         body.pack(fill="both", expand=True, padx=(0, px(12)))
+        # Calcule la largeur du panneau AVANT d'y créer les lignes : chacune est ainsi dessinée une seule fois,
+        # directement à la bonne taille (au lieu d'une fois à sa taille demandée puis une fois à la vraie).
+        panel.update_idletasks()
         body_builder(body)
         panel.lift()
         self.panel, self.panel_kind = panel, kind
@@ -1287,8 +1308,14 @@ class App(tk.Tk):
 
         def body(b):
             sec = self._section(b, t("settings_general"), first=True)
-            self._setting_row(sec, t("label_language"), lambda p: Segmented(
-                p, self, list(langs.items()), s["language"], lambda v: s.update(language=v)))
+            if len(langs) <= 3:
+                make_lang = lambda p: Segmented(  # noqa: E731
+                    p, self, list(langs.items()), s["language"], lambda v: s.update(language=v))
+            else:  # 5 langues ne tiennent plus côte à côte dans le panneau : liste déroulante
+                make_lang = lambda p: Select(  # noqa: E731
+                    p, self, list(langs.items()), s["language"], lambda v: s.update(language=v),
+                    height=36, width=130, font=self.fonts.small, popup_width=180)
+            self._setting_row(sec, t("label_language"), make_lang)
             self._setting_row(sec, t("label_theme"), lambda p: Segmented(
                 p, self, [("auto", t("theme_auto")), ("light", t("theme_light")), ("dark", t("theme_dark"))],
                 s["theme"], lambda v: s.update(theme=v)))
@@ -1348,6 +1375,15 @@ class App(tk.Tk):
             self._label(sec, t("label_folder"))
             Field(sec, self, self.v_folder, height=40, font=self.fonts.small, action_icon="folder",
                   action_command=self._browse_folder).pack(fill="x")
+
+            sec = self._section(b, t("settings_backup"))
+            self._hint(sec, t("hint_backup"))
+            row = tk.Frame(sec, bg=self.c.panel)
+            row.pack(anchor="w", pady=(self.px(4), 0))
+            Button(row, self, text=t("btn_export"), kind="secondary", font=self.fonts.small, height=36,
+                   command=self.export_data).pack(side="left", padx=(0, self.px(8)))
+            Button(row, self, text=t("btn_import"), kind="secondary", font=self.fonts.small, height=36,
+                   command=self.import_data).pack(side="left")
 
             sec = self._section(b, t("settings_about"))
             from . import __version__
@@ -1481,29 +1517,16 @@ class App(tk.Tk):
                         scripts_folder=self.v_folder.get().strip() or str(core.DEFAULT_FOLDER),
                         live_check=bool(s["live_check"]), live_interval=int(s["live_interval"]),
                         live_notify=bool(s["live_notify"]), tray=bool(s["tray"]), hotkey=bool(s["hotkey"]),
-                        update_check=bool(s["update_check"]), clipboard_watch=bool(s["clipboard_watch"]), hotkey_combo=s["hotkey_combo"])
+                        update_check=bool(s["update_check"]), clipboard_watch=bool(s["clipboard_watch"]),
+                        hotkey_combo=s["hotkey_combo"])
         if self.sl_update and self.sl_update.get("path") != core.find_streamlink(self.cfg["streamlink_path"]):
             self.sl_update = None  # autre Streamlink choisi : l'ancien résultat ne vaut plus
-        autostart_error = False
-        if bool(s["autostart"]) != bool(self.cfg.get("autostart")):
-            script = os.path.join(str(core.BASE_DIR), "slink_launcher.py")
-            if wintray.set_autostart(bool(s["autostart"]), script, sys.executable) or os.name != "nt":
-                self.cfg["autostart"] = bool(s["autostart"])
-            else:
-                autostart_error = True
-        if self.target[0] == "script" and not self.cfg["show_scripts"]:
-            self.target = ("platform", self.platforms[0]["id"])
+        autostart_error = not self._apply_autostart(bool(s["autostart"]))
         core.save_config(self.cfg)
         self.platforms, error = core.load_platforms()
         if self.target[0] == "platform" and not self.platform_by_id(self.target[1]):
             self.target = ("platform", self.platforms[0]["id"])
-        if self.cfg["language"] != old_lang:
-            self.t.set(self.cfg["language"])
-        if not self.cfg["live_check"]:
-            self.live.clear()
-        self.apply_tray_settings(startup=True)  # avant la reconstruction : l'état affiché est à jour
-        self.build(reopen="settings")
-        self.schedule_live(1500)
+        self._settings_changed(old_lang, clear_live=not self.cfg["live_check"])
         if error:
             self.log(self.t("log_platforms_error", error=error), "err")
             self.toast(self.t("toast_platforms_error"), "error", action=(self.t("action_show_log"), self.show_log))
@@ -1511,6 +1534,91 @@ class App(tk.Tk):
             self.toast(self.t("toast_autostart_failed"), "error")
         else:
             self.toast(self.t("toast_settings_saved"), "ok")
+
+    def _apply_autostart(self, wanted):
+        """Active ou désactive le lancement avec Windows ; False si Windows a refusé."""
+        if wanted == bool(self.cfg.get("autostart")):
+            return True
+        script = os.path.join(str(core.BASE_DIR), "slink_launcher.py")
+        if wintray.set_autostart(wanted, script, sys.executable) or os.name != "nt":
+            self.cfg["autostart"] = wanted
+            return True
+        return False
+
+    # =====================================================
+    # Sauvegarde : export / import des réglages et des favoris
+    # =====================================================
+    def export_data(self):
+        from . import __version__
+        t = self.t
+        name = f"streamlink-launcher-{core.now_str()[:10]}.json"
+        path = filedialog.asksaveasfilename(parent=self, title=t("btn_export"), defaultextension=".json",
+                                            initialfile=name, filetypes=[(t("filetype_json"), "*.json")])
+        if not path:
+            return False
+        backup = core.make_backup(self.cfg, self.store.favorites, __version__)
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(backup, f, ensure_ascii=False, indent=2)
+        except OSError as e:
+            core.log.error("Export impossible vers %s : %s", path, e)
+            self.toast(t("toast_export_failed"), "error")
+            return False
+        self.log(t("log_export_ok", path=path), "dim")
+        self.toast(t("toast_export_ok", file=os.path.basename(path)), "ok")
+        return True
+
+    def import_data(self, path=None):
+        t = self.t
+        path = path or filedialog.askopenfilename(parent=self, title=t("btn_import"),
+                                                  filetypes=[(t("filetype_json"), "*.json"), ("*", "*")])
+        if not path:
+            return False
+        try:
+            settings, favorites = core.read_backup(path, core.available_languages(), wintray.HOTKEYS)
+        except core.BackupError as e:
+            self.toast(t(e.key), "error")
+            return False
+        n, m = len(settings), len(favorites)
+        if favorites:
+            answer = messagebox.askyesnocancel(
+                t("title_confirm"), t("confirm_import", settings=n, favorites=m), parent=self)
+            if answer is None:
+                return False
+            replace = answer is False
+        else:
+            if not messagebox.askokcancel(t("title_confirm"), t("confirm_import_settings", settings=n), parent=self):
+                return False
+            replace = False
+        old_lang = self.cfg["language"]
+        autostart = settings.pop("autostart", None)  # appliqué à Windows ci-dessous, pas seulement noté
+        self.cfg.update(settings)
+        self.cfg["qualities"] = dict(self.cfg.get("qualities") or {})
+        autostart_ok = autostart is None or self._apply_autostart(autostart)
+        core.save_config(self.cfg)
+        if favorites:
+            if replace:
+                self.store.favorites = favorites
+            else:
+                self.store.favorites, m = core.merge_favorites(self.store.favorites, favorites)
+            self.store.save_favorites()
+        self._settings_changed(old_lang, clear_live=True)  # favoris peut-être changés : statuts à revérifier
+        self.log(self.t("log_import_ok", settings=n, favorites=m), "dim")
+        self.toast(self.t("toast_import_ok", settings=n, favorites=m) if autostart_ok
+                   else self.t("toast_autostart_failed"), "ok" if autostart_ok else "error")
+        return True
+
+    def _settings_changed(self, old_lang, clear_live):
+        """Après « Enregistrer » ou un import : langue, cible, statuts en direct, icône et raccourci, affichage."""
+        if self.cfg["language"] != old_lang:
+            self.t.set(self.cfg["language"])
+        if self.target[0] == "script" and not self.cfg["show_scripts"]:
+            self.target = ("platform", self.platforms[0]["id"])
+        if clear_live:
+            self.live.clear()
+        self.apply_tray_settings(startup=True)  # avant la reconstruction : l'état affiché est à jour
+        self.build(reopen="settings")
+        self.schedule_live(1500)
 
     def _browse_file(self, var):
         filetypes = [(self.t("filetype_exe"), "*.exe"), ("*", "*")] if os.name == "nt" else [("*", "*")]

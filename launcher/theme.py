@@ -103,6 +103,31 @@ MONO = ["Cascadia Mono", "Cascadia Code", "Consolas", "JetBrains Mono", "DejaVu 
 ICONS = ["Segoe Fluent Icons", "Segoe MDL2 Assets"]
 
 
+class CachedFont(tkfont.Font):
+    """Police dont les mesures de texte sont mémorisées.
+
+    Chaque measure() est un aller-retour vers Tk ; or les mêmes textes (noms de chaînes, libellés) sont
+    mesurés à chaque dessin. Les polices de l'application ne changent jamais de taille après leur
+    création (une nouvelle échelle recrée l'objet Fonts), le cache reste donc juste.
+    """
+
+    _CACHE_MAX = 4000
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._widths = {}
+
+    def measure(self, text, displayof=None):
+        if displayof is not None:
+            return super().measure(text, displayof)
+        width = self._widths.get(text)
+        if width is None:
+            if len(self._widths) >= self._CACHE_MAX:
+                self._widths.clear()
+            width = self._widths[text] = super().measure(text)
+        return width
+
+
 class Fonts:
     def __init__(self, root, px):
         families = set(tkfont.families(root))
@@ -116,17 +141,17 @@ class Fonts:
         mono = pick(MONO) or tkfont.nametofont("TkFixedFont").actual("family")
         self.icon_family = pick(ICONS)
         self.fluent = self.icon_family == "Segoe Fluent Icons"
-        self._root, self._px, self._icons = root, px, {}
+        self._root, self._icons = root, {}
 
         def regular(size):
-            return tkfont.Font(root=root, family=sans, size=-px(size))
+            return CachedFont(root=root, family=sans, size=-px(size))
 
         def semibold(size):
             if semi:
-                return tkfont.Font(root=root, family=semi, size=-px(size))
-            return tkfont.Font(root=root, family=sans, size=-px(size), weight="bold")
+                return CachedFont(root=root, family=semi, size=-px(size))
+            return CachedFont(root=root, family=sans, size=-px(size), weight="bold")
 
-        self.title = (tkfont.Font(root=root, family=display, size=-px(21)) if display else semibold(21))
+        self.title = (CachedFont(root=root, family=display, size=-px(21)) if display else semibold(21))
         self.panel_title = semibold(18)
         self.field = regular(15)
         self.button = semibold(15)
@@ -137,15 +162,15 @@ class Fonts:
         self.small_semi = semibold(13)
         self.tiny = regular(12)
         self.caps = semibold(11)
-        self.mono = tkfont.Font(root=root, family=mono, size=-px(12))
-        self.mono_field = tkfont.Font(root=root, family=mono, size=-px(13))
+        self.mono = CachedFont(root=root, family=mono, size=-px(12))
+        self.mono_field = CachedFont(root=root, family=mono, size=-px(13))
 
     def icon(self, size_px):
         if not self.icon_family:
             return None
         font = self._icons.get(size_px)
         if font is None:
-            font = self._icons[size_px] = tkfont.Font(root=self._root, family=self.icon_family, size=-size_px)
+            font = self._icons[size_px] = CachedFont(root=self._root, family=self.icon_family, size=-size_px)
         return font
 
 
@@ -154,9 +179,16 @@ def fit_text(font, text, width):
     text = text or ""
     if font.measure(text) <= width:
         return text
-    while text and font.measure(text + "…") > width:
-        text = text[:-1]
-    return text + "…" if text else ""
+    # Plus long préfixe qui tient avec « … » : recherche dichotomique (quelques mesures au lieu d'une
+    # par caractère retiré). La largeur croît avec la longueur du préfixe, le résultat est donc le même.
+    lo, hi = 0, len(text) - 1
+    while lo < hi:
+        mid = (lo + hi + 1) // 2
+        if font.measure(text[:mid] + "…") <= width:
+            lo = mid
+        else:
+            hi = mid - 1
+    return text[:lo] + "…" if lo else ""
 
 
 # ---------------------
