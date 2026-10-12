@@ -5,6 +5,28 @@ from .gfx import draw_icon
 from .theme import mix, fit_text, accent_ring, readable_on
 
 
+def _schedule_redraw(widget):
+    """Regroupe les redessins dus aux changements de taille : un seul passage, à la fin du calcul de la mise
+    en page. Sans cela, chaque composant était dessiné une fois à sa taille demandée puis une fois à sa taille
+    réelle (deux fois plus de travail à chaque ouverture de panneau)."""
+    app = widget.app
+    pending = app.__dict__.setdefault("_redraw_pending", {})
+    pending[str(widget)] = widget
+    if not app.__dict__.get("_redraw_job"):
+        app._redraw_job = app.after_idle(_flush_redraws, app)
+
+
+def _flush_redraws(app):
+    app._redraw_job = None
+    pending, app._redraw_pending = app._redraw_pending, {}
+    for w in pending.values():
+        try:
+            if w.winfo_exists() and w._size() != w._drawn:
+                w.redraw()
+        except tk.TclError:
+            pass
+
+
 class Widget(tk.Canvas):
     """Base : redessine à la taille réelle, gère survol, clic, clavier et focus."""
 
@@ -18,7 +40,8 @@ class Widget(tk.Canvas):
         focus = (command is not None) if focusable is None else focusable
         super().__init__(parent, width=width, height=height, bg=bg, highlightthickness=0, bd=0,
                          takefocus=1 if focus else 0, cursor="hand2" if command else "")
-        self.bind("<Configure>", lambda e: self.redraw())
+        self._drawn = None  # taille du dernier dessin
+        self.bind("<Configure>", self._on_configure)
         self.bind("<Enter>", self._enter)
         self.bind("<Leave>", self._leave)
         self.bind("<ButtonRelease-1>", self._release)
@@ -79,15 +102,24 @@ class Widget(tk.Canvas):
     def icon(self, name, x, y, size, color):
         draw_icon(self, self.app.fonts, name, x, y, size, color)
 
-    def redraw(self):
-        try:
-            w, h = self.winfo_width(), self.winfo_height()
-        except tk.TclError:
-            return
+    def _on_configure(self, e):
+        if (e.width, e.height) != self._drawn:
+            _schedule_redraw(self)
+
+    def _size(self):
+        w, h = self.winfo_width(), self.winfo_height()
         if w <= 1:
             w = int(self.cget("width"))
         if h <= 1:
             h = int(self.cget("height"))
+        return w, h
+
+    def redraw(self):
+        try:
+            w, h = self._size()
+        except tk.TclError:
+            return
+        self._drawn = (w, h)
         self.delete("all")
         self.draw(w, h)
         if self.focused:
@@ -880,10 +912,29 @@ class ScrollArea(tk.Frame):
         self.canvas.configure(yscrollcommand=self.bar.set)
         self.body = tk.Frame(self.canvas, bg=bg)
         self._win = self.canvas.create_window(0, 0, anchor="nw", window=self.body)
-        self.body.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+        self._region_job = None
+        self.body.bind("<Configure>", self._body_changed)
         self.canvas.bind("<Configure>", lambda e: self.canvas.itemconfigure(self._win, width=e.width))
         self.bind("<Enter>", self._bind_wheel)
         self.bind("<Leave>", self._unbind_wheel)
+
+    def _body_changed(self, e):
+        # Une seule mise à jour de la zone de défilement par passage, pas une par ligne ajoutée
+        if self._region_job is None:
+            self._region_job = self.after_idle(self._update_region)
+
+    def _update_region(self):
+        self._region_job = None
+        try:
+            self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+        except tk.TclError:
+            pass
+
+    def destroy(self):
+        if self._region_job is not None:
+            self.after_cancel(self._region_job)
+            self._region_job = None
+        super().destroy()
 
     def _bind_wheel(self, e):
         self.bind_all("<MouseWheel>", self._wheel)

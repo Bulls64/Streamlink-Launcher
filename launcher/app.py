@@ -52,6 +52,7 @@ class App(tk.Tk):
         self._drop_events = deque()  # glisser-déposer OLE → interface (même règle : jamais de Tk dans les rappels)
         self.drop_target = None
         self._drop_overlay = None
+        self._win_events_running = False
         self._clip_seen = None       # (n° de séquence, texte) du presse-papiers déjà examiné
         self.sl_update = None        # dernier résultat de vérification de mise à jour
         self._update_busy = False
@@ -601,7 +602,7 @@ class App(tk.Tk):
                 self.log(self.t("log_tray_failed"), "err")
                 return
             self.tray = tray
-            self.after(100, self._poll_tray)
+            self._start_win_events()
         self.apply_tray_settings(startup=True)
 
     def apply_tray_settings(self, startup=False):
@@ -648,15 +649,25 @@ class App(tk.Tk):
                               self.t("toast_live_summary", count=count))
         self.tray.set_tooltip(text)
 
-    def _poll_tray(self):
-        """Traite les clics sur l'icône et le raccourci global (file remplie par wintray)."""
-        while self._tray_events:
-            try:
-                self._tray_event(self._tray_events.popleft())
-            except Exception as e:  # une erreur ici ne doit jamais arrêter la surveillance
-                self.log(self.t("log_error", error=e), "err")
-        if self.tray is not None:
-            self.after(100, self._poll_tray)
+    def _start_win_events(self):
+        """Une seule boucle (10 fois par seconde) relit les files de l'icône, du raccourci et du
+        glisser-déposer : deux fois moins de réveils de l'application au repos qu'avec une boucle chacun."""
+        if not self._win_events_running:
+            self._win_events_running = True
+            self.after(100, self._poll_win_events)
+
+    def _poll_win_events(self):
+        """Traite les clics sur l'icône, le raccourci global (file remplie par wintray) et les dépôts (windrop)."""
+        for queue_, handler in ((self._tray_events, self._tray_event), (self._drop_events, self.handle_drop)):
+            while queue_:
+                try:
+                    handler(queue_.popleft())
+                except Exception as e:  # une erreur ici ne doit jamais arrêter la surveillance
+                    self.log(self.t("log_error", error=e), "err")
+        if self.tray is not None or self.drop_target is not None:
+            self.after(100, self._poll_win_events)
+        else:
+            self._win_events_running = False
 
     def _tray_event(self, event):
         if event == "open":
@@ -900,18 +911,9 @@ class App(tk.Tk):
             return
         if target.register():
             self.drop_target = target
-            self.after(100, self._poll_drop)
+            self._start_win_events()
         else:
             self.log(self.t("log_drop_failed"), "warn")
-
-    def _poll_drop(self):
-        while self._drop_events:
-            try:
-                self.handle_drop(self._drop_events.popleft())
-            except Exception as e:
-                self.log(self.t("log_error", error=e), "err")
-        if self.drop_target is not None:
-            self.after(100, self._poll_drop)
 
     def handle_drop(self, event):
         kind = event[0]
@@ -1207,6 +1209,9 @@ class App(tk.Tk):
         area.pack(fill="both", expand=True, padx=(px(24), px(6)), pady=(0, px(8)))
         body = tk.Frame(area.body, bg=c.panel)
         body.pack(fill="both", expand=True, padx=(0, px(12)))
+        # Calcule la largeur du panneau AVANT d'y créer les lignes : chacune est ainsi dessinée une seule fois,
+        # directement à la bonne taille (au lieu d'une fois à sa taille demandée puis une fois à la vraie).
+        panel.update_idletasks()
         body_builder(body)
         panel.lift()
         self.panel, self.panel_kind = panel, kind

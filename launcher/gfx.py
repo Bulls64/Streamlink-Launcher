@@ -7,6 +7,12 @@ from .theme import hex_to_rgb
 _SAMPLES = (0.125, 0.375, 0.625, 0.875)  # suréchantillonnage 4x4
 
 
+def _tri_crosses(tri, i, j):
+    """Un sommet du triangle tombe-t-il dans le pixel (i, j) ? (le triangle pourrait alors l'entamer
+    sans qu'aucun coin du pixel soit dedans)."""
+    return any(i <= x <= i + 1 and j <= y <= j + 1 for x, y in tri)
+
+
 class Painter:
     """Les coins sont de petites images (r x r) où la couleur du fond est déjà mélangée :
     pas de transparence, donc rapide et identique sur toutes les versions de Tk."""
@@ -111,9 +117,24 @@ class Painter:
             d3 = (x - ax) * (cy - ay) - (cx - ax) * (y - ay)
             return not ((d1 < 0 or d2 < 0 or d3 < 0) and (d1 > 0 or d2 > 0 or d3 > 0))
 
-        img = tk.PhotoImage(master=self.root, width=size, height=size)
+        # Pixel entièrement dans une forme convexe (ses 4 coins le sont) : tous ses sous-échantillons aussi,
+        # inutile de les calculer un par un. Seuls les pixels des bords sont suréchantillonnés : même résultat.
+        def solid(i, j, inside):
+            return inside(i, j) and inside(i + 1, j) and inside(i, j + 1) and inside(i + 1, j + 1)
+
+        color_c, color_w = "#%02x%02x%02x" % C, "#%02x%02x%02x" % W
+        rows, transparent = [], []
         for j in range(size):
+            row = []
             for i in range(size):
+                if solid(i, j, in_rr):
+                    if solid(i, j, in_tri):
+                        row.append(color_w)
+                        continue
+                    if not any(in_tri(i + a, j + b) for a in (0, 1) for b in (0, 1)) and not _tri_crosses(
+                            tri, i, j):
+                        row.append(color_c)
+                        continue
                 acc = [0.0, 0.0, 0.0]
                 cover = 0
                 for sy in _SAMPLES:
@@ -125,11 +146,17 @@ class Painter:
                             for k in range(3):
                                 acc[k] += col[k]
                 if cover:
-                    img.put("#%02x%02x%02x" % tuple(int(a / cover) for a in acc), (i, j))
+                    row.append("#%02x%02x%02x" % tuple(int(a / cover) for a in acc))
                     if cover < 8:
-                        img.transparency_set(i, j, True)
+                        transparent.append((i, j))
                 else:
-                    img.transparency_set(i, j, True)
+                    row.append(color_c)
+                    transparent.append((i, j))
+            rows.append("{" + " ".join(row) + "}")
+        img = tk.PhotoImage(master=self.root, width=size, height=size)
+        img.put(" ".join(rows))  # une seule écriture au lieu d'une par pixel
+        for i, j in transparent:
+            img.transparency_set(i, j, True)
         return img
 
 
