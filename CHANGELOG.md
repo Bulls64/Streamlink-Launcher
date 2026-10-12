@@ -18,6 +18,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 - **Faster interface**: rebuilding the window (theme or language change) is about 35-45 % faster, the History panel opens about 40 % faster, and start-up is a little quicker. Each control is now drawn once at its final size instead of twice, text measurements are remembered, the window icon is computed only where needed, and on Windows the tray, shortcut and drag-and-drop share one 100 ms check instead of two. The display is pixel-identical.
 
+### Fixed
+- Importing a backup with *Start with Windows* enabled now really registers the launcher at start-up (the setting was saved but Windows was never told).
+- The hover highlight of the *Stop* button (log drawer) and of the Streamlink card button no longer stays lit after the mouse leaves.
+
+### Removed
+- Dead code: unused constants, method and attribute, and 5 translation texts (× 5 languages) left over from the old *Test* button. A test now fails if a translation is no longer used.
+
 ### Planned
 - Viewing statistics (time per channel, peak hours).
 
@@ -181,6 +188,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Modifié
 - **Interface plus rapide** : la reconstruction de la fenêtre (changement de thème ou de langue) est environ 35 à 45 % plus rapide, le panneau Historique s'ouvre environ 40 % plus vite, et le démarrage est un peu plus court. Chaque composant est maintenant dessiné une seule fois à sa taille finale au lieu de deux, les mesures de texte sont mémorisées, l'icône de la fenêtre n'est calculée finement que sur ses bords, et sous Windows l'icône de notification, le raccourci et le glisser-déposer partagent une seule vérification toutes les 100 ms au lieu de deux. L'affichage est identique au pixel près.
+
+### Corrigé
+- L'import d'une sauvegarde avec *Lancer au démarrage de Windows* activé inscrit maintenant vraiment le lanceur au démarrage (le réglage était enregistré mais Windows n'était jamais prévenu).
+- Le survol du bouton *Arrêter* (tiroir du journal) et du bouton de la carte Streamlink ne reste plus allumé quand la souris s'en va.
+
+### Retiré
+- Code mort : constantes, méthode et attribut inutilisés, et 5 textes de traduction (× 5 langues) restés de l'ancien bouton *Tester*. Un test échoue désormais si une traduction n'est plus utilisée.
 
 ### Prévu
 - Statistiques de visionnage (temps par chaîne, heures de pointe).

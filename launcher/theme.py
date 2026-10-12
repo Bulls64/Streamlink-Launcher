@@ -141,7 +141,7 @@ class Fonts:
         mono = pick(MONO) or tkfont.nametofont("TkFixedFont").actual("family")
         self.icon_family = pick(ICONS)
         self.fluent = self.icon_family == "Segoe Fluent Icons"
-        self._root, self._px, self._icons = root, px, {}
+        self._root, self._icons = root, {}
 
         def regular(size):
             return CachedFont(root=root, family=sans, size=-px(size))

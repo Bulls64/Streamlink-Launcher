@@ -73,6 +73,15 @@ class TestTranslations(unittest.TestCase):
                 self.assertEqual(sorted(re.findall(r"{\w+}", strings[key])), sorted(re.findall(r"{\w+}", ref)),
                                  f"{lang}.json : {key}")
 
+    def test_no_unused_translation(self):
+        code = "".join(f.read_text(encoding="utf-8") for f in (ROOT / "launcher").glob("*.py"))
+        code += (ROOT / "platforms.json").read_text(encoding="utf-8")
+        dynamic = ("ph_", "player_")  # clés construites : t("ph_" + type), t("player_" + lecteur)
+        keys = json.loads((ROOT / "lang" / "fr.json").read_text(encoding="utf-8"))
+        unused = [k for k in keys if not k.startswith("_") and not k.startswith(dynamic)
+                  and f'"{k}"' not in code and f"'{k}'" not in code]
+        self.assertEqual(unused, [])
+
     def test_every_language_has_a_name_and_twelve_months(self):
         for f in (ROOT / "lang").glob("*.json"):
             d = json.loads(f.read_text(encoding="utf-8"))

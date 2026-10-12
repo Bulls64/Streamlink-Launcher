@@ -320,6 +320,11 @@ class App(tk.Tk):
         self.cfg["last_platform"] = pid
         self.refresh_target()
 
+    def placeholder_for(self, p):
+        """Texte d'aide du champ selon le type de saisie de la plateforme (fenêtre et mode mini)."""
+        kind = p["input"] if p["input"] in ("channel", "youtube", "video", "none", "url") else "channel"
+        return self.t("ph_" + kind, name=self.platform_name(p))
+
     def refresh_target(self):
         t = self.t
         accent = self.accent
@@ -334,10 +339,8 @@ class App(tk.Tk):
         self.field.set_accent(accent)
         if self.target[0] == "platform":
             p = self.platform_by_id(self.target[1])
-            kind = p["input"]
-            self.field.set_placeholder(t("ph_" + kind if kind in ("channel", "youtube", "video", "none", "url")
-                                         else "ph_channel", name=self.platform_name(p)))
-            self.field.set_disabled(kind == "none")
+            self.field.set_placeholder(self.placeholder_for(p))
+            self.field.set_disabled(p["input"] == "none")
             value = self.quality_for(p)
             options = [(q, q) for q in p["qualities"]]
             if value not in p["qualities"]:
@@ -763,10 +766,14 @@ class App(tk.Tk):
             text = entry.get("channel", "")
         else:
             text = entry.get("channel", "")
+        self.set_query(text)
+        self.field.focus()
+
+    def set_query(self, text):
+        """Remplit la zone de saisie sans ouvrir les suggestions."""
         self._suppress_suggest = True
         self.query.set(text)
         self._suppress_suggest = False
-        self.field.focus()
 
     # =====================================================
     # Saisie et suggestions
@@ -785,19 +792,27 @@ class App(tk.Tk):
         if not hasattr(self, "field") or not self.field.has_focus():
             return
         text = self.query.get().strip()
-        items = []
-        for source, e in self.store.suggestions(text):
-            name, color = self.target_label(self.entry_target(e))
-            channel = e.get("channel", "")
-            fav = source == "favorite"
-            right = name if fav else f"{name} · {self.t.format_date(e.get('date', ''))}"
-            items.append({"label": channel, "value": e, "icon": "star_fill" if fav else "history",
-                          "icon_color": "#F5C451" if fav else None, "right": right, "right_dot": color,
-                          "bold": len(text) if channel.lower().startswith(text.lower()) else 0, "query": text})
+        items = [self.suggestion_item(source, e, text) for source, e in self.store.suggestions(text)]
         if items:
             self.popover.show(self.field, items, self._pick_suggestion, width=self.field.winfo_width())
         elif self.popover.is_open_for(self.field):
             self.popover.close()
+
+    def suggestion_item(self, source, entry, text, show_live=False):
+        """Ligne de suggestion (favori ou historique) pour le menu du champ et le mode mini."""
+        name, color = self.target_label(self.entry_target(entry))
+        channel = entry.get("channel", "") or name
+        fav = source == "favorite"
+        right_color = None
+        if show_live and (self.live_info(entry) or {}).get("live"):
+            right, right_color = f"{name} · {self.t('live_on')}", self.c.ok
+        elif fav:
+            right = name
+        else:
+            right = f"{name} · {self.t.format_date(entry.get('date', ''))}"
+        return {"label": channel, "value": entry, "right": right, "right_dot": color, "right_color": right_color,
+                "icon": "star_fill" if fav else "history", "icon_color": "#F5C451" if fav else None,
+                "bold": len(text) if text and channel.lower().startswith(text.lower()) else 0, "query": text}
 
     def _pick_suggestion(self, item):
         self.fill_from_entry(item["value"])
@@ -890,9 +905,7 @@ class App(tk.Tk):
     def use_link(self, pid, link, launch=False):
         """Met un lien dans la zone de saisie (plateforme sélectionnée) et le lance si demandé."""
         self.select_platform(pid)
-        self._suppress_suggest = True
-        self.query.set(link)
-        self._suppress_suggest = False
+        self.set_query(link)
         if launch:
             self.launch()
         else:
@@ -1504,23 +1517,16 @@ class App(tk.Tk):
                         scripts_folder=self.v_folder.get().strip() or str(core.DEFAULT_FOLDER),
                         live_check=bool(s["live_check"]), live_interval=int(s["live_interval"]),
                         live_notify=bool(s["live_notify"]), tray=bool(s["tray"]), hotkey=bool(s["hotkey"]),
-                        update_check=bool(s["update_check"]), clipboard_watch=bool(s["clipboard_watch"]), hotkey_combo=s["hotkey_combo"])
+                        update_check=bool(s["update_check"]), clipboard_watch=bool(s["clipboard_watch"]),
+                        hotkey_combo=s["hotkey_combo"])
         if self.sl_update and self.sl_update.get("path") != core.find_streamlink(self.cfg["streamlink_path"]):
             self.sl_update = None  # autre Streamlink choisi : l'ancien résultat ne vaut plus
         autostart_error = not self._apply_autostart(bool(s["autostart"]))
-        if self.target[0] == "script" and not self.cfg["show_scripts"]:
-            self.target = ("platform", self.platforms[0]["id"])
         core.save_config(self.cfg)
         self.platforms, error = core.load_platforms()
         if self.target[0] == "platform" and not self.platform_by_id(self.target[1]):
             self.target = ("platform", self.platforms[0]["id"])
-        if self.cfg["language"] != old_lang:
-            self.t.set(self.cfg["language"])
-        if not self.cfg["live_check"]:
-            self.live.clear()
-        self.apply_tray_settings(startup=True)  # avant la reconstruction : l'état affiché est à jour
-        self.build(reopen="settings")
-        self.schedule_live(1500)
+        self._settings_changed(old_lang, clear_live=not self.cfg["live_check"])
         if error:
             self.log(self.t("log_platforms_error", error=error), "err")
             self.toast(self.t("toast_platforms_error"), "error", action=(self.t("action_show_log"), self.show_log))
@@ -1585,9 +1591,10 @@ class App(tk.Tk):
                 return False
             replace = False
         old_lang = self.cfg["language"]
+        autostart = settings.pop("autostart", None)  # appliqué à Windows ci-dessous, pas seulement noté
         self.cfg.update(settings)
         self.cfg["qualities"] = dict(self.cfg.get("qualities") or {})
-        autostart_ok = self._apply_autostart(bool(self.cfg.get("autostart"))) if "autostart" in settings else True
+        autostart_ok = autostart is None or self._apply_autostart(autostart)
         core.save_config(self.cfg)
         if favorites:
             if replace:
@@ -1595,18 +1602,23 @@ class App(tk.Tk):
             else:
                 self.store.favorites, m = core.merge_favorites(self.store.favorites, favorites)
             self.store.save_favorites()
-        if self.cfg["language"] != old_lang:
-            self.t.set(self.cfg["language"])
-        if self.target[0] == "script" and not self.cfg["show_scripts"]:
-            self.target = ("platform", self.platforms[0]["id"])
-        self.live.clear()
-        self.apply_tray_settings(startup=True)
-        self.build(reopen="settings")
-        self.schedule_live(1500)
+        self._settings_changed(old_lang, clear_live=True)  # favoris peut-être changés : statuts à revérifier
         self.log(self.t("log_import_ok", settings=n, favorites=m), "dim")
         self.toast(self.t("toast_import_ok", settings=n, favorites=m) if autostart_ok
                    else self.t("toast_autostart_failed"), "ok" if autostart_ok else "error")
         return True
+
+    def _settings_changed(self, old_lang, clear_live):
+        """Après « Enregistrer » ou un import : langue, cible, statuts en direct, icône et raccourci, affichage."""
+        if self.cfg["language"] != old_lang:
+            self.t.set(self.cfg["language"])
+        if self.target[0] == "script" and not self.cfg["show_scripts"]:
+            self.target = ("platform", self.platforms[0]["id"])
+        if clear_live:
+            self.live.clear()
+        self.apply_tray_settings(startup=True)  # avant la reconstruction : l'état affiché est à jour
+        self.build(reopen="settings")
+        self.schedule_live(1500)
 
     def _browse_file(self, var):
         filetypes = [(self.t("filetype_exe"), "*.exe"), ("*", "*")] if os.name == "nt" else [("*", "*")]

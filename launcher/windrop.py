@@ -128,33 +128,25 @@ if os.name == "nt":
         finally:
             ole32.ReleaseStgMedium(ctypes.byref(sm))
 
+    def _as_ptr(data_obj):
+        return data_obj if isinstance(data_obj, ctypes.c_void_p) else ctypes.c_void_p(data_obj)
+
     def read_data_object(data_obj):
-        """-> ("text", str) | ("files", [chemins]) | None, en lisant un IDataObject."""
-        data_obj = ctypes.c_void_p(data_obj) if not isinstance(data_obj, ctypes.c_void_p) else data_obj
-        cf_w = user32.RegisterClipboardFormatW(FORMAT_URL_W)
-        cf_a = user32.RegisterClipboardFormatW(FORMAT_URL_A)
-        raw = _hglobal(data_obj, cf_w)
-        if raw:
-            text = raw.decode("utf-16-le", "ignore").split("\0")[0].strip()
-            if text:
-                return ("text", text)
-        raw = _hglobal(data_obj, cf_a)
-        if raw:
-            text = raw.decode("cp1252", "ignore").split("\0")[0].strip()
-            if text:
-                return ("text", text)
-        raw = _hglobal(data_obj, CF_UNICODETEXT)
-        if raw:
-            text = raw.decode("utf-16-le", "ignore").split("\0")[0].strip()
+        """-> ("text", str) | ("files", [chemins]) | None, en lisant un IDataObject.
+        Ordre : lien (Unicode puis ANSI, glissé depuis un navigateur), texte, puis fichiers."""
+        data_obj = _as_ptr(data_obj)
+        for cf, encoding in ((user32.RegisterClipboardFormatW(FORMAT_URL_W), "utf-16-le"),
+                             (user32.RegisterClipboardFormatW(FORMAT_URL_A), "cp1252"),
+                             (CF_UNICODETEXT, "utf-16-le")):
+            raw = _hglobal(data_obj, cf)
+            text = raw.decode(encoding, "ignore").split("\0")[0].strip() if raw else ""
             if text:
                 return ("text", text)
         files = _files(data_obj)
-        if files:
-            return ("files", files)
-        return None
+        return ("files", files) if files else None
 
     def accepts(data_obj):
-        data_obj = ctypes.c_void_p(data_obj) if not isinstance(data_obj, ctypes.c_void_p) else data_obj
+        data_obj = _as_ptr(data_obj)
         formats = (user32.RegisterClipboardFormatW(FORMAT_URL_W), CF_UNICODETEXT, CF_HDROP)
         return any(_has(data_obj, cf) for cf in formats)
 
