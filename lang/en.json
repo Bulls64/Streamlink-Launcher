@@ -134,6 +134,13 @@
   "minutes": "{count} min",
   "label_live_notify": "Windows notification",
   "hint_live_notify": "When a favorite goes live.",
+  "decimal_sep": ".",
+  "num_thousands": "{n}K",
+  "num_millions": "{n}M",
+  "viewers": "{count} viewers",
+  "viewers_one": "{count} viewer",
+  "label_live_previews": "Live previews",
+  "hint_live_previews": "Thumbnail, title and viewer count of live Twitch favorites.",
 
   "mini_hint": "Tab: platform · ↓: suggestions · Enter: launch · Esc: close",
   "notif_click_to_watch": "Click to watch",

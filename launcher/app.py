@@ -2,6 +2,7 @@
 import os
 import re
 import json
+import base64
 import sys
 import queue
 import threading
@@ -14,6 +15,7 @@ from . import core
 from . import winnotify
 from . import wintray
 from . import windrop
+from . import thumb
 from .mini import MiniBar
 from .gfx import Painter
 from .theme import palette, resolve_theme, Fonts, apply_window_chrome
@@ -70,6 +72,8 @@ class App(tk.Tk):
         self._live_job = None
         self._live_busy = False
         self._live_first = True     # pas de notification Windows pour ce qui est déjà en direct au démarrage
+        self.previews = {}          # {clé de live: {"data": octets JPEG, "img": PhotoImage, "size": (l, h)}}
+        self._preview_render = {}   # {clé: (l, h)} mises à l'échelle en attente (regroupées pendant un redimensionnement)
         pid = self.cfg.get("last_platform")
         self.target = ("platform", pid if self.platform_by_id(pid) else self.platforms[0]["id"])
 
@@ -401,8 +405,9 @@ class App(tk.Tk):
             w.destroy()
         for i in range(4):
             self.fav_grid.columnconfigure(i, weight=1, uniform="fav")
-        # Les favoris en direct passent devant (l'ordre est conservé sinon)
-        favs = sorted(self.store.favorites, key=lambda e: not (self.live_info(e) or {}).get("live"))[:FAV_SLOTS]
+        favs = self.shown_favorites()
+        # Avec l'aperçu activé et au moins un favori affiché en direct : cartes avec image (toutes la même hauteur)
+        with_media = bool(self.cfg.get("live_previews")) and any((self.live_info(f) or {}).get("live") for f in favs)
 
         def pad(col):
             return (0 if col == 0 else px(5), 0 if col == 3 else px(5))
@@ -410,21 +415,113 @@ class App(tk.Tk):
         for col, fav in enumerate(favs):
             name, color = self.target_label(self.entry_target(fav))
             info = self.live_info(fav)
-            status = None
-            if info is not None:
-                status = (t("live_on"), True) if info.get("live") else (t("live_off"), False)
-            card = Card(self.fav_grid, self, title=fav.get("channel", "?"), subtitle=name, dot=color,
-                        command=lambda e=fav: self.launch_favorite(e), status=status,
+            live = info.get("live") if info is not None else None
+            subtitle = " · ".join(x for x in (name, with_media and live and info.get("game")) if x)
+            status = media = None
+            if with_media:
+                key = self.live_key(fav)
+                media = {"live": live, "viewers": info.get("viewers") if live else None,
+                         "stream_title": (info.get("title") or "") if live else "",
+                         "image": (lambda w, h, k=key: self.preview_image(k, w, h)) if key else None}
+            elif info is not None:
+                viewers = info.get("viewers") if live else None
+                status = ((t.viewers(viewers) if isinstance(viewers, int) else t("live_on"), True) if live
+                          else (t("live_off"), False))
+            card = Card(self.fav_grid, self, title=fav.get("channel", "?"), subtitle=subtitle, dot=color,
+                        command=lambda e=fav: self.launch_favorite(e), status=status, media=media,
                         on_menu=lambda ev, e=fav: self.favorite_menu(ev, e))
-            card.grid(row=0, column=col, sticky="ew", padx=pad(col))
+            card.grid(row=0, column=col, sticky="nsew", padx=pad(col))
         col = len(favs)
-        Card(self.fav_grid, self, title=t("card_add_favorite"), add=True,
-             command=self.add_current_to_favorites).grid(row=0, column=col, sticky="ew", padx=pad(col))
+        Card(self.fav_grid, self, title=t("card_add_favorite"), add=True, media={} if with_media else None,
+             command=self.add_current_to_favorites).grid(row=0, column=col, sticky="nsew", padx=pad(col))
         if not favs:
             tk.Label(self.fav_grid, text=t("hint_no_favorites"), font=self.fonts.small, bg=c.bg, fg=c.faint,
                      anchor="w", justify="left").grid(row=0, column=1, columnspan=3, sticky="w", padx=px(14))
         if hasattr(self, "fav_link"):
             self.fav_link.set_text(self._fav_link_text())
+
+    def shown_favorites(self):
+        """Favoris des cartes de l'écran principal : ceux en direct d'abord (l'ordre est conservé sinon)."""
+        return sorted(self.store.favorites, key=lambda e: not (self.live_info(e) or {}).get("live"))[:FAV_SLOTS]
+
+    # --- aperçus des lives
+    def preview_image(self, key, w, h):
+        """Image d'aperçu à la taille demandée, ou None (la carte affiche alors un fond de remplacement).
+        La mise à l'échelle se fait hors de l'interface ; la carte est redessinée quand elle est prête."""
+        p = self.previews.get(key)
+        if not p or not p.get("data"):
+            return None
+        same_size = p.get("size") == (w, h)
+        if (not same_size or p.get("stale")) and p.get("failed") != (w, h):
+            pending = self._preview_render.get(key)
+            self._preview_render[key] = (w, h)
+            if pending is None:  # pendant un redimensionnement, seule la dernière taille est calculée
+                self.after(150, lambda: self._render_preview(key))
+        return p.get("img") if same_size else None
+
+    def _render_preview(self, key):
+        size = self._preview_render.pop(key, None)
+        p = self.previews.get(key)
+        if size is None or not p or not p.get("data"):
+            return
+        data, (w, h), radius = p["data"], size, self.px(8)
+        self.run_in_thread(lambda: thumb.render(data, w, h, radius),
+                           lambda png: self._preview_rendered(key, data, size, png))
+
+    def _preview_rendered(self, key, data, size, png):
+        p = self.previews.get(key)
+        if not p or p.get("data") is not data:
+            return  # image remplacée entre-temps
+        p["stale"] = False
+        try:
+            if isinstance(png, Exception) or not png:
+                raise tk.TclError(png)
+            p["img"] = tk.PhotoImage(master=self, data=base64.b64encode(png))
+        except tk.TclError:
+            p["failed"] = size  # on garde l'image précédente s'il y en a une
+            return
+        p["size"] = size
+        self._redraw_favorite_cards()
+
+    def _redraw_favorite_cards(self):
+        for w in self.fav_grid.winfo_children():
+            if isinstance(w, Card) and w.media:
+                w.redraw()
+
+    def refresh_previews(self):
+        """Après une vérification : télécharge l'aperçu des favoris affichés qui sont en direct."""
+        if not self.cfg.get("live_previews") or not self.cfg.get("live_check"):
+            self.previews.clear()
+            return
+        urls = {}
+        for fav in self.shown_favorites():
+            key = self.live_key(fav)
+            info = self.live.get(key) if key else None
+            url = core.preview_url((info or {}).get("preview")) if info and info.get("live") else None
+            if url:
+                urls[key] = url
+        for key in list(self.previews):
+            if key not in urls:
+                del self.previews[key]
+        if urls:
+            self.run_in_thread(lambda: core.fetch_previews(urls), self._previews_fetched)
+
+    def _previews_fetched(self, results):
+        if isinstance(results, Exception):
+            return
+        changed = False
+        for key, data in results.items():
+            if not data:
+                continue  # échec : on garde l'image précédente s'il y en a une
+            old = self.previews.get(key)
+            if old and old.get("data") == data:
+                continue
+            # La nouvelle image remplace l'ancienne dès qu'elle est prête (pas de clignotement)
+            self.previews[key] = {"data": data, "img": (old or {}).get("img"), "size": (old or {}).get("size"),
+                                  "stale": True}
+            changed = True
+        if changed:
+            self._redraw_favorite_cards()
 
     def launch_favorite(self, fav):
         if self.entry_target(fav):
@@ -549,6 +646,7 @@ class App(tk.Tk):
                 started.append(key)
             self.live[key] = info
         self.build_favorites()
+        self.refresh_previews()
         if self.panel_kind == "favorites":
             self.open_favorites()
         if first:
@@ -709,6 +807,9 @@ class App(tk.Tk):
                 live.append(fav)
         for i, fav in enumerate(live[:8]):
             name, _ = self.target_label(self.entry_target(fav))
+            viewers = (self.live_info(fav) or {}).get("viewers")
+            if isinstance(viewers, int):
+                name = f"{name} · {t.viewers(viewers)}"
             items.append((100 + i, t("tray_watch", name=fav.get("channel", ""), platform=name), False))
         if live:
             items.append(None)
@@ -804,8 +905,11 @@ class App(tk.Tk):
         channel = entry.get("channel", "") or name
         fav = source == "favorite"
         right_color = None
-        if show_live and (self.live_info(entry) or {}).get("live"):
-            right, right_color = f"{name} · {self.t('live_on')}", self.c.ok
+        info = self.live_info(entry) if show_live else None
+        if info and info.get("live"):
+            viewers = info.get("viewers")
+            state = self.t.viewers(viewers) if isinstance(viewers, int) else self.t("live_on")
+            right, right_color = f"{name} · {state}", self.c.ok
         elif fav:
             right = name
         else:
@@ -1283,6 +1387,7 @@ class App(tk.Tk):
             return
         s = self.settings_state = {k: self.cfg[k] for k in ("language", "theme", "player", "show_scripts",
                                                              "live_check", "live_interval", "live_notify",
+                                                             "live_previews",
                                                              "tray", "hotkey", "autostart", "update_check",
                                                              "clipboard_watch", "hotkey_combo")}
         self.v_player_path = tk.StringVar(value=self.cfg["player_path"])
@@ -1329,6 +1434,8 @@ class App(tk.Tk):
                 lambda v: s.update(live_interval=v), height=36, width=120, font=self.fonts.small))
             self._switch_row(sec, t("label_live_notify"), t("hint_live_notify"), s["live_notify"],
                              lambda v: s.update(live_notify=v))
+            self._switch_row(sec, t("label_live_previews"), t("hint_live_previews"), s["live_previews"],
+                             lambda v: s.update(live_previews=v))
 
             sec = self._section(b, t("settings_window"))
             self._switch_row(sec, t("label_tray"), t("hint_tray"), s["tray"], lambda v: s.update(tray=v))
@@ -1516,7 +1623,8 @@ class App(tk.Tk):
                         streamlink_path=self.v_streamlink.get().strip(), show_scripts=bool(s["show_scripts"]),
                         scripts_folder=self.v_folder.get().strip() or str(core.DEFAULT_FOLDER),
                         live_check=bool(s["live_check"]), live_interval=int(s["live_interval"]),
-                        live_notify=bool(s["live_notify"]), tray=bool(s["tray"]), hotkey=bool(s["hotkey"]),
+                        live_notify=bool(s["live_notify"]), live_previews=bool(s["live_previews"]),
+                        tray=bool(s["tray"]), hotkey=bool(s["hotkey"]),
                         update_check=bool(s["update_check"]), clipboard_watch=bool(s["clipboard_watch"]),
                         hotkey_combo=s["hotkey_combo"])
         if self.sl_update and self.sl_update.get("path") != core.find_streamlink(self.cfg["streamlink_path"]):
@@ -1618,6 +1726,7 @@ class App(tk.Tk):
             self.live.clear()
         self.apply_tray_settings(startup=True)  # avant la reconstruction : l'état affiché est à jour
         self.build(reopen="settings")
+        self.refresh_previews()
         self.schedule_live(1500)
 
     def _browse_file(self, var):
@@ -1688,7 +1797,9 @@ class App(tk.Tk):
                 name, color = self.target_label(self.entry_target(fav))
                 info = self.live_info(fav)
                 if info and info.get("live"):
-                    detail = " · ".join(x for x in (t("live_on"), info.get("game"), info.get("title")) if x)
+                    viewers = info.get("viewers")
+                    detail = " · ".join(x for x in (t("live_on"), isinstance(viewers, int) and t.viewers(viewers),
+                                                    info.get("game"), info.get("title")) if x)
                 else:
                     detail = f"{t('added_on')} {t.format_date(fav.get('added', ''))}"
                 ListRow(b, self, fav.get("channel", "?"), f"{name} · {detail}",
