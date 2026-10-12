@@ -20,6 +20,7 @@ Pure Python + Tkinter, **no third-party dependency**. From source, it starts in 
 - **Platforms**: Twitch (ads disabled), Kick, YouTube, Dailymotion and Steam TV, plus a *Direct link* entry for any site Streamlink supports. Platforms are defined in `platforms.json`, so you can add your own.
 - **Quality and player**: quality is remembered per platform (`best`, `1080p60`, `audio_only`, fallback lists such as `720p60,720p,best`). You can choose the player and its arguments.
 - **Favorites with live status**: shows which Twitch and Kick favorites are live, with a Windows notification when one goes live.
+- **Smart clipboard and drag and drop**: a copied stream link is offered as soon as you come back to the window (and pre-fills the mini bar). You can also drop a link, text or a `.url` shortcut onto the window.
 - **Mini mode**: a floating Spotlight-style bar, opened with <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd> from any application. The shortcut can be changed in the settings.
 - **Notification area**: closing the window keeps it running in the tray, with streams and live checks still active. It can optionally start with Windows.
 - **Log drawer**: Streamlink output, running streams and a *Stop* button for each.
@@ -63,6 +64,8 @@ Use `python` instead of `pythonw` if you want to see a console. The `--tray` arg
 | Action | How |
 |---|---|
 | Launch a stream | Type a channel or paste a link, then press <kbd>Enter</kbd> or click **Launch** |
+| Use a copied link | Come back to the window and click **Launch** in the notification, or open the mini bar: the link is already there |
+| Drop a link | Drag it onto the window (address bar, selected text, `.url` file) |
 | Choose a suggestion | <kbd>↓</kbd> / <kbd>↑</kbd> then <kbd>Enter</kbd> |
 | Mini mode | <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd> (anywhere). <kbd>Tab</kbd> changes the platform, <kbd>Esc</kbd> closes it |
 | Settings | Gear icon, or <kbd>Ctrl</kbd>+<kbd>,</kbd> |
@@ -133,6 +136,7 @@ launcher/
   widgets.py           Lightweight canvas widgets (buttons, pills, cards, fields…)
   theme.py, gfx.py     Colors, fonts, anti-aliased shapes, icons
   mini.py              Mini mode
+  windrop.py           Drag and drop of links onto the window (OLE, ctypes)
   wintray.py           Tray icon, global shortcut, single instance, start with Windows (ctypes)
   winnotify.py         Windows notifications, taskbar flashing
 lang/                  Translations
@@ -146,6 +150,8 @@ tests/                 Unit tests (standard library only)
 The launcher only connects to the Internet for:
 - **Live checks** (can be turned off): one request to Twitch's public web endpoint for your Twitch favorites, and `streamlink --json` for Kick favorites. This Twitch endpoint is not an official API: if Twitch changes it, live status shows as unknown until an update.
 - **Update check** (can be turned off): one request to [PyPI](https://pypi.org/project/streamlink/) to read the latest Streamlink version.
+
+The clipboard is only read, on this computer, to look for a stream link (you can turn this off in the settings); its content is never stored or sent.
 
 Nothing else is sent, and no data is collected.
 
@@ -178,6 +184,7 @@ Python et Tkinter uniquement, **sans aucune dépendance externe**. Depuis les so
 - **Plateformes** : Twitch (publicités désactivées), Kick, YouTube, Dailymotion et Steam TV, plus une entrée *Lien direct* pour tout site pris en charge par Streamlink. Les plateformes sont définies dans `platforms.json`, tu peux donc ajouter les tiennes.
 - **Qualité et lecteur** : la qualité est mémorisée par plateforme (`best`, `1080p60`, `audio_only`, listes de secours comme `720p60,720p,best`). Tu peux choisir le lecteur et ses arguments.
 - **Favoris avec statut en direct** : indique lesquels de tes favoris Twitch et Kick sont en direct, avec une notification Windows quand l'un d'eux commence un live.
+- **Presse-papiers intelligent et glisser-déposer** : un lien de stream copié est proposé dès que tu reviens sur la fenêtre (et pré-remplit la barre mini). Tu peux aussi déposer un lien, du texte ou un raccourci `.url` sur la fenêtre.
 - **Mode mini** : une barre flottante façon Spotlight, ouverte avec <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd> depuis n'importe quelle application. Le raccourci se change dans les Paramètres.
 - **Zone de notification** : fermer la fenêtre laisse le lanceur actif à côté de l'horloge, avec les streams et la surveillance des lives. Il peut aussi démarrer avec Windows (option).
 - **Tiroir du journal** : sortie de Streamlink, streams en cours et un bouton *Arrêter* pour chacun.
@@ -221,6 +228,8 @@ Utilise `python` au lieu de `pythonw` si tu veux voir une console. L'argument `-
 | Action | Comment |
 |---|---|
 | Lancer un stream | Tape une chaîne ou colle un lien, puis <kbd>Entrée</kbd> ou **Lancer** |
+| Utiliser un lien copié | Reviens sur la fenêtre et clique **Lancer** dans la notification, ou ouvre la barre mini : le lien y est déjà |
+| Déposer un lien | Glisse-le sur la fenêtre (barre d'adresse, texte sélectionné, fichier `.url`) |
 | Choisir une suggestion | <kbd>↓</kbd> / <kbd>↑</kbd> puis <kbd>Entrée</kbd> |
 | Mode mini | <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd> (partout). <kbd>Tab</kbd> change de plateforme, <kbd>Échap</kbd> ferme |
 | Paramètres | Icône engrenage, ou <kbd>Ctrl</kbd>+<kbd>,</kbd> |
@@ -273,6 +282,7 @@ launcher/
   widgets.py           Composants légers dessinés (boutons, pastilles, cartes, champs…)
   theme.py, gfx.py     Couleurs, polices, formes lissées, icônes
   mini.py              Mode mini
+  windrop.py           Glisser-déposer de liens sur la fenêtre (OLE, ctypes)
   wintray.py           Icône de notification, raccourci global, instance unique, démarrage avec Windows (ctypes)
   winnotify.py         Notifications Windows, clignotement de la barre des tâches
 lang/                  Traductions
@@ -286,6 +296,8 @@ tests/                 Tests unitaires (bibliothèque standard uniquement)
 Le lanceur ne se connecte à Internet que pour :
 - **Le statut en direct** (désactivable) : une requête vers l'accès web public de Twitch pour tes favoris Twitch, et `streamlink --json` pour tes favoris Kick. Cet accès Twitch n'est pas une API officielle : si Twitch le modifie, le statut reste inconnu jusqu'à une mise à jour.
 - **La vérification des mises à jour** (désactivable) : une requête vers [PyPI](https://pypi.org/project/streamlink/) pour lire la dernière version de Streamlink.
+
+Le presse-papiers n'est lu que sur ton ordinateur, pour y chercher un lien de stream (désactivable dans les Paramètres) : son contenu n'est ni enregistré ni envoyé.
 
 Rien d'autre n'est envoyé, et aucune donnée n'est collectée.
 

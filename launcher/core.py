@@ -81,6 +81,7 @@ DEFAULT_CONFIG = {
     "autostart": False,        # lancer au démarrage de Windows, réduit
     "tray_hint_shown": False,
     "update_check": True,      # vérifier au démarrage si Streamlink est à jour
+    "clipboard_watch": True,   # proposer un lien de stream copié dans le presse-papiers
 }
 
 LIVE_INTERVALS = [2, 5, 10, 15, 30]
@@ -498,6 +499,88 @@ def detect_platform_in_text(platforms, text):
         generic = next((p for p in platforms if p["input"] == "url"), None)
         return generic["id"] if generic else None
     return None
+
+
+# --- Liens collés, copiés ou glissés dans l'application ------------------------
+CLIPBOARD_MAX = 2000   # au-delà, le contenu du presse-papiers est ignoré (texte énorme)
+_URL_IN_TEXT = re.compile(r"https?://[^\s\"'<>]{3,2000}", re.IGNORECASE)
+
+
+def link_in_text(platforms, text):
+    """Premier lien reconnu dans un texte -> (id de plateforme, lien) ou None.
+
+    Les liens des plateformes connues passent avant un lien quelconque, et un texte sans
+    lien (un simple mot, une phrase) ne donne rien : le presse-papiers n'est pas fouillé
+    pour autre chose que des adresses.
+    """
+    text = (text or "").strip()
+    if not text or len(text) > CLIPBOARD_MAX:
+        return None
+    candidates = _URL_IN_TEXT.findall(text)
+    if not candidates and " " not in text and "\n" not in text:
+        candidates = [text]          # « twitch.tv/zerator » sans https://
+    generic = None
+    for c in candidates:
+        c = c.rstrip(".,;)]}")
+        pid = detect_platform_in_text(platforms, c)
+        if not pid:
+            continue
+        if any(p["id"] == pid and p["input"] != "url" for p in platforms):
+            return pid, c
+        generic = generic or (pid, c)
+    return generic
+
+
+def link_from_url_file(path):
+    """Adresse contenue dans un raccourci Internet .url (INI) ou .webloc simple, sinon None."""
+    try:
+        if Path(path).stat().st_size > 64 * 1024:
+            return None
+        raw = Path(path).read_bytes()
+    except OSError:
+        return None
+    for enc in ("utf-8-sig", "utf-16", "cp1252"):
+        try:
+            text = raw.decode(enc)
+            break
+        except UnicodeError:
+            continue
+    else:
+        return None
+    m = re.search(r"^\s*URL\s*=\s*(\S+)", text, re.IGNORECASE | re.MULTILINE)
+    if not m:
+        m = re.search(r"<string>\s*(https?://[^<\s]+)\s*</string>", text, re.IGNORECASE)
+    return m.group(1) if m and URL_RE.match(m.group(1)) else None
+
+
+def links_from_paths(platforms, paths):
+    """Fichiers déposés (.url, .txt) -> premier lien reconnu, ou None."""
+    for path in paths:
+        suffix = Path(path).suffix.lower()
+        if suffix == ".url":
+            found = link_from_url_file(path)
+        elif suffix in (".txt", ".webloc"):
+            try:
+                found = Path(path).read_text(encoding="utf-8", errors="ignore")[:CLIPBOARD_MAX]
+            except OSError:
+                found = None
+        else:
+            found = None
+        hit = link_in_text(platforms, found) if found else None
+        if hit:
+            return hit
+    return None
+
+
+def clipboard_sequence():
+    """Numéro de séquence du presse-papiers Windows (change à chaque copie), 0 ailleurs."""
+    if os.name != "nt":
+        return 0
+    try:
+        import ctypes
+        return int(ctypes.windll.user32.GetClipboardSequenceNumber())
+    except Exception:
+        return 0
 
 
 def build_script_command(path, arg):

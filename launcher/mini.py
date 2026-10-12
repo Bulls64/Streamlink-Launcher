@@ -56,6 +56,10 @@ class MiniBar:
         app, c, px, t = self.app, self.app.c, self.app.px, self.app.t
         self.pid = app.target[1] if app.target[0] == "platform" else app.platforms[0]["id"]
         self.message = None
+        offer = app.clipboard_offer()  # lien de stream copié : la barre s'ouvre déjà remplie
+        if offer:
+            self.pid = offer[0]
+            self.message = (t("mini_clip_hint"), "info")
         p = self.platform
         accent = (p["color"], p["text_color"])
 
@@ -108,10 +112,16 @@ class MiniBar:
         self._had_focus = False
         self._shown_at = time.monotonic()
 
+        if offer:
+            self._suppress = True
+            self.query.set(offer[1])
+            self._suppress = False
         self.refresh()
         win.deiconify()
         apply_window_chrome(win, c.dark, border=accent[0])
         self._focus()
+        if offer:
+            self.field.entry.select_range(0, "end")  # taper remplace le lien proposé
         win.after(80, self._focus)  # 2e essai : Windows applique parfois le premier plan avec un léger retard
 
     def hide(self):
@@ -227,7 +237,7 @@ class MiniBar:
         self.list.set_items(self.items())
         if self.message:
             text, kind = self.message
-            self.hint.configure(text=text, fg=c.error if kind == "error" else c.warn)
+            self.hint.configure(text=text, fg={"error": c.error, "info": c.muted}.get(kind, c.warn))
         else:
             self.hint.configure(text=self.app.t("mini_hint"), fg=c.faint)
         self._place()
