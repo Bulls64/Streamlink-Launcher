@@ -205,5 +205,19 @@
   "mini_clip_hint": "Kopierter Link erkannt — Enter zum Starten, oder tippe, um ihn zu ersetzen",
   "label_clipboard": "Kopierte Links erkennen",
   "hint_clipboard": "Bietet an, einen kopierten Stream-Link zu starten, wenn das Fenster aktiviert wird, und füllt die Mini-Leiste vor",
-  "log_drop_failed": "Drag-and-drop nicht verfügbar (siehe launcher.log)"
+  "log_drop_failed": "Drag-and-drop nicht verfügbar (siehe launcher.log)",
+  "settings_backup": "Sicherung",
+  "hint_backup": "Speichert deine Einstellungen und Favoriten in einer Datei, um sie wiederherzustellen oder auf einen anderen Computer zu übertragen. Pfade, die zu diesem Computer gehören (Streamlink, Player, Skripte), sind nicht enthalten.",
+  "btn_export": "Exportieren…",
+  "btn_import": "Importieren…",
+  "filetype_json": "JSON-Datei",
+  "toast_export_ok": "Sicherung gespeichert: {file}",
+  "toast_export_failed": "Die Sicherung konnte nicht gespeichert werden",
+  "toast_import_ok": "Importiert: {settings} Einstellung(en), {favorites} Favorit(en)",
+  "confirm_import": "{settings} Einstellung(en) und {favorites} Favorit(en) importieren?\n\nJa: Favoriten zu den aktuellen hinzufügen\nNein: aktuelle Favoriten ersetzen\nAbbrechen: nichts ändern",
+  "confirm_import_settings": "{settings} Einstellung(en) importieren? Deine Favoriten bleiben unverändert.",
+  "err_backup_read": "Diese Datei konnte nicht gelesen werden",
+  "err_backup_invalid": "Diese Datei enthält keine erkennbaren Einstellungen oder Favoriten",
+  "log_export_ok": "Sicherung exportiert: {path}",
+  "log_import_ok": "Import: {settings} Einstellung(en), {favorites} Favorit(en)"
 }

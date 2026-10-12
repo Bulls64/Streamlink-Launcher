@@ -1,6 +1,7 @@
 """Fenêtre principale : écran de lancement, tiroir du journal, panneaux latéraux."""
 import os
 import re
+import json
 import sys
 import queue
 import threading
@@ -997,6 +998,9 @@ class App(tk.Tk):
         if not core.QUALITY_RE.match(quality):
             report(t("err_quality"), "warn")
             return False
+        # Le lien lancé n'est pas à reproposer. Lu AVANT de démarrer le processus : sous X11, lire le presse-papiers
+        # traite des événements, et une notification d'échec pourrait sinon être recouverte par « Lancement ».
+        self._clip_seen = self._clip_key()[0]
         opts, missing = core.player_options(self.cfg)
         if missing:
             self.log(t("log_player_not_found", player=core.PLAYER_NAMES.get(missing, missing)), "warn")
@@ -1017,7 +1021,6 @@ class App(tk.Tk):
             self.log(t("log_error", error=e), "err")
             return False
         self.log(t("log_launching", label=f"{pname} / {name}", quality=quality))
-        self._clip_seen = self._clip_key()[0]  # le lien lancé n'est pas à reproposer
         self.store.add_history({"channel": display, "platform": p["id"]})
         self.toast(t("toast_launching", name=name, platform=pname), "ok")
         self.build_recents()
@@ -1355,6 +1358,15 @@ class App(tk.Tk):
             Field(sec, self, self.v_folder, height=40, font=self.fonts.small, action_icon="folder",
                   action_command=self._browse_folder).pack(fill="x")
 
+            sec = self._section(b, t("settings_backup"))
+            self._hint(sec, t("hint_backup"))
+            row = tk.Frame(sec, bg=self.c.panel)
+            row.pack(anchor="w", pady=(self.px(4), 0))
+            Button(row, self, text=t("btn_export"), kind="secondary", font=self.fonts.small, height=36,
+                   command=self.export_data).pack(side="left", padx=(0, self.px(8)))
+            Button(row, self, text=t("btn_import"), kind="secondary", font=self.fonts.small, height=36,
+                   command=self.import_data).pack(side="left")
+
             sec = self._section(b, t("settings_about"))
             from . import __version__
             tk.Label(sec, text=f"Streamlink Launcher {__version__}", font=self.fonts.body, bg=self.c.panel,
@@ -1490,13 +1502,7 @@ class App(tk.Tk):
                         update_check=bool(s["update_check"]), clipboard_watch=bool(s["clipboard_watch"]), hotkey_combo=s["hotkey_combo"])
         if self.sl_update and self.sl_update.get("path") != core.find_streamlink(self.cfg["streamlink_path"]):
             self.sl_update = None  # autre Streamlink choisi : l'ancien résultat ne vaut plus
-        autostart_error = False
-        if bool(s["autostart"]) != bool(self.cfg.get("autostart")):
-            script = os.path.join(str(core.BASE_DIR), "slink_launcher.py")
-            if wintray.set_autostart(bool(s["autostart"]), script, sys.executable) or os.name != "nt":
-                self.cfg["autostart"] = bool(s["autostart"])
-            else:
-                autostart_error = True
+        autostart_error = not self._apply_autostart(bool(s["autostart"]))
         if self.target[0] == "script" and not self.cfg["show_scripts"]:
             self.target = ("platform", self.platforms[0]["id"])
         core.save_config(self.cfg)
@@ -1517,6 +1523,85 @@ class App(tk.Tk):
             self.toast(self.t("toast_autostart_failed"), "error")
         else:
             self.toast(self.t("toast_settings_saved"), "ok")
+
+    def _apply_autostart(self, wanted):
+        """Active ou désactive le lancement avec Windows ; False si Windows a refusé."""
+        if wanted == bool(self.cfg.get("autostart")):
+            return True
+        script = os.path.join(str(core.BASE_DIR), "slink_launcher.py")
+        if wintray.set_autostart(wanted, script, sys.executable) or os.name != "nt":
+            self.cfg["autostart"] = wanted
+            return True
+        return False
+
+    # =====================================================
+    # Sauvegarde : export / import des réglages et des favoris
+    # =====================================================
+    def export_data(self):
+        from . import __version__
+        t = self.t
+        name = f"streamlink-launcher-{core.now_str()[:10]}.json"
+        path = filedialog.asksaveasfilename(parent=self, title=t("btn_export"), defaultextension=".json",
+                                            initialfile=name, filetypes=[(t("filetype_json"), "*.json")])
+        if not path:
+            return False
+        backup = core.make_backup(self.cfg, self.store.favorites, __version__)
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(backup, f, ensure_ascii=False, indent=2)
+        except OSError as e:
+            core.log.error("Export impossible vers %s : %s", path, e)
+            self.toast(t("toast_export_failed"), "error")
+            return False
+        self.log(t("log_export_ok", path=path), "dim")
+        self.toast(t("toast_export_ok", file=os.path.basename(path)), "ok")
+        return True
+
+    def import_data(self, path=None):
+        t = self.t
+        path = path or filedialog.askopenfilename(parent=self, title=t("btn_import"),
+                                                  filetypes=[(t("filetype_json"), "*.json"), ("*", "*")])
+        if not path:
+            return False
+        try:
+            settings, favorites = core.read_backup(path, core.available_languages(), wintray.HOTKEYS)
+        except core.BackupError as e:
+            self.toast(t(e.key), "error")
+            return False
+        n, m = len(settings), len(favorites)
+        if favorites:
+            answer = messagebox.askyesnocancel(
+                t("title_confirm"), t("confirm_import", settings=n, favorites=m), parent=self)
+            if answer is None:
+                return False
+            replace = answer is False
+        else:
+            if not messagebox.askokcancel(t("title_confirm"), t("confirm_import_settings", settings=n), parent=self):
+                return False
+            replace = False
+        old_lang = self.cfg["language"]
+        self.cfg.update(settings)
+        self.cfg["qualities"] = dict(self.cfg.get("qualities") or {})
+        autostart_ok = self._apply_autostart(bool(self.cfg.get("autostart"))) if "autostart" in settings else True
+        core.save_config(self.cfg)
+        if favorites:
+            if replace:
+                self.store.favorites = favorites
+            else:
+                self.store.favorites, m = core.merge_favorites(self.store.favorites, favorites)
+            self.store.save_favorites()
+        if self.cfg["language"] != old_lang:
+            self.t.set(self.cfg["language"])
+        if self.target[0] == "script" and not self.cfg["show_scripts"]:
+            self.target = ("platform", self.platforms[0]["id"])
+        self.live.clear()
+        self.apply_tray_settings(startup=True)
+        self.build(reopen="settings")
+        self.schedule_live(1500)
+        self.log(self.t("log_import_ok", settings=n, favorites=m), "dim")
+        self.toast(self.t("toast_import_ok", settings=n, favorites=m) if autostart_ok
+                   else self.t("toast_autostart_failed"), "ok" if autostart_ok else "error")
+        return True
 
     def _browse_file(self, var):
         filetypes = [(self.t("filetype_exe"), "*.exe"), ("*", "*")] if os.name == "nt" else [("*", "*")]

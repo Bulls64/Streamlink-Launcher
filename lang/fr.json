@@ -205,5 +205,19 @@
   "mini_clip_hint": "Lien copié détecté — Entrée pour lancer, ou tapez pour le remplacer",
   "label_clipboard": "Détecter les liens copiés",
   "hint_clipboard": "Propose de lancer un lien de stream copié quand la fenêtre s'active, et pré-remplit la barre mini",
-  "log_drop_failed": "Glisser-déposer indisponible (voir launcher.log)"
+  "log_drop_failed": "Glisser-déposer indisponible (voir launcher.log)",
+  "settings_backup": "Sauvegarde",
+  "hint_backup": "Enregistre tes réglages et tes favoris dans un fichier, pour les restaurer ou les copier sur un autre ordinateur. Les chemins propres à cet ordinateur (Streamlink, lecteur, scripts) ne sont pas inclus.",
+  "btn_export": "Exporter…",
+  "btn_import": "Importer…",
+  "filetype_json": "Fichier JSON",
+  "toast_export_ok": "Sauvegarde enregistrée : {file}",
+  "toast_export_failed": "Impossible d'enregistrer la sauvegarde",
+  "toast_import_ok": "Importé : {settings} réglage(s), {favorites} favori(s)",
+  "confirm_import": "Importer {settings} réglage(s) et {favorites} favori(s) ?\n\nOui : ajouter les favoris à tes favoris actuels\nNon : remplacer tes favoris actuels\nAnnuler : ne rien changer",
+  "confirm_import_settings": "Importer {settings} réglage(s) ? Tes favoris ne changent pas.",
+  "err_backup_read": "Impossible de lire ce fichier",
+  "err_backup_invalid": "Ce fichier ne contient ni réglages ni favoris reconnus",
+  "log_export_ok": "Sauvegarde exportée : {path}",
+  "log_import_ok": "Import : {settings} réglage(s), {favorites} favori(s)"
 }

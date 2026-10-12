@@ -205,5 +205,19 @@
   "mini_clip_hint": "Copied link detected — Enter to launch, or type to replace it",
   "label_clipboard": "Detect copied links",
   "hint_clipboard": "Offers to launch a copied stream link when the window is activated, and pre-fills the mini bar",
-  "log_drop_failed": "Drag and drop unavailable (see launcher.log)"
+  "log_drop_failed": "Drag and drop unavailable (see launcher.log)",
+  "settings_backup": "Backup",
+  "hint_backup": "Saves your settings and favorites to a file, to restore them or copy them to another computer. Paths specific to this computer (Streamlink, player, scripts) are not included.",
+  "btn_export": "Export…",
+  "btn_import": "Import…",
+  "filetype_json": "JSON file",
+  "toast_export_ok": "Backup saved: {file}",
+  "toast_export_failed": "Could not save the backup",
+  "toast_import_ok": "Imported: {settings} setting(s), {favorites} favorite(s)",
+  "confirm_import": "Import {settings} setting(s) and {favorites} favorite(s)?\n\nYes: add the favorites to your current ones\nNo: replace your current favorites\nCancel: change nothing",
+  "confirm_import_settings": "Import {settings} setting(s)? Your favorites will not change.",
+  "err_backup_read": "This file could not be read",
+  "err_backup_invalid": "This file contains no recognised settings or favorites",
+  "log_export_ok": "Backup exported: {path}",
+  "log_import_ok": "Import: {settings} setting(s), {favorites} favorite(s)"
 }

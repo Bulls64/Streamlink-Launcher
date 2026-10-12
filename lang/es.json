@@ -205,5 +205,19 @@
   "mini_clip_hint": "Enlace copiado detectado — Intro para iniciar, o escribe para reemplazarlo",
   "label_clipboard": "Detectar enlaces copiados",
   "hint_clipboard": "Propone iniciar un enlace de stream copiado al activar la ventana, y rellena la barra mini",
-  "log_drop_failed": "Arrastrar y soltar no disponible (consulta launcher.log)"
+  "log_drop_failed": "Arrastrar y soltar no disponible (consulta launcher.log)",
+  "settings_backup": "Copia de seguridad",
+  "hint_backup": "Guarda tus ajustes y favoritos en un archivo, para restaurarlos o copiarlos a otro ordenador. Las rutas propias de este ordenador (Streamlink, reproductor, scripts) no se incluyen.",
+  "btn_export": "Exportar…",
+  "btn_import": "Importar…",
+  "filetype_json": "Archivo JSON",
+  "toast_export_ok": "Copia guardada: {file}",
+  "toast_export_failed": "No se ha podido guardar la copia",
+  "toast_import_ok": "Importado: {settings} ajuste(s), {favorites} favorito(s)",
+  "confirm_import": "¿Importar {settings} ajuste(s) y {favorites} favorito(s)?\n\nSí: añadir los favoritos a los actuales\nNo: reemplazar tus favoritos actuales\nCancelar: no cambiar nada",
+  "confirm_import_settings": "¿Importar {settings} ajuste(s)? Tus favoritos no cambian.",
+  "err_backup_read": "No se puede leer este archivo",
+  "err_backup_invalid": "Este archivo no contiene ajustes ni favoritos reconocidos",
+  "log_export_ok": "Copia exportada: {path}",
+  "log_import_ok": "Importación: {settings} ajuste(s), {favorites} favorito(s)"
 }

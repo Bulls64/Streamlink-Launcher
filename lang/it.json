@@ -205,5 +205,19 @@
   "mini_clip_hint": "Link copiato rilevato — Invio per avviare, oppure digita per sostituirlo",
   "label_clipboard": "Rileva i link copiati",
   "hint_clipboard": "Propone di avviare un link di stream copiato quando la finestra si attiva e precompila la barra mini",
-  "log_drop_failed": "Trascinamento non disponibile (vedi launcher.log)"
+  "log_drop_failed": "Trascinamento non disponibile (vedi launcher.log)",
+  "settings_backup": "Backup",
+  "hint_backup": "Salva le tue impostazioni e i tuoi preferiti in un file, per ripristinarli o copiarli su un altro computer. I percorsi specifici di questo computer (Streamlink, lettore, script) non sono inclusi.",
+  "btn_export": "Esporta…",
+  "btn_import": "Importa…",
+  "filetype_json": "File JSON",
+  "toast_export_ok": "Backup salvato: {file}",
+  "toast_export_failed": "Impossibile salvare il backup",
+  "toast_import_ok": "Importato: {settings} impostazione/i, {favorites} preferito/i",
+  "confirm_import": "Importare {settings} impostazione/i e {favorites} preferito/i?\n\nSì: aggiungi i preferiti a quelli attuali\nNo: sostituisci i preferiti attuali\nAnnulla: non cambiare nulla",
+  "confirm_import_settings": "Importare {settings} impostazione/i? I tuoi preferiti non cambiano.",
+  "err_backup_read": "Impossibile leggere questo file",
+  "err_backup_invalid": "Questo file non contiene impostazioni o preferiti riconosciuti",
+  "log_export_ok": "Backup esportato: {path}",
+  "log_import_ok": "Importazione: {settings} impostazione/i, {favorites} preferito/i"
 }
