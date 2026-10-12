@@ -25,6 +25,7 @@ Pure Python + Tkinter, **no third-party dependency**. From source, it starts in 
 - **Notification area**: closing the window keeps it running in the tray, with streams and live checks still active. It can optionally start with Windows.
 - **Log drawer**: Streamlink output, running streams and a *Stop* button for each.
 - **Streamlink update check**: in the settings and optionally at start-up.
+- **Backup**: export your settings and favorites to a single file and import them on another computer (Settings → Backup).
 - **Interface**: light, dark or automatic theme (follows Windows), in English, French, Spanish, German and Italian.
 
 | Light theme | Mini mode | Settings |
@@ -189,6 +190,7 @@ Python et Tkinter uniquement, **sans aucune dépendance externe**. Depuis les so
 - **Zone de notification** : fermer la fenêtre laisse le lanceur actif à côté de l'horloge, avec les streams et la surveillance des lives. Il peut aussi démarrer avec Windows (option).
 - **Tiroir du journal** : sortie de Streamlink, streams en cours et un bouton *Arrêter* pour chacun.
 - **Vérification des mises à jour de Streamlink** : dans les réglages, et au démarrage si tu le souhaites.
+- **Sauvegarde** : exporte tes réglages et tes favoris dans un seul fichier et importe-le sur un autre ordinateur (Paramètres → Sauvegarde).
 - **Interface** : thème clair, sombre ou automatique (suit Windows), en français, anglais, espagnol, allemand et italien.
 
 | Thème clair | Mode mini | Paramètres |
