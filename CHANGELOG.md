@@ -11,7 +11,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Planned
+- Viewing statistics (time per channel, peak hours).
+
+## [1.1.0] - 2026-10-12
+
 ### Added
+- **Smart clipboard.** When you come back to the window, the launcher notices a stream link you just copied and offers to launch it from a notification (*Launch* button). Opening the mini bar with the shortcut pre-fills it with the copied link, selected, so you can press <kbd>Enter</kbd> or simply type to replace it. A link is offered only once (copying it again offers it again), never when it is already in the field, and only links are looked at: ordinary text is ignored. It can be turned off in the settings (*Detect copied links*).
+- **Drag and drop.** Drop a link onto the window — from a browser address bar or tab, selected text, or an Internet shortcut (`.url`) / text file — and it fills the field, selects the right platform and offers to launch it. A dashed drop zone appears while you drag. Windows only; no new dependency.
 - **Export / import of settings and favorites** (Settings → Backup): one JSON file to restore your setup or copy it to another computer. Importing asks whether to add the favorites to the current ones or replace them. Paths specific to the computer (Streamlink, player, scripts folder, window position) are neither exported nor imported, and only known settings with valid values are accepted, so a file received from someone else cannot point to a program to run. A plain `config.json` or `favorites.json` can also be imported.
 - **Spanish, German and Italian translations** (complete interface). The language is chosen in the settings, now a drop-down list since five languages no longer fit side by side; the system language is detected at first launch.
 
@@ -24,15 +31,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Removed
 - Dead code: unused constants, method and attribute, and 5 translation texts (× 5 languages) left over from the old *Test* button. A test now fails if a translation is no longer used.
-
-### Planned
-- Viewing statistics (time per channel, peak hours).
-
-## [1.1.0] - 2026-10-11
-
-### Added
-- **Smart clipboard.** When you come back to the window, the launcher notices a stream link you just copied and offers to launch it from a notification (*Launch* button). Opening the mini bar with the shortcut pre-fills it with the copied link, selected, so you can press <kbd>Enter</kbd> or simply type to replace it. A link is offered only once (copying it again offers it again), never when it is already in the field, and only links are looked at: ordinary text is ignored. It can be turned off in the settings (*Detect copied links*).
-- **Drag and drop.** Drop a link onto the window — from a browser address bar or tab, selected text, or an Internet shortcut (`.url`) / text file — and it fills the field, selects the right platform and offers to launch it. A dashed drop zone appears while you drag. Windows only; no new dependency.
 
 ## [1.0.2] - 2026-10-11
 
@@ -182,7 +180,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Non publié]
 
+### Prévu
+- Statistiques de visionnage (temps par chaîne, heures de pointe).
+
+## [1.1.0] - 2026-10-12
+
 ### Ajouté
+- **Presse-papiers intelligent.** Quand tu reviens sur la fenêtre, le lanceur repère un lien de stream que tu viens de copier et propose de le lancer depuis une notification (bouton *Lancer*). L'ouverture de la barre mini avec le raccourci la pré-remplit avec le lien copié, sélectionné : <kbd>Entrée</kbd> pour lancer, ou tape directement pour le remplacer. Un lien n'est proposé qu'une fois (le recopier le propose de nouveau), jamais s'il est déjà dans le champ, et seuls les liens sont regardés : un texte ordinaire est ignoré. Désactivable dans les Paramètres (*Détecter les liens copiés*).
+- **Glisser-déposer.** Dépose un lien sur la fenêtre — depuis la barre d'adresse ou un onglet d'un navigateur, du texte sélectionné, ou un raccourci Internet (`.url`) / fichier texte — et il remplit le champ, choisit la bonne plateforme et propose de le lancer. Une zone de dépôt en pointillés apparaît pendant le glissement. Windows uniquement ; aucune nouvelle dépendance.
 - **Export / import des réglages et des favoris** (Paramètres → Sauvegarde) : un fichier JSON pour restaurer ta configuration ou la copier sur un autre ordinateur. L'import demande s'il faut ajouter les favoris aux actuels ou les remplacer. Les chemins propres à l'ordinateur (Streamlink, lecteur, dossier des scripts, position de la fenêtre) ne sont ni exportés ni importés, et seuls les réglages connus aux valeurs valides sont acceptés : un fichier reçu d'ailleurs ne peut donc pas désigner un programme à lancer. Un simple `config.json` ou `favorites.json` peut aussi être importé.
 - **Traductions en espagnol, allemand et italien** (interface complète). La langue se choisit dans les Paramètres, désormais une liste déroulante car cinq langues ne tiennent plus côte à côte ; la langue du système est détectée au premier lancement.
 
@@ -195,15 +200,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Retiré
 - Code mort : constantes, méthode et attribut inutilisés, et 5 textes de traduction (× 5 langues) restés de l'ancien bouton *Tester*. Un test échoue désormais si une traduction n'est plus utilisée.
-
-### Prévu
-- Statistiques de visionnage (temps par chaîne, heures de pointe).
-
-## [1.1.0] - 2026-10-11
-
-### Ajouté
-- **Presse-papiers intelligent.** Quand tu reviens sur la fenêtre, le lanceur repère un lien de stream que tu viens de copier et propose de le lancer depuis une notification (bouton *Lancer*). L'ouverture de la barre mini avec le raccourci la pré-remplit avec le lien copié, sélectionné : <kbd>Entrée</kbd> pour lancer, ou tape directement pour le remplacer. Un lien n'est proposé qu'une fois (le recopier le propose de nouveau), jamais s'il est déjà dans le champ, et seuls les liens sont regardés : un texte ordinaire est ignoré. Désactivable dans les Paramètres (*Détecter les liens copiés*).
-- **Glisser-déposer.** Dépose un lien sur la fenêtre — depuis la barre d'adresse ou un onglet d'un navigateur, du texte sélectionné, ou un raccourci Internet (`.url`) / fichier texte — et il remplit le champ, choisit la bonne plateforme et propose de le lancer. Une zone de dépôt en pointillés apparaît pendant le glissement. Windows uniquement ; aucune nouvelle dépendance.
 
 ## [1.0.2] - 2026-10-11
 
