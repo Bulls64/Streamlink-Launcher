@@ -58,10 +58,26 @@ class TestVersion(unittest.TestCase):
 class TestTranslations(unittest.TestCase):
     def test_same_keys_in_every_language(self):
         files = sorted((ROOT / "lang").glob("*.json"))
-        self.assertGreaterEqual(len(files), 2)
+        self.assertEqual({f.stem for f in files}, {"fr", "en", "es", "de", "it"})
         keys = [set(json.loads(f.read_text(encoding="utf-8"))) for f in files]
         for f, k in zip(files[1:], keys[1:]):
             self.assertEqual(k, keys[0], f"{f.name} : {sorted(k ^ keys[0])}")
+
+    def test_same_placeholders_in_every_language(self):
+        import re
+        data = {f.stem: json.loads(f.read_text(encoding="utf-8")) for f in (ROOT / "lang").glob("*.json")}
+        for key, ref in data["fr"].items():
+            if not isinstance(ref, str):
+                continue
+            for lang, strings in data.items():
+                self.assertEqual(sorted(re.findall(r"{\w+}", strings[key])), sorted(re.findall(r"{\w+}", ref)),
+                                 f"{lang}.json : {key}")
+
+    def test_every_language_has_a_name_and_twelve_months(self):
+        for f in (ROOT / "lang").glob("*.json"):
+            d = json.loads(f.read_text(encoding="utf-8"))
+            self.assertTrue(d.get("_language_name"), f.name)
+            self.assertEqual(len(d["months_short"]), 12, f.name)
 
     def test_placeholder_named_key_is_allowed(self):
         t = core.I18n("fr")
