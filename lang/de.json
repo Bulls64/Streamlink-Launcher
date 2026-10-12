@@ -134,6 +134,13 @@
   "minutes": "{count} Min.",
   "label_live_notify": "Windows-Benachrichtigung",
   "hint_live_notify": "Wenn ein Favorit einen Livestream startet.",
+  "decimal_sep": ",",
+  "num_thousands": "{n} Tsd.",
+  "num_millions": "{n} Mio.",
+  "viewers": "{count} Zuschauer",
+  "viewers_one": "{count} Zuschauer",
+  "label_live_previews": "Live-Vorschau",
+  "hint_live_previews": "Vorschaubild, Titel und Zuschauerzahl der Twitch-Favoriten, die live sind.",
 
   "mini_hint": "Tab: Plattform · ↓: Vorschläge · Enter: starten · Esc: schließen",
   "notif_click_to_watch": "Zum Ansehen klicken",

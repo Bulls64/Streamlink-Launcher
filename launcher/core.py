@@ -9,6 +9,7 @@ import logging
 import shutil
 import locale
 import threading
+import time
 import subprocess
 from datetime import datetime
 from pathlib import Path
@@ -76,6 +77,7 @@ DEFAULT_CONFIG = {
     "live_check": True,        # vérifier qui est en direct parmi les favoris
     "live_interval": 5,        # minutes
     "live_notify": True,       # notification Windows au début d'un live
+    "live_previews": True,     # aperçu, titre et spectateurs des favoris en direct (Twitch)
     "tray": True,              # fermer la fenêtre = réduire dans la zone de notification (Windows)
     "hotkey": True,            # raccourci global qui ouvre le mode mini (Windows)
     "hotkey_combo": "ctrl+alt+s",
@@ -343,6 +345,20 @@ class I18n:
         if d.year == now.year:
             return self("date_same_year", day=d.day, month=months[d.month - 1], time=hm)
         return self("date_other_year", day=d.day, month=months[d.month - 1], year=d.year)
+
+    def format_number(self, n):
+        """12 -> '12', 1234 -> '1,2 k', 123456 -> '123 k', 2500000 -> '2,5 M' (arrondi vers le bas, selon la langue)."""
+        n = max(0, int(n))
+        for div, key in ((1_000_000, "num_millions"), (1000, "num_thousands")):
+            if n >= div:
+                tenths = n * 10 // div
+                text = str(tenths // 10) if tenths >= 1000 or tenths % 10 == 0 else f"{tenths // 10}.{tenths % 10}"
+                return self(key, n=text.replace(".", self.get("decimal_sep") or ","))
+        return str(n)
+
+    def viewers(self, n):
+        """'1 spectateur', '12,3 k spectateurs'…"""
+        return self("viewers_one" if n == 1 else "viewers", count=self.format_number(n))
 
 
 # ---------------------
@@ -973,6 +989,8 @@ def check_streamlink_update(streamlink_path=""):
 TWITCH_GQL_URL = "https://gql.twitch.tv/gql"
 TWITCH_CLIENT_ID = "kimne78kx3ncx6brgo4mv6wki5h1ko"  # identifiant public du site web Twitch (utilisé aussi par Streamlink)
 TWITCH_LOGIN_RE = re.compile(r"^[A-Za-z0-9_]{1,25}$")
+PREVIEW_SIZE = (640, 360)  # taille demandée à Twitch ; réduite ensuite à la taille de la carte
+PREVIEW_MAX_BYTES = 2 * 1024 * 1024
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) StreamlinkLauncher"
 
 
@@ -989,12 +1007,16 @@ def _http_json(url, payload, headers, timeout):
         return json.loads(resp.read().decode("utf-8"))
 
 
+def _offline():
+    return {"live": False, "title": None, "game": None, "viewers": None, "preview": None}
+
+
 def twitch_live(logins, timeout=8):
     """Une seule requête pour toutes les chaînes Twitch : {login: info}."""
     logins = sorted({l.lower() for l in logins if TWITCH_LOGIN_RE.match(l or "")})
     result = {}
     query = ("query($logins:[String!]){users(logins:$logins){login stream{title viewersCount "
-             "game{displayName}}}}")
+             "previewImageURL(width:%d,height:%d) game{displayName}}}}" % PREVIEW_SIZE)
     for i in range(0, len(logins), 100):
         chunk = logins[i:i + 100]
         data = _http_json(TWITCH_GQL_URL, {"query": query, "variables": {"logins": chunk}},
@@ -1012,9 +1034,10 @@ def twitch_live(logins, timeout=8):
                     "title": (s or {}).get("title"),
                     "game": ((s or {}).get("game") or {}).get("displayName"),
                     "viewers": (s or {}).get("viewersCount"),
+                    "preview": (s or {}).get("previewImageURL"),
                 }
         for login in chunk:
-            result[login] = found.get(login, {"live": False, "title": None, "game": None, "viewers": None})
+            result[login] = found.get(login, _offline())
     return result
 
 
@@ -1030,10 +1053,11 @@ def streamlink_live(streamlink, url, timeout=30):
         return None
     if data.get("streams"):
         meta = data.get("metadata") or {}
-        return {"live": True, "title": meta.get("title"), "game": meta.get("category"), "viewers": None}
+        return {"live": True, "title": meta.get("title"), "game": meta.get("category"), "viewers": None,
+                "preview": None}
     error = (data.get("error") or "").lower()
     if "no playable streams" in error:
-        return {"live": False, "title": None, "game": None, "viewers": None}
+        return _offline()
     return None
 
 
@@ -1064,6 +1088,38 @@ def check_live(entries, platforms, streamlink_path=""):
                 info = None
         results[(ch.lower(), pid)] = info
     return results
+
+
+def preview_url(url, now=None):
+    """URL d'aperçu sûre (https uniquement), avec un paramètre qui change toutes les 5 minutes :
+    le CDN de Twitch garde sinon longtemps la même image en cache. None si l'URL ne convient pas."""
+    if not isinstance(url, str) or not url.startswith("https://") or len(url) > 500:
+        return None
+    stamp = int((now if now is not None else time.time()) // 300)
+    return f"{url}{'&' if '?' in url else '?'}t={stamp}"
+
+
+def fetch_image(url, timeout=8):
+    """Télécharge une image (JPEG/PNG, 2 Mo maximum). Renvoie les octets, ou None."""
+    import urllib.request
+    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        data = resp.read(PREVIEW_MAX_BYTES + 1)
+    if len(data) > PREVIEW_MAX_BYTES or not data.startswith((b"\xff\xd8", b"\x89PNG")):
+        return None
+    return data
+
+
+def fetch_previews(urls):
+    """{clé: url} -> {clé: octets ou None}. Une erreur sur une image n'empêche pas les autres."""
+    out = {}
+    for key, url in urls.items():
+        try:
+            out[key] = fetch_image(url)
+        except Exception as e:
+            log.info("Aperçu indisponible (%s) : %s", key, e)
+            out[key] = None
+    return out
 
 
 # ---------------------

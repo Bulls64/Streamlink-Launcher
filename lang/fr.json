@@ -134,6 +134,13 @@
   "minutes": "{count} min",
   "label_live_notify": "Notification Windows",
   "hint_live_notify": "Quand un favori commence un live.",
+  "decimal_sep": ",",
+  "num_thousands": "{n} k",
+  "num_millions": "{n} M",
+  "viewers": "{count} spectateurs",
+  "viewers_one": "{count} spectateur",
+  "label_live_previews": "Aperçu des lives",
+  "hint_live_previews": "Image, titre et nombre de spectateurs des favoris Twitch en direct.",
 
   "mini_hint": "Tab : plateforme · ↓ : suggestions · Entrée : lancer · Échap : fermer",
   "notif_click_to_watch": "Clique pour regarder",

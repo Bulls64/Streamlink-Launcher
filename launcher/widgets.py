@@ -281,15 +281,39 @@ class Pill(Widget):
 
 
 class Card(Widget):
-    """Carte de favori, ou carte « Ajouter » (add=True)."""
+    """Carte de favori, ou carte « Ajouter » (add=True).
+
+    media : None = carte compacte. Sinon, carte avec une zone d'aperçu en haut. Chaque carte demande la
+    hauteur qui donne un aperçu 16:9 ; la grille les étire toutes à la plus haute (sticky="nsew"), si bien
+    que les aperçus d'une même rangée ont exactement la même hauteur. Contenu : {"live": True/False/None, "viewers": int ou None, "stream_title": str, "image": f(l, h)
+    -> PhotoImage ou None}. Un dict vide sert à la carte « Ajouter » pour qu'elle garde la même hauteur.
+    """
+
+    INSET, TEXT_H = 6, 72          # marge autour de l'aperçu, hauteur de la partie texte (px logiques)
+    LIVE_RED, BADGE_BG = "#E91916", "#0E0E10"
 
     def __init__(self, parent, app, title="", subtitle="", dot=None, command=None, add=False, on_menu=None,
-                 height=86, status=None):
+                 height=86, status=None, media=None):
         self.title, self.subtitle, self.dot, self.add = title, subtitle, dot, add
         self.status = status  # None (inconnu) ou (texte, en_direct: bool)
+        self.media = media
+        self._image = None    # référence de l'aperçu affiché (sinon Tk l'efface)
         super().__init__(parent, app, width=app.px(120), height=app.px(height), command=command)
         if on_menu:
             self.bind("<Button-3>", on_menu)
+
+    def thumb_size(self, w, h=None):
+        """Taille de l'aperçu : toute la largeur (moins les marges) ; hauteur 16:9, ou ce que laisse la carte."""
+        tw = max(16, w - 2 * self.px(self.INSET))
+        th = round(tw * 9 / 16) if h is None else h - self.px(self.INSET) - self.px(self.TEXT_H)
+        return tw, max(16, th)
+
+    def _on_configure(self, e):
+        if self.media is not None and e.width > 1:
+            want = self.px(self.INSET) + self.thumb_size(e.width)[1] + self.px(self.TEXT_H)
+            if int(self.cget("height")) != want:
+                self.configure(height=want)
+        super()._on_configure(e)
 
     def draw(self, w, h):
         c, bg, px = self.c, self.cget("bg"), self.px
@@ -303,17 +327,23 @@ class Card(Widget):
             self.create_text(w / 2, h / 2 + px(14), text=fit_text(self.app.fonts.small, self.title, w - px(16)),
                              font=self.app.fonts.small, fill=fg)
             return
-        live = bool(self.status and self.status[1])
+        live = bool(self.status and self.status[1]) or bool(self.media and self.media.get("live"))
         fill = c.surface_hover if self.hover else c.surface
         outline = (self.dot or c.border_strong) if self.hover else (c.border_strong if live else c.border)
         self.P.round_rect(self, 0, 0, w, h, r, fill, outline, bg)
         f = self.app.fonts
+        top = px(14)
+        if self.media is not None:
+            top = self._draw_media(w, h, fill) + px(10)
         title_w = w - px(28) - (px(22) if self.hover else 0)
-        self.create_text(px(14), px(14), text=fit_text(f.card_title, self.title, title_w), font=f.card_title,
+        self.create_text(px(14), top, text=fit_text(f.card_title, self.title, title_w), font=f.card_title,
                          fill=c.text, anchor="nw")
         if self.hover:
-            self.icon("play_fill", w - px(20), px(24), px(12), self.dot or c.text)
-        y = h - px(20)
+            self.icon("play_fill", w - px(20), top + px(10), px(12), self.dot or c.text)
+        if self.media and self.media.get("live") and self.media.get("stream_title"):
+            self.create_text(px(14), top + px(24), text=fit_text(f.tiny, self.media["stream_title"], w - px(28)),
+                             font=f.tiny, fill=c.muted, anchor="nw")
+        y = h - px(20) if self.media is None else h - px(17)
         right = w - px(14)
         if self.status:
             text, on = self.status
@@ -330,6 +360,41 @@ class Card(Widget):
             self.P.circle(self, px(14) + px(3.5), y, px(7), self.dot, bg=fill)
         self.create_text(px(27), y, text=fit_text(f.tiny, self.subtitle, right - px(27)), font=f.tiny, fill=c.muted,
                          anchor="w")
+
+    def _draw_media(self, w, h, fill):
+        """Zone d'aperçu : image du stream (ou fond de remplacement), badge EN DIRECT, spectateurs.
+        Renvoie le bas de la zone."""
+        c, f, px, m, t = self.c, self.app.fonts, self.px, self.media, self.app.t
+        i = px(self.INSET)
+        tw, th = self.thumb_size(w, h)
+        live = m.get("live")
+        image = m["image"](tw, th) if live and m.get("image") else None
+        self._image = image
+        if image is not None:
+            self.create_image(i, i, image=image, anchor="nw")
+        else:
+            tint = mix(fill, self.dot or c.border_strong, 0.14 if live else 0.06)
+            self.P.round_rect(self, i, i, i + tw, i + th, px(8), tint, tint, fill)
+            if live is False:
+                self.create_text(i + tw / 2, i + th / 2, text=t("live_off"), font=f.small, fill=c.faint)
+            elif live:  # en direct sans image (Kick, ou aperçu pas encore chargé)
+                self.icon("play_fill", i + tw / 2, i + th / 2, px(22), self.dot or c.muted)
+        if live:
+            badge = t("live_on").upper()
+            bx = by = i + px(8)
+            bw, bh = f.caps.measure(badge) + px(10), px(18)
+            self.create_rectangle(bx, by, bx + bw, by + bh, fill=self.LIVE_RED, width=0)
+            self.create_text(bx + bw / 2, by + bh / 2, text=badge, font=f.caps, fill="#FFFFFF")
+            viewers = m.get("viewers")
+            if isinstance(viewers, int):
+                text = t.viewers(viewers)
+                if f.tiny.measure(text) > tw - px(26):
+                    text = t.format_number(viewers)
+                vw, vh = f.tiny.measure(text) + px(10), px(20)
+                vy = i + th - px(8) - vh
+                self.create_rectangle(bx, vy, bx + vw, vy + vh, fill=self.BADGE_BG, width=0)
+                self.create_text(bx + px(5), vy + vh / 2, text=text, font=f.tiny, fill="#FFFFFF", anchor="w")
+        return i + th
 
 
 class RecentRow(Widget):

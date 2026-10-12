@@ -314,6 +314,125 @@ class TestBackup(TempData):
         self.assertEqual(len(core.sanitize_favorites(many)), core.FAVORITES_MAX)
 
 
+SMALL_JPEG = (
+    "/9j/4AAQSkZJRgABAQAAAAAAAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMU"
+    "FRUVDA8XGBYUGBIUFRT/wAALCAAJABABAREA/8QAFAABAAAAAAAAAAAAAAAAAAAAAP/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAI"
+    "AQEAAD8AAP/Z"
+)
+
+
+class TestLivePreviews(unittest.TestCase):
+    def test_viewer_counts_follow_the_language(self):
+        fr, en = core.I18n("fr"), core.I18n("en")
+        self.assertEqual([fr.format_number(n) for n in (0, 999, 1000, 1234, 12345, 99999, 123456, 2_560_000)],
+                         ["0", "999", "1 k", "1,2 k", "12,3 k", "99,9 k", "123 k", "2,5 M"])
+        self.assertEqual(en.format_number(12345), "12.3K")
+        self.assertEqual(fr.viewers(1), "1 spectateur")
+        self.assertEqual(en.viewers(0), "0 viewers")
+        for lang in core.available_languages():
+            t = core.I18n(lang)
+            self.assertIn("2", t.viewers(2_000_000))
+            self.assertNotIn("{", t.viewers(1) + t.viewers(5000))
+
+    def test_twitch_request_asks_for_preview(self):
+        sent = {}
+
+        def fake_http(url, payload, headers, timeout):
+            sent.update(payload)
+            return {"data": {"users": [
+                {"login": "On", "stream": {"title": "T", "viewersCount": 42, "game": {"displayName": "G"},
+                                           "previewImageURL": "https://static-cdn.jtvnw.net/p-640x360.jpg"}},
+                {"login": "off", "stream": None}]}}
+        with mock.patch.object(core, "_http_json", fake_http):
+            res = core.twitch_live(["On", "off", "absent"])
+        self.assertIn("previewImageURL(width:640,height:360)", sent["query"])
+        self.assertEqual(res["on"], {"live": True, "title": "T", "game": "G", "viewers": 42,
+                                     "preview": "https://static-cdn.jtvnw.net/p-640x360.jpg"})
+        self.assertEqual(res["off"], core._offline())
+        self.assertEqual(res["absent"], core._offline())
+
+    def test_preview_url_is_https_only_and_refreshed(self):
+        base = "https://static-cdn.jtvnw.net/previews-ttv/live_user_x-640x360.jpg"
+        self.assertEqual(core.preview_url(base, now=600), base + "?t=2")
+        self.assertEqual(core.preview_url(base + "?a=1", now=0), base + "?a=1&t=0")
+        self.assertNotEqual(core.preview_url(base, now=0), core.preview_url(base, now=300))
+        for bad in (None, "", "http://example.com/x.jpg", "file:///c:/x.jpg", "https://" + "a" * 600):
+            self.assertIsNone(core.preview_url(bad))
+
+    def test_fetch_previews_survives_errors(self):
+        def fake(url, timeout=8):
+            if "bad" in url:
+                raise OSError("boom")
+            return b"\xff\xd8data"
+        with mock.patch.object(core, "fetch_image", fake):
+            self.assertEqual(core.fetch_previews({"a": "https://ok", "b": "https://bad"}),
+                             {"a": b"\xff\xd8data", "b": None})
+
+    def test_setting_is_on_by_default_and_importable(self):
+        self.assertIs(core.DEFAULT_CONFIG["live_previews"], True)
+        self.assertEqual(core.sanitize_settings({"live_previews": False}), {"live_previews": False})
+        self.assertEqual(core.sanitize_settings({"live_previews": "yes"}), {})
+
+
+class TestThumb(unittest.TestCase):
+    def setUp(self):
+        from launcher import thumb
+        self.thumb = thumb
+
+    def test_png_is_valid(self):
+        import struct
+        import zlib
+        w, h = 3, 2
+        png = self.thumb.png_rgba(w, h, bytes(range(24)))
+        self.assertTrue(png.startswith(b"\x89PNG\r\n\x1a\n"))
+        self.assertEqual(struct.unpack(">II", png[16:24]), (w, h))
+        idat = png.index(b"IDAT")
+        size = struct.unpack(">I", png[idat - 4:idat])[0]
+        raw = zlib.decompress(png[idat + 4:idat + 4 + size])
+        self.assertEqual(raw, b"\0" + bytes(range(12)) + b"\0" + bytes(range(12, 24)))
+
+    def test_rounded_corners_are_transparent_and_smooth(self):
+        w, h, r = 40, 20, 8
+        rgba = self.thumb.round_corners(bytearray(b"\x10\x20\x30\xff" * (w * h)), w, h, r)
+        alpha = lambda x, y: rgba[(y * w + x) * 4 + 3]  # noqa: E731
+        for x, y in ((0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1)):
+            self.assertEqual(alpha(x, y), 0)
+        self.assertEqual(alpha(w // 2, h // 2), 255)
+        self.assertEqual(alpha(r, 0), 255)
+        self.assertTrue(any(0 < alpha(x, 1) < 255 for x in range(r)))  # bord lissé
+        self.assertEqual(rgba[0:3], b"\x10\x20\x30")  # couleurs intactes
+
+    def test_cover_box_crops_without_distortion(self):
+        cb = self.thumb.cover_box
+        self.assertEqual(cb(640, 360, 192, 108), (0, 0, 640, 360))
+        self.assertEqual(cb(640, 360, 100, 100), (140, 0, 360, 360))
+        self.assertEqual(cb(640, 360, 300, 100), (0, 73, 640, 213))
+
+    def test_bgra_to_rgba_with_padding(self):
+        buf = bytes([1, 2, 3, 4, 9, 9, 9, 9,
+                     5, 6, 7, 8, 9, 9, 9, 9])  # 1 pixel par ligne, 4 octets de remplissage
+        self.assertEqual(bytes(self.thumb.bgra_to_rgba(buf, 1, 2, 8)), bytes([3, 2, 1, 4, 7, 6, 5, 8]))
+
+    def test_render_refuses_bad_input(self):
+        self.assertIsNone(self.thumb.render(b"", 100, 50, 8))
+        self.assertIsNone(self.thumb.render(b"\xff\xd8xx", 4, 4, 8))
+        with mock.patch.object(self.thumb, "decode_scaled", side_effect=OSError("bad")):
+            self.assertIsNone(self.thumb.render(b"\xff\xd8xx", 100, 50, 8))
+        with mock.patch.object(self.thumb, "decode_scaled", return_value=b"\0" * 10):
+            self.assertIsNone(self.thumb.render(b"\xff\xd8xx", 100, 50, 8))  # taille incohérente
+        with mock.patch.object(self.thumb, "decode_scaled", return_value=b"\xff" * (100 * 50 * 4)):
+            self.assertTrue(self.thumb.render(b"\xff\xd8xx", 100, 50, 8).startswith(b"\x89PNG"))
+
+    @unittest.skipUnless(os.name == "nt", "GDI+ : Windows uniquement")
+    def test_gdiplus_decodes_a_real_jpeg(self):
+        # JPEG 16x9 gris généré une fois (aucune dépendance) puis réduit en 8x4
+        import base64
+        jpeg = base64.b64decode(SMALL_JPEG)
+        rgba = self.thumb.decode_scaled(jpeg, 8, 4)
+        self.assertEqual(len(rgba), 8 * 4 * 4)
+        self.assertTrue(all(a == 255 for a in rgba[3::4]))
+
+
 class TestDataFolder(unittest.TestCase):
     def test_writable_probe(self):
         tmp = Path(tempfile.mkdtemp())
