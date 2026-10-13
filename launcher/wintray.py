@@ -87,6 +87,11 @@ if os.name == "nt":
     user32.GetParent.argtypes = [wintypes.HWND]
     user32.AllowSetForegroundWindow.argtypes = [wintypes.DWORD]
     kernel32.GetCurrentThreadId.restype = wintypes.DWORD
+    kernel32.OpenProcess.restype = wintypes.HANDLE
+    kernel32.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+    kernel32.WaitForSingleObject.restype = wintypes.DWORD
+    kernel32.WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]
+    kernel32.CloseHandle.argtypes = [wintypes.HANDLE]
     kernel32_le.CreateMutexW.restype = wintypes.HANDLE
     kernel32_le.CreateMutexW.argtypes = [wintypes.LPVOID, wintypes.BOOL, wintypes.LPCWSTR]
     user32.FindWindowW.restype = wintypes.HWND
@@ -397,6 +402,24 @@ def set_autostart(enabled, script_path, python_exe):
 # Une seule instance (Windows)
 # ---------------------
 _mutex = None
+
+
+def wait_for_pid(pid, timeout=20):
+    """Attend la fin d'un processus (après une mise à jour, l'ancienne instance tient encore le verrou
+    d'instance unique). True s'il est terminé ou introuvable, False si le délai est dépassé."""
+    if os.name != "nt":
+        return True
+    try:
+        handle = kernel32.OpenProcess(0x00100000, False, int(pid))  # SYNCHRONIZE
+        if not handle:
+            return True
+        try:
+            return kernel32.WaitForSingleObject(handle, int(timeout * 1000)) == 0
+        finally:
+            kernel32.CloseHandle(handle)
+    except Exception as e:
+        _log.warning("Attente de l'ancienne instance impossible : %s", e)
+        return False
 
 
 def acquire_single_instance():

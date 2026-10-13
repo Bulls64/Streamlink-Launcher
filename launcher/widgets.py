@@ -1153,10 +1153,14 @@ class StatusCard(Widget):
         self.redraw()
 
     def _btn(self, w, h):
+        if not self.button:  # pas de bouton (opération en cours)
+            return w - self.px(12), h / 2, w - self.px(12), h / 2
         tw = self.app.fonts.small.measure(self.button)
         return w - self.px(12) - tw - self.px(24), h / 2 - self.px(16), w - self.px(12), h / 2 + self.px(16)
 
     def zone_at(self, x, y):
+        if not self.button:
+            return None
         x0, y0, x1, y1 = self._btn(self.winfo_width(), self.winfo_height())
         return "btn" if x0 <= x <= x1 and y0 <= y <= y1 else None
 
@@ -1178,6 +1182,8 @@ class StatusCard(Widget):
                          fill=c.text, anchor="w")
         self.create_text(px(56), h / 2 + px(10), text=fit_text(f.tiny, self.detail, avail), font=f.tiny,
                          fill=c.faint, anchor="w")
+        if not self.button:
+            return
         if self.primary:
             col, on = self.app.accent
             fill = mix(col, "#000000" if c.dark else "#FFFFFF", 0.12) if self.zone else col

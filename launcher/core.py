@@ -356,6 +356,10 @@ class I18n:
                 return self(key, n=text.replace(".", self.get("decimal_sep") or ","))
         return str(n)
 
+    def format_size(self, nbytes):
+        """13790309 -> '13,2 Mo' (séparateur décimal et unité selon la langue)."""
+        return self("size_mb", size=f"{max(0, nbytes) / 1048576:.1f}".replace(".", self.get("decimal_sep") or ","))
+
     def viewers(self, n):
         """'1 spectateur', '12,3 k spectateurs'…"""
         return self("viewers_one" if n == 1 else "viewers", count=self.format_number(n))
@@ -981,6 +985,276 @@ def check_streamlink_update(streamlink_path=""):
     elif not result["error"]:
         result["error"] = "version"
     return result
+
+
+# ---------------------
+# Mise à jour du lanceur (releases GitHub)
+# ---------------------
+REPO = "Bulls64/Streamlink-Launcher"
+REPO_URL = f"https://github.com/{REPO}"
+RELEASES_API = f"https://api.github.com/repos/{REPO}/releases/latest"
+UPDATE_TAG_RE = re.compile(r"^v(\d+\.\d+\.\d+)$")
+SHA256_RE = re.compile(r"^sha256:([0-9a-f]{64})$")
+UPDATE_MIN_BYTES, UPDATE_MAX_BYTES = 1_000_000, 100 * 1024 * 1024
+OLD_SUFFIX = ".old"      # ancien exécutable, gardé le temps du redémarrage puis supprimé
+
+
+class UpdateError(Exception):
+    """Échec de mise à jour ; .key est la clé de traduction du message à afficher."""
+
+    def __init__(self, key):
+        super().__init__(key)
+        self.key = key
+
+
+def parse_release(data):
+    """Réponse de l'API GitHub -> {version, tag, page, asset} ou None si elle ne convient pas.
+    asset = {name, url, size, sha256} ou None quand la version n'a pas d'exécutable téléchargeable.
+    Tout est contrôlé : seules une release publiée (ni brouillon ni préversion) et une adresse de
+    téléchargement qui est exactement celle attendue sur ce dépôt sont acceptées."""
+    if not isinstance(data, dict) or data.get("draft") or data.get("prerelease"):
+        return None
+    tag = str(data.get("tag_name") or "")
+    m = UPDATE_TAG_RE.match(tag)
+    if not m:
+        return None
+    version = m.group(1)
+    release = {"version": version, "tag": tag, "page": f"{REPO_URL}/releases/tag/{tag}", "asset": None}
+    name = f"StreamlinkLauncher-{version}.exe"
+    url = f"{REPO_URL}/releases/download/{tag}/{name}"
+    for a in data.get("assets") or []:
+        if not isinstance(a, dict) or a.get("name") != name:
+            continue
+        size, digest = a.get("size"), SHA256_RE.match(str(a.get("digest") or ""))
+        if (a.get("browser_download_url") == url and digest and isinstance(size, int) and not isinstance(size, bool)
+                and UPDATE_MIN_BYTES <= size <= UPDATE_MAX_BYTES):
+            release["asset"] = {"name": name, "url": url, "size": size, "sha256": digest.group(1)}
+    return release
+
+
+def check_app_update(current=None):
+    """Compare la version du lanceur à la dernière release publiée.
+    Renvoie {current, latest, update, release, error} ; 'update' vaut None si on ne peut pas conclure."""
+    if current is None:
+        from . import __version__ as current
+    result = {"current": current, "latest": None, "update": None, "release": None, "error": None}
+    try:
+        data = _http_get_json(RELEASES_API, 10)
+    except Exception as e:
+        log.warning("Recherche de mise à jour du lanceur impossible : %s", e)
+        result["error"] = "release" if getattr(e, "code", None) == 404 else "network"
+        return result
+    release = parse_release(data)
+    if release is None:
+        result["error"] = "release"
+        return result
+    result.update(latest=release["version"], release=release,
+                  update=parse_version(release["version"]) > parse_version(current))
+    return result
+
+
+def can_self_update():
+    """Vrai pour l'exécutable Windows dont le dossier est modifiable ; sinon, la page de la release s'ouvre."""
+    if not (FROZEN and os.name == "nt"):
+        return False
+    exe = Path(sys.executable)
+    return os.access(exe.parent, os.W_OK) and os.access(exe, os.W_OK)
+
+
+def _safe_opener():
+    """Ouvreur d'adresses qui refuse toute redirection hors de GitHub ou en clair (http)."""
+    import urllib.error
+    import urllib.request
+
+    class Redirect(urllib.request.HTTPRedirectHandler):
+        def redirect_request(self, req, fp, code, msg, headers, newurl):
+            u = urlparse(newurl)
+            host = (u.hostname or "").lower()
+            if u.scheme != "https" or not (host == "github.com" or host.endswith((".github.com", ".githubusercontent.com"))):
+                raise urllib.error.URLError(f"redirection refusée : {u.scheme}://{host}")
+            return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+    return urllib.request.build_opener(Redirect)
+
+
+def _open_download(url, timeout=20):
+    import urllib.request
+    return _safe_opener().open(urllib.request.Request(url, headers={"User-Agent": USER_AGENT}), timeout=timeout)
+
+
+def download_update(release, dest_dir, progress=None, cancel=None, opener=None):
+    """Télécharge l'exécutable de la release dans dest_dir et le contrôle : taille annoncée, empreinte SHA-256
+    publiée par GitHub, en-tête d'exécutable Windows. Renvoie son chemin. Lève UpdateError, et le fichier
+    partiel est alors supprimé. progress(octets_reçus, total) ; cancel : threading.Event."""
+    import hashlib
+    asset = (release or {}).get("asset")
+    if not asset:
+        raise UpdateError("app_err_release")
+    dest = Path(dest_dir) / (asset["name"] + ".download")
+    digest, done, ok = hashlib.sha256(), 0, False
+    try:
+        try:
+            resp = (opener or _open_download)(asset["url"])
+        except Exception as e:
+            log.warning("Téléchargement impossible : %s", e)
+            raise UpdateError("app_err_network")
+        try:
+            with resp, open(dest, "wb") as out:
+                while True:
+                    if cancel is not None and cancel.is_set():
+                        raise UpdateError("app_err_cancelled")
+                    chunk = resp.read(1 << 16)
+                    if not chunk:
+                        break
+                    done += len(chunk)
+                    if done > asset["size"]:
+                        raise UpdateError("app_err_hash")
+                    digest.update(chunk)
+                    out.write(chunk)
+                    if progress:
+                        progress(done, asset["size"])
+        except UpdateError:
+            raise
+        except Exception as e:
+            log.warning("Téléchargement interrompu : %s", e)
+            raise UpdateError("app_err_download")
+        if done != asset["size"]:
+            raise UpdateError("app_err_download")
+        if digest.hexdigest() != asset["sha256"]:
+            raise UpdateError("app_err_hash")
+        with open(dest, "rb") as f:
+            if f.read(2) != b"MZ":
+                raise UpdateError("app_err_hash")
+        ok = True
+        return dest
+    finally:
+        if not ok:
+            try:
+                dest.unlink()
+            except OSError:
+                pass
+
+
+def _parse_authenticode(text):
+    """'Valid|CN=Nom, O=…' -> ('Valid', 'CN=Nom, O=…') ; sortie vide ou illisible -> ('error', None)."""
+    lines = (text or "").strip().splitlines()
+    status, _, subject = (lines[-1] if lines else "").partition("|")
+    return (status.strip(), subject.strip() or None) if status.strip() else ("error", None)
+
+
+def authenticode(path, timeout=40):
+    """Signature d'un exécutable Windows : (statut, signataire). Statut : 'Valid', 'NotSigned', 'HashMismatch',
+    'NotTrusted'… ou 'error' si PowerShell est indisponible."""
+    if os.name != "nt":
+        return "error", None
+    try:
+        script = "$s = Get-AuthenticodeSignature -LiteralPath $env:SL_FILE; '{0}|{1}' -f $s.Status, $s.SignerCertificate.Subject"
+        out = subprocess.run([shutil.which("powershell") or "powershell", "-NoProfile", "-NonInteractive",
+                              "-ExecutionPolicy", "Bypass", "-Command", script],
+                             capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=timeout,
+                             creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+                             env=dict(os.environ, SL_FILE=str(path)))
+        return _parse_authenticode(out.stdout)
+    except Exception as e:
+        log.warning("Lecture de la signature impossible : %s", e)
+        return "error", None
+
+
+def _common_name(subject):
+    m = re.search(r"CN=([^,]+)", subject or "")
+    return (m.group(1) if m else subject or "").strip()
+
+
+def check_signature(current_file, new_file, probe=None):
+    """None si la nouvelle version peut être installée, sinon la clé du message d'erreur.
+    Si l'application actuelle est signée (signature valide), la nouvelle doit l'être aussi, par le même
+    signataire : impossible de revenir à une version non signée. Sinon, on refuse seulement une signature
+    présente mais invalide (fichier modifié)."""
+    probe = probe or authenticode
+    cur_status, cur_subject = probe(current_file)
+    new_status, new_subject = probe(new_file)
+    if cur_status == "Valid":
+        same = new_status == "Valid" and _common_name(new_subject) == _common_name(cur_subject)
+        return None if same else "app_err_signature"
+    return None if new_status in ("Valid", "NotSigned", "error") else "app_err_signature"
+
+
+def install_update(new_file, exe=None):
+    """Remplace l'exécutable : l'ancien est renommé en .old (Windows permet de renommer un exécutable en
+    cours d'exécution, pas de l'écraser), le nouveau prend sa place. En cas d'échec, l'ancien est remis."""
+    exe, new_file = Path(exe or sys.executable), Path(new_file)
+    old = exe.with_name(exe.name + OLD_SUFFIX)
+    try:
+        old.unlink(missing_ok=True)
+        os.replace(exe, old)
+    except OSError as e:
+        log.warning("Remplacement impossible : %s", e)
+        raise UpdateError("app_err_install")
+    try:
+        os.replace(new_file, exe)
+    except OSError as e:
+        log.warning("Remplacement impossible : %s", e)
+        try:
+            os.replace(old, exe)
+        except OSError:
+            log.error("L'ancien exécutable n'a pas pu être remis en place (%s)", old)
+        raise UpdateError("app_err_install")
+    return old
+
+
+def cleanup_old_executable(exe=None, tries=30, delay=1.0):
+    """Supprime l'ancien exécutable laissé par une mise à jour (réessaie : l'ancienne instance peut
+    mettre quelques secondes à se fermer). Renvoie True si rien ne reste."""
+    exe = Path(exe or sys.executable)
+    old = exe.with_name(exe.name + OLD_SUFFIX)
+    for i in range(tries):
+        if not old.exists():
+            return True
+        try:
+            old.unlink()
+            return True
+        except OSError:
+            time.sleep(delay)
+    return False
+
+
+def cleanup_update_leftovers(exe=None):
+    """Au démarrage : ancien exécutable d'une mise à jour, et téléchargements interrompus."""
+    exe = Path(exe or sys.executable)
+    cleanup_old_executable(exe)
+    for f in exe.parent.glob("StreamlinkLauncher-*.exe.download"):
+        try:
+            f.unlink()
+        except OSError:
+            pass
+
+
+def relaunch(exe=None, old_version=None):
+    """Démarre la nouvelle version, détachée de ce processus ; elle attend sa fermeture (--wait-pid) avant de
+    prendre le verrou d'instance unique. PYINSTALLER_RESET_ENVIRONMENT : sans cela, un exécutable
+    PyInstaller lancé par lui-même réutiliserait le dossier temporaire de l'ancien, supprimé à sa fermeture."""
+    exe = str(exe or sys.executable)
+    args = [exe, "--wait-pid", str(os.getpid())]
+    if old_version:
+        args += ["--updated-from", str(old_version)]
+    flags = getattr(subprocess, "DETACHED_PROCESS", 0) | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
+    try:
+        subprocess.Popen(args, cwd=os.path.dirname(exe), close_fds=True, creationflags=flags,
+                         stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                         env=dict(os.environ, PYINSTALLER_RESET_ENVIRONMENT="1"))
+        return True
+    except OSError as e:
+        log.error("Redémarrage impossible : %s", e)
+        return False
+
+
+def arg_value(name, argv=None):
+    """Valeur qui suit l'option `name` sur la ligne de commande, ou None."""
+    argv = sys.argv if argv is None else argv
+    for i, a in enumerate(argv[:-1]):
+        if a == name:
+            return argv[i + 1]
+    return None
 
 
 # ---------------------
