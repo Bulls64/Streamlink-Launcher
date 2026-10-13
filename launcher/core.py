@@ -83,7 +83,8 @@ DEFAULT_CONFIG = {
     "hotkey_combo": "ctrl+alt+s",
     "autostart": False,        # lancer au démarrage de Windows, réduit
     "tray_hint_shown": False,
-    "update_check": True,      # vérifier au démarrage si Streamlink est à jour
+    "update_check": True,      # vérifier au démarrage si Streamlink et le lanceur sont à jour
+    "auto_update": False,      # installer seul, au démarrage, la mise à jour du lanceur (exécutable Windows)
     "clipboard_watch": True,   # proposer un lien de stream copié dans le presse-papiers
 }
 
@@ -1053,6 +1054,17 @@ def check_app_update(current=None):
     return result
 
 
+def should_auto_update(cfg, result, updated_from=None, can_update=None):
+    """Faut-il installer sans demander la mise à jour trouvée au démarrage ? Oui si l'option est active (avec la
+    vérification au démarrage), si une version plus récente existe avec un fichier téléchargeable, si cet exécutable
+    peut se remplacer, et si le lanceur ne vient pas lui-même d'être mis à jour (pas de boucle de mises à jour)."""
+    if can_update is None:
+        can_update = can_self_update()
+    release = (result or {}).get("release") or {}
+    return bool(cfg.get("auto_update") and cfg.get("update_check") and (result or {}).get("update")
+                and release.get("asset") and can_update and not updated_from)
+
+
 def can_self_update():
     """Vrai pour l'exécutable Windows dont le dossier est modifiable ; sinon, la page de la release s'ouvre."""
     if not (FROZEN and os.name == "nt"):
@@ -1229,12 +1241,12 @@ def cleanup_update_leftovers(exe=None):
             pass
 
 
-def relaunch(exe=None, old_version=None):
+def relaunch(exe=None, old_version=None, extra_args=()):
     """Démarre la nouvelle version, détachée de ce processus ; elle attend sa fermeture (--wait-pid) avant de
     prendre le verrou d'instance unique. PYINSTALLER_RESET_ENVIRONMENT : sans cela, un exécutable
     PyInstaller lancé par lui-même réutiliserait le dossier temporaire de l'ancien, supprimé à sa fermeture."""
     exe = str(exe or sys.executable)
-    args = [exe, "--wait-pid", str(os.getpid())]
+    args = [exe, "--wait-pid", str(os.getpid()), *extra_args]
     if old_version:
         args += ["--updated-from", str(old_version)]
     flags = getattr(subprocess, "DETACHED_PROCESS", 0) | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)

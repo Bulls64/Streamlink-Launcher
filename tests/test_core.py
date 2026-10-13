@@ -666,6 +666,30 @@ class TestAppUpdate(unittest.TestCase):
         with mock.patch.object(core.subprocess, "Popen", side_effect=OSError):
             self.assertFalse(core.relaunch("/x/app.exe"))
 
+    def test_should_auto_update(self):
+        res = {"update": True, "release": {"asset": {"name": "a"}}}
+        cfg = {"auto_update": True, "update_check": True}
+        ok = lambda c=cfg, r=res, u=None, can=True: core.should_auto_update(c, r, u, can)
+        self.assertTrue(ok())
+        self.assertFalse(ok(c={**cfg, "auto_update": False}))
+        self.assertFalse(ok(c={**cfg, "update_check": False}))
+        self.assertFalse(ok(r={**res, "update": False}))
+        self.assertFalse(ok(r={"update": True, "release": {"asset": None}}))
+        self.assertFalse(ok(r=None))
+        self.assertFalse(ok(can=False))
+        self.assertFalse(ok(u="1.3.0"))               # vient d'être mis à jour : pas de boucle
+        self.assertFalse(core.DEFAULT_CONFIG["auto_update"])   # désactivé par défaut
+
+    def test_auto_update_setting_is_validated(self):
+        out = core.sanitize_settings({"auto_update": True})
+        self.assertEqual(out.get("auto_update"), True)
+        self.assertNotIn("auto_update", core.sanitize_settings({"auto_update": "oui"}))
+
+    def test_relaunch_keeps_tray_argument(self):
+        with mock.patch.object(core.subprocess, "Popen") as popen:
+            core.relaunch("/x/app.exe", "1.0.0", extra_args=("--tray",))
+        self.assertIn("--tray", popen.call_args[0][0])
+
     def test_arg_value(self):
         self.assertEqual(core.arg_value("--a", ["p", "--a", "1"]), "1")
         self.assertIsNone(core.arg_value("--a", ["p", "--a"]))

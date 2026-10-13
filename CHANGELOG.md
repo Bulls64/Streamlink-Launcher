@@ -11,6 +11,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+- **Automatic launcher updates.** New setting *Update the launcher automatically* (Settings → About, off by default). When it is on and *Check for updates at start-up* is on, a newer release found at start-up is downloaded, verified and installed without asking, then the launcher restarts (staying in the notification area if it was started there). It never runs while a stream is running (the update card offers it instead), only for the executable in a writable folder, not on a manual check, and not right after an update (no update loop). A failure (network, checksum, signature) is shown on the update card and in the log, and the current version stays in place.
+
 ### Planned
 - Viewing statistics (time per channel, peak hours).
 
@@ -203,6 +206,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## Français
 
 ## [Non publié]
+
+### Ajouté
+- **Mise à jour automatique du lanceur.** Nouveau réglage *Mises à jour automatiques du lanceur* (Paramètres → À propos, désactivé par défaut). Quand il est activé avec *Vérifier les mises à jour au démarrage*, une version plus récente trouvée au démarrage est téléchargée, vérifiée et installée sans demander, puis le lanceur redémarre (en restant dans la zone de notification s'il y était). Rien ne se fait pendant un stream (la carte de mise à jour la propose alors), ni pour une vérification manuelle, ni juste après une mise à jour (pas de boucle), et seulement pour l'exécutable dans un dossier modifiable. Un échec (réseau, empreinte, signature) s'affiche sur la carte et dans le journal, et la version actuelle reste en place.
 
 ### Prévu
 - Statistiques de visionnage (temps par chaîne, heures de pointe).

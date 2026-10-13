@@ -255,5 +255,9 @@
   "toast_updated": "Aggiornato: {old} → {new}",
   "log_app_update_available": "Aggiornamento del launcher disponibile: {installed} → {latest}",
   "log_app_updated": "Launcher aggiornato: {old} → {new}",
-  "log_app_update_failed": "Aggiornamento del launcher non riuscito: {error}"
+  "log_app_update_failed": "Aggiornamento del launcher non riuscito: {error}",
+  "label_auto_update": "Aggiorna il launcher automaticamente",
+  "hint_auto_update": "All’avvio scarica, verifica e installa la nuova versione, poi riavvia il launcher. Richiede «Cerca aggiornamenti all’avvio» e l’eseguibile (.exe); mai durante uno stream.",
+  "toast_app_auto_update": "Aggiornamento automatico a {latest}…",
+  "log_app_auto_update": "Aggiornamento automatico del launcher: {installed} → {latest}"
 }

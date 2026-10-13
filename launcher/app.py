@@ -1436,7 +1436,7 @@ class App(tk.Tk):
                                                              "live_check", "live_interval", "live_notify",
                                                              "live_previews",
                                                              "tray", "hotkey", "autostart", "update_check",
-                                                             "clipboard_watch", "hotkey_combo")}
+                                                             "clipboard_watch", "hotkey_combo", "auto_update")}
         self.v_player_path = tk.StringVar(value=self.cfg["player_path"])
         self.v_player_args = tk.StringVar(value=self.cfg["player_args"])
         self.v_streamlink = tk.StringVar(value=self.cfg["streamlink_path"])
@@ -1549,6 +1549,8 @@ class App(tk.Tk):
                    command=self._open_release_notes).pack(side="left", padx=(0, self.px(16)))
             Button(links, self, text=t("link_repo"), kind="link", font=self.fonts.small, pad=0, height=32,
                    command=lambda: self.open_url(core.REPO_URL)).pack(side="left")
+            self._switch_row(sec, t("label_auto_update"), t("hint_auto_update"), s["auto_update"],
+                             lambda v: s.update(auto_update=v))
             self._hint(sec, t("about_data", path=core.DATA_ROOT))
             Button(sec, self, text=t("btn_open_data"), kind="link", font=self.fonts.small, pad=0, height=32,
                    command=lambda: self.open_path(str(core.DATA_ROOT))).pack(anchor="w")
@@ -1719,6 +1721,12 @@ class App(tk.Tk):
                 result["error"], "app_err_network")
         self._update_app_card()
         self._refresh_update_badge()
+        # jamais de mise à jour surprise pendant un stream : la carte propose alors la mise à jour
+        if not manual and not self.streams.running() and core.should_auto_update(self.cfg, result, self._updated_from):
+            self.log(t("log_app_auto_update", installed=result["current"], latest=result["latest"]), "warn")
+            self.toast(t("toast_app_auto_update", latest=result["latest"]), "ok", duration=6000)
+            self.install_app_update(auto=True)
+            return
         if result.get("update"):
             self.log(t("log_app_update_available", installed=result["current"], latest=result["latest"]), "warn")
             self.toast(t("toast_app_update", latest=result["latest"]), "warn",
@@ -1726,7 +1734,7 @@ class App(tk.Tk):
         elif result.get("update") is False and manual:
             self.toast(t("toast_app_up_to_date"), "ok")
 
-    def install_app_update(self):
+    def install_app_update(self, auto=False):
         """Télécharge la release, la contrôle, remplace l'exécutable et redémarre. Sans exécutable
         remplaçable (lancé depuis les sources, dossier protégé…), ouvre la page de la release."""
         t = self.t
@@ -1741,7 +1749,7 @@ class App(tk.Tk):
         text = t("confirm_app_update", latest=rel["version"])
         if running:
             text += "\n" + t("confirm_app_update_streams", count=len(running))
-        if not messagebox.askyesno(t("title_confirm"), text, parent=self):
+        if not auto and not messagebox.askyesno(t("title_confirm"), text, parent=self):
             return
         self._app_state, self._app_error = "downloading", None
         self._app_dl = (0, rel["asset"]["size"])
@@ -1798,7 +1806,7 @@ class App(tk.Tk):
             self._update_app_card()
             return
         self.log(t("log_app_updated", old=__version__, new=rel["version"]))
-        if core.relaunch(old_version=__version__):
+        if core.relaunch(old_version=__version__, extra_args=("--tray",) if "--tray" in sys.argv else ()):
             self._shutdown()
         else:  # nouvelle version en place, mais impossible de la démarrer : à relancer à la main
             self._app_state = "restart"
@@ -1836,7 +1844,8 @@ class App(tk.Tk):
                         live_check=bool(s["live_check"]), live_interval=int(s["live_interval"]),
                         live_notify=bool(s["live_notify"]), live_previews=bool(s["live_previews"]),
                         tray=bool(s["tray"]), hotkey=bool(s["hotkey"]),
-                        update_check=bool(s["update_check"]), clipboard_watch=bool(s["clipboard_watch"]),
+                        update_check=bool(s["update_check"]), auto_update=bool(s["auto_update"]),
+                        clipboard_watch=bool(s["clipboard_watch"]),
                         hotkey_combo=s["hotkey_combo"])
         if self.sl_update and self.sl_update.get("path") != core.find_streamlink(self.cfg["streamlink_path"]):
             self.sl_update = None  # autre Streamlink choisi : l'ancien résultat ne vaut plus

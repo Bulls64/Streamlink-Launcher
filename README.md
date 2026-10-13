@@ -24,7 +24,7 @@ Pure Python + Tkinter, **no third-party dependency**. From source, it starts in 
 - **Mini mode**: a floating Spotlight-style bar, opened with <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd> from any application. The shortcut can be changed in the settings.
 - **Notification area**: closing the window keeps it running in the tray, with streams and live checks still active. It can optionally start with Windows.
 - **Log drawer**: Streamlink output, running streams and a *Stop* button for each.
-- **Updates**: Streamlink update check, and the launcher itself can update from its GitHub releases (Settings → About): download, SHA-256 and signature checks, automatic restart.
+- **Updates**: Streamlink update check, and the launcher itself can update from its GitHub releases (Settings → About): download, SHA-256 and signature checks, automatic restart. An optional setting installs updates by itself at start-up.
 - **Backup**: export your settings and favorites to a single file and import them on another computer (Settings → Backup).
 - **Interface**: light, dark or automatic theme (follows Windows), in English, French, Spanish, German and Italian.
 
@@ -218,7 +218,7 @@ Python et Tkinter uniquement, **sans aucune dépendance externe**. Depuis les so
 - **Mode mini** : une barre flottante façon Spotlight, ouverte avec <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd> depuis n'importe quelle application. Le raccourci se change dans les Paramètres.
 - **Zone de notification** : fermer la fenêtre laisse le lanceur actif à côté de l'horloge, avec les streams et la surveillance des lives. Il peut aussi démarrer avec Windows (option).
 - **Tiroir du journal** : sortie de Streamlink, streams en cours et un bouton *Arrêter* pour chacun.
-- **Mises à jour** : vérification des mises à jour de Streamlink, et le lanceur peut se mettre à jour lui-même depuis ses releases GitHub (Paramètres → À propos) : téléchargement, contrôle du SHA-256 et de la signature, redémarrage automatique.
+- **Mises à jour** : vérification des mises à jour de Streamlink, et le lanceur peut se mettre à jour lui-même depuis ses releases GitHub (Paramètres → À propos) : téléchargement, contrôle du SHA-256 et de la signature, redémarrage automatique. Un réglage facultatif les installe tout seul au démarrage.
 - **Sauvegarde** : exporte tes réglages et tes favoris dans un seul fichier et importe-le sur un autre ordinateur (Paramètres → Sauvegarde).
 - **Interface** : thème clair, sombre ou automatique (suit Windows), en français, anglais, espagnol, allemand et italien.
 
