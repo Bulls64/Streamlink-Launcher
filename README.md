@@ -165,6 +165,22 @@ Nothing else is sent, and no data is collected.
 - **Antivirus warning on the `.exe`**: PyInstaller executables are sometimes flagged by mistake. Check the SHA-256 against `SHA256SUMS.txt` in the release, report the false positive to your antivirus vendor (for Microsoft Defender: [submit a file](https://www.microsoft.com/wdsi/filesubmission), category *Incorrectly detected as malware*), or run from source instead.
 - **Reporting a bug**: attach `launcher.log` (*Settings › About › Open the data folder*) to your [issue](https://github.com/Bulls64/Streamlink-Launcher/issues).
 
+### If Windows blocks the executable
+
+The executable is not code-signed (see [Code signing](#code-signing)), so Windows or your antivirus may object. Nothing here asks you to trust the file blindly: check it first, then unblock it.
+
+1. **Check the file.** Download it only from the [releases page](https://github.com/Bulls64/Streamlink-Launcher/releases) of this repository, then compare its SHA-256 with the one in `SHA256SUMS.txt` (or shown by GitHub next to the file). In PowerShell, from the folder containing the file:
+   ```powershell
+   Get-FileHash .\StreamlinkLauncher-<version>.exe -Algorithm SHA256
+   ```
+   The two values must be identical. If they are not, delete the file and do not run it.
+2. **SmartScreen ("Windows protected your PC").** Click **More info**, then **Run anyway**. The warning appears because the file is new and unsigned, not because something was detected.
+3. **"This file came from another computer" / nothing happens on double-click.** Right-click the file › **Properties** › tick **Unblock** at the bottom of the *General* tab › **OK**. Or in PowerShell: `Unblock-File .\StreamlinkLauncher-<version>.exe`.
+4. **The antivirus quarantines or deletes it.** Restore it from the quarantine after checking the SHA-256 (step 1), add the folder containing it to the antivirus exclusions, and report the false positive to the vendor so that it is fixed for everyone (Microsoft Defender: [submit a file](https://www.microsoft.com/wdsi/filesubmission), category *Incorrectly detected as malware*, and mention that it is a PyInstaller program built on GitHub Actions).
+5. **Still blocked, or you would rather not trust an unsigned file?** Run it from source (see [Option 2](#option-2-from-source)): the code is the same and nothing has to be unblocked.
+
+Putting the file in a folder of your own (for example `Documents\Streamlink`) rather than a protected one such as `C:\Program Files` also lets the built-in updater replace it.
+
 ### Code signing
 
 The Windows executables are **not code-signed**: free signing programs for open source projects require a project size and track record that this one does not have yet. Windows SmartScreen may therefore warn on the first launch (see [Option 1](#option-1-executable-no-python-needed)), and some antivirus programs may flag the file wrongly.
@@ -324,6 +340,22 @@ Rien d'autre n'est envoyé, et aucune donnée n'est collectée.
 - **<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd> ne fait rien** : une autre application utilise sans doute ce raccourci. Le lanceur t'en avertit, et *Paramètres › Fenêtre et raccourci* affiche son état et te permet d'en choisir un autre. Chaque appui reçu est aussi noté dans le tiroir du journal.
 - **Alerte antivirus sur le `.exe`** : les exécutables PyInstaller sont parfois détectés à tort. Vérifie le SHA-256 avec `SHA256SUMS.txt` dans la release, signale le faux positif à l'éditeur de l'antivirus (pour Microsoft Defender : [envoyer un fichier](https://www.microsoft.com/wdsi/filesubmission), catégorie *Incorrectly detected as malware*), ou utilise la version source.
 - **Signaler un bug** : joins `launcher.log` (*Paramètres › À propos › Ouvrir le dossier des données*) à ton [ticket](https://github.com/Bulls64/Streamlink-Launcher/issues).
+
+### Si Windows bloque l'exécutable
+
+L'exécutable n'est pas signé (voir [Signature du code](#signature-du-code)) : Windows ou ton antivirus peuvent donc faire des difficultés. Rien ici ne te demande de faire confiance les yeux fermés : vérifie le fichier d'abord, débloque-le ensuite.
+
+1. **Vérifie le fichier.** Télécharge-le uniquement depuis la [page des releases](https://github.com/Bulls64/Streamlink-Launcher/releases) de ce dépôt, puis compare son SHA-256 avec celui de `SHA256SUMS.txt` (ou affiché par GitHub à côté du fichier). Dans PowerShell, depuis le dossier du fichier :
+   ```powershell
+   Get-FileHash .\StreamlinkLauncher-<version>.exe -Algorithm SHA256
+   ```
+   Les deux valeurs doivent être identiques. Sinon, supprime le fichier et ne le lance pas.
+2. **SmartScreen (« Windows a protégé votre ordinateur »).** Clique sur **Informations complémentaires**, puis **Exécuter quand même**. L'avertissement apparaît parce que le fichier est récent et non signé, pas parce que quelque chose a été détecté.
+3. **« Ce fichier provient d'un autre ordinateur » / rien ne se passe au double-clic.** Clic droit sur le fichier › **Propriétés** › coche **Débloquer** en bas de l'onglet *Général* › **OK**. Ou dans PowerShell : `Unblock-File .\StreamlinkLauncher-<version>.exe`.
+4. **L'antivirus le met en quarantaine ou le supprime.** Restaure-le depuis la quarantaine après avoir vérifié le SHA-256 (étape 1), ajoute le dossier qui le contient aux exclusions de l'antivirus, et signale le faux positif à l'éditeur pour que ce soit corrigé pour tout le monde (Microsoft Defender : [envoyer un fichier](https://www.microsoft.com/wdsi/filesubmission), catégorie *Incorrectly detected as malware*, en précisant qu'il s'agit d'un programme PyInstaller compilé sur GitHub Actions).
+5. **Toujours bloqué, ou tu préfères ne pas faire confiance à un fichier non signé ?** Lance-le depuis les sources (voir l'[option 2](#option-2--depuis-les-sources)) : le code est le même et rien n'est à débloquer.
+
+Placer le fichier dans un dossier à toi (par exemple `Documents\Streamlink`) plutôt que dans un dossier protégé comme `C:\Program Files` permet aussi à la mise à jour intégrée de le remplacer.
 
 ### Signature du code
 
