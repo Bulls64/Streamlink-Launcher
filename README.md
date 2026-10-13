@@ -24,7 +24,7 @@ Pure Python + Tkinter, **no third-party dependency**. From source, it starts in 
 - **Mini mode**: a floating Spotlight-style bar, opened with <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd> from any application. The shortcut can be changed in the settings.
 - **Notification area**: closing the window keeps it running in the tray, with streams and live checks still active. It can optionally start with Windows.
 - **Log drawer**: Streamlink output, running streams and a *Stop* button for each.
-- **Streamlink update check**: in the settings and optionally at start-up.
+- **Updates**: Streamlink update check, and the launcher itself can update from its GitHub releases (Settings → About): download, SHA-256 and signature checks, automatic restart.
 - **Backup**: export your settings and favorites to a single file and import them on another computer (Settings → Backup).
 - **Interface**: light, dark or automatic theme (follows Windows), in English, French, Spanish, German and Italian.
 
@@ -151,7 +151,7 @@ tests/                 Unit tests (standard library only)
 
 The launcher only connects to the Internet for:
 - **Live checks** (can be turned off): one request to Twitch's public web endpoint for your Twitch favorites, and `streamlink --json` for Kick favorites. This Twitch endpoint is not an official API: if Twitch changes it, live status shows as unknown until an update. With *Live previews* on, the preview image of the live Twitch favorites shown on the main screen (three at most) is downloaded from Twitch's image server at each check.
-- **Update check** (can be turned off): one request to [PyPI](https://pypi.org/project/streamlink/) to read the latest Streamlink version.
+- **Update check** (can be turned off): one request to [PyPI](https://pypi.org/project/streamlink/) to read the latest Streamlink version, and one to `api.github.com` (`/repos/Bulls64/Streamlink-Launcher/releases/latest`) to read the latest launcher release. The launcher's own file is downloaded from `github.com` only when you click *Update*.
 
 The clipboard is only read, on this computer, to look for a stream link (you can turn this off in the settings); its content is never stored or sent.
 
@@ -201,7 +201,7 @@ Python et Tkinter uniquement, **sans aucune dépendance externe**. Depuis les so
 - **Mode mini** : une barre flottante façon Spotlight, ouverte avec <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd> depuis n'importe quelle application. Le raccourci se change dans les Paramètres.
 - **Zone de notification** : fermer la fenêtre laisse le lanceur actif à côté de l'horloge, avec les streams et la surveillance des lives. Il peut aussi démarrer avec Windows (option).
 - **Tiroir du journal** : sortie de Streamlink, streams en cours et un bouton *Arrêter* pour chacun.
-- **Vérification des mises à jour de Streamlink** : dans les réglages, et au démarrage si tu le souhaites.
+- **Mises à jour** : vérification des mises à jour de Streamlink, et le lanceur peut se mettre à jour lui-même depuis ses releases GitHub (Paramètres → À propos) : téléchargement, contrôle du SHA-256 et de la signature, redémarrage automatique.
 - **Sauvegarde** : exporte tes réglages et tes favoris dans un seul fichier et importe-le sur un autre ordinateur (Paramètres → Sauvegarde).
 - **Interface** : thème clair, sombre ou automatique (suit Windows), en français, anglais, espagnol, allemand et italien.
 
@@ -310,7 +310,7 @@ tests/                 Tests unitaires (bibliothèque standard uniquement)
 
 Le lanceur ne se connecte à Internet que pour :
 - **Le statut en direct** (désactivable) : une requête vers l'accès web public de Twitch pour tes favoris Twitch, et `streamlink --json` pour tes favoris Kick. Cet accès Twitch n'est pas une API officielle : si Twitch le modifie, le statut reste inconnu jusqu'à une mise à jour. Avec *Aperçu des lives* activé, l'image d'aperçu des favoris Twitch en direct affichés sur l'écran principal (trois au plus) est téléchargée depuis le serveur d'images de Twitch à chaque vérification.
-- **La vérification des mises à jour** (désactivable) : une requête vers [PyPI](https://pypi.org/project/streamlink/) pour lire la dernière version de Streamlink.
+- **La vérification des mises à jour** (désactivable) : une requête vers [PyPI](https://pypi.org/project/streamlink/) pour lire la dernière version de Streamlink, et une vers `api.github.com` (`/repos/Bulls64/Streamlink-Launcher/releases/latest`) pour lire la dernière version du lanceur. Le fichier du lanceur n'est téléchargé depuis `github.com` que si tu cliques sur *Mettre à jour*.
 
 Le presse-papiers n'est lu que sur ton ordinateur, pour y chercher un lien de stream (désactivable dans les Paramètres) : son contenu n'est ni enregistré ni envoyé.
 

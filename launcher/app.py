@@ -58,6 +58,12 @@ class App(tk.Tk):
         self._clip_seen = None       # (n° de séquence, texte) du presse-papiers déjà examiné
         self.sl_update = None        # dernier résultat de vérification de mise à jour
         self._update_busy = False
+        self.app_update = None       # idem pour le lanceur lui-même (core.check_app_update)
+        self._app_state = "idle"     # idle, checking, downloading, verifying, error, restart
+        self._app_error = None       # clé de traduction du message d'erreur affiché
+        self._app_dl = (0, 0)        # octets reçus, taille totale
+        self._app_cancel = threading.Event()
+        self._updated_from = core.arg_value("--updated-from")  # version précédente, après une mise à jour
         self.query = tk.StringVar()
         self.query.trace_add("write", self._on_query)
         self.log_lines = deque(maxlen=LOG_LIMIT)
@@ -104,8 +110,16 @@ class App(tk.Tk):
         if not ("--tray" in sys.argv and self.tray_active):  # --tray : démarrage réduit (avec Windows)
             self.deiconify()
         self.after(300, self._startup_checks)
+        if core.FROZEN:  # restes d'une mise à jour précédente (ancien exécutable, téléchargement interrompu)
+            threading.Thread(target=core.cleanup_update_leftovers, daemon=True).start()
+        if self._updated_from:
+            from . import __version__
+            self.log(self.t("log_app_updated", old=self._updated_from, new=__version__))
+            self.after(900, lambda: self.toast(self.t("toast_updated", old=self._updated_from, new=__version__),
+                                               "ok", duration=6000))
         if self.cfg.get("update_check"):
             self.after(4000, lambda: self.check_streamlink_update(manual=False))
+            self.after(7000, lambda: self.check_app_update(manual=False))
         self.schedule_live(2500)
 
     # =====================================================
@@ -1526,9 +1540,15 @@ class App(tk.Tk):
                    command=self.import_data).pack(side="left")
 
             sec = self._section(b, t("settings_about"))
-            from . import __version__
-            tk.Label(sec, text=f"Streamlink Launcher {__version__}", font=self.fonts.body, bg=self.c.panel,
-                     fg=self.c.text, anchor="w").pack(anchor="w")
+            self.app_card = StatusCard(sec, self, True, "", "", t("btn_check"), self._app_card_action)
+            self.app_card.pack(fill="x")
+            self._update_app_card()
+            links = tk.Frame(sec, bg=self.c.panel)
+            links.pack(anchor="w", pady=(self.px(2), 0))
+            Button(links, self, text=t("link_release_notes"), kind="link", font=self.fonts.small, pad=0, height=32,
+                   command=self._open_release_notes).pack(side="left", padx=(0, self.px(16)))
+            Button(links, self, text=t("link_repo"), kind="link", font=self.fonts.small, pad=0, height=32,
+                   command=lambda: self.open_url(core.REPO_URL)).pack(side="left")
             self._hint(sec, t("about_data", path=core.DATA_ROOT))
             Button(sec, self, text=t("btn_open_data"), kind="link", font=self.fonts.small, pad=0, height=32,
                    command=lambda: self.open_path(str(core.DATA_ROOT))).pack(anchor="w")
@@ -1623,10 +1643,168 @@ class App(tk.Tk):
 
     def _refresh_update_badge(self):
         if hasattr(self, "settings_btn"):
+            pending = (self.sl_update or {}).get("update") or (self.app_update or {}).get("update")
             try:
-                self.settings_btn.set_badge(self.c.warn if (self.sl_update or {}).get("update") else None)
+                self.settings_btn.set_badge(self.c.warn if pending else None)
             except tk.TclError:
                 pass
+
+    # --- Le lanceur : mise à jour depuis les releases GitHub
+    def _update_app_card(self):
+        t = self.t
+        try:
+            if not hasattr(self, "app_card") or not self.app_card.winfo_exists():
+                return
+        except tk.TclError:
+            return
+        from . import __version__
+        card, state, r = self.app_card, self._app_state, self.app_update
+        title = t("app_card_title", version=__version__)
+        if state == "checking":
+            card.set_state(True, t("app_checking"), title, button=t("btn_check"), level="busy")
+        elif state == "downloading":
+            done, total = self._app_dl
+            card.set_state(True, t("app_downloading", percent=int(done * 100 / total) if total else 0),
+                           f"{t.format_size(done)} / {t.format_size(total)}", button=t("btn_cancel"), level="busy")
+        elif state == "verifying":
+            card.set_state(True, t("app_verifying"), t("app_verifying_detail"), button="", level="busy")
+        elif state == "restart":
+            card.set_state(True, t("app_restart_title"), t("app_restart_detail", latest=(r or {}).get("latest", "")),
+                           button="", level="ok")
+        elif state == "error":
+            card.set_state(False, t("app_error_title"), t(self._app_error or "app_err_network"),
+                           button=t("btn_retry"), level="warn")
+        elif r and r.get("update"):
+            asset = (r.get("release") or {}).get("asset")
+            direct = bool(asset) and core.can_self_update()
+            detail = (t("app_update_detail", installed=__version__, size=t.format_size(asset["size"])) if direct
+                      else t("app_update_manual", installed=__version__))
+            card.set_state(False, t("app_update_title", latest=r["latest"]), detail,
+                           button=t("btn_update") if direct else t("btn_open_release"), level="update", primary=True)
+        elif r and r.get("update") is False:
+            card.set_state(True, title, t("app_up_to_date"), button=t("btn_check"))
+        else:
+            card.set_state(True, title, core.REPO_URL.split("//", 1)[1], button=t("btn_check"))
+
+    def _app_card_action(self):
+        state, r = self._app_state, self.app_update
+        if state == "downloading":
+            self._app_cancel.set()
+        elif state in ("idle", "error") and r and r.get("update") and state != "error":
+            self.install_app_update()
+        elif state in ("idle", "error"):
+            self.check_app_update(manual=True)
+
+    def _open_release_notes(self):
+        rel = (self.app_update or {}).get("release")
+        self.open_url(rel["page"] if rel else core.REPO_URL + "/releases")
+
+    def check_app_update(self, manual=False):
+        """Cherche une release plus récente sur GitHub, hors de l'interface (thread)."""
+        if self._app_state in ("checking", "downloading", "verifying", "restart"):
+            return
+        self._app_state, self._app_error = "checking", None
+        self._update_app_card()
+        self.run_in_thread(core.check_app_update, lambda result: self._app_update_checked(result, manual))
+
+    def _app_update_checked(self, result, manual):
+        t = self.t
+        self._app_state = "idle"
+        if isinstance(result, Exception):
+            result = {"error": "network", "update": None}
+        self.app_update = None if result.get("error") else result
+        if result.get("error") and manual:
+            self._app_state = "error"
+            self._app_error = {"network": "app_err_network", "release": "app_err_release"}.get(
+                result["error"], "app_err_network")
+        self._update_app_card()
+        self._refresh_update_badge()
+        if result.get("update"):
+            self.log(t("log_app_update_available", installed=result["current"], latest=result["latest"]), "warn")
+            self.toast(t("toast_app_update", latest=result["latest"]), "warn",
+                       action=(t("btn_update"), self.open_settings), duration=8000, low_priority=not manual)
+        elif result.get("update") is False and manual:
+            self.toast(t("toast_app_up_to_date"), "ok")
+
+    def install_app_update(self):
+        """Télécharge la release, la contrôle, remplace l'exécutable et redémarre. Sans exécutable
+        remplaçable (lancé depuis les sources, dossier protégé…), ouvre la page de la release."""
+        t = self.t
+        rel = (self.app_update or {}).get("release")
+        if not rel:
+            return
+        if not (rel.get("asset") and core.can_self_update()):
+            self.open_url(rel["page"])
+            self.toast(t("toast_update_page_opened"), "ok")
+            return
+        running = self.streams.running()
+        text = t("confirm_app_update", latest=rel["version"])
+        if running:
+            text += "\n" + t("confirm_app_update_streams", count=len(running))
+        if not messagebox.askyesno(t("title_confirm"), text, parent=self):
+            return
+        self._app_state, self._app_error = "downloading", None
+        self._app_dl = (0, rel["asset"]["size"])
+        self._app_cancel = cancel = threading.Event()
+        folder, exe = os.path.dirname(sys.executable), sys.executable
+
+        def progress(done, total):
+            self._app_dl = (done, total)
+
+        def work():
+            path = core.download_update(rel, folder, progress, cancel)
+            self._app_state = "verifying"
+            key = core.check_signature(exe, path)
+            if key:
+                try:
+                    os.remove(path)
+                except OSError:
+                    pass
+                raise core.UpdateError(key)
+            return path
+
+        self._update_app_card()
+        self.after(200, self._poll_app_update)
+        self.run_in_thread(work, lambda result: self._app_downloaded(result, rel))
+
+    def _poll_app_update(self):
+        if self._app_state in ("downloading", "verifying"):
+            self._update_app_card()
+            self.after(200, self._poll_app_update)
+
+    def _app_downloaded(self, result, rel):
+        t = self.t
+        from . import __version__
+        if isinstance(result, Exception):
+            key = result.key if isinstance(result, core.UpdateError) else "app_err_download"
+            if key == "app_err_cancelled":
+                self._app_state = "idle"
+            else:
+                self._app_state, self._app_error = "error", key
+                self.log(t("log_app_update_failed", error=t(key)), "err")
+                if not isinstance(result, core.UpdateError):
+                    core.log.error("Mise à jour : %r", result)
+            self._update_app_card()
+            return
+        try:
+            core.install_update(result)
+        except core.UpdateError as e:
+            try:
+                os.remove(result)
+            except OSError:
+                pass
+            self._app_state, self._app_error = "error", e.key
+            self.log(t("log_app_update_failed", error=t(e.key)), "err")
+            self._update_app_card()
+            return
+        self.log(t("log_app_updated", old=__version__, new=rel["version"]))
+        if core.relaunch(old_version=__version__):
+            self._shutdown()
+        else:  # nouvelle version en place, mais impossible de la démarrer : à relancer à la main
+            self._app_state = "restart"
+            self._update_app_card()
+            self.toast(t("app_restart_title") + " — " + t("app_restart_detail", latest=rel["version"]), "ok",
+                       duration=8000)
 
     def open_update(self):
         """Installateur Windows : page de téléchargement. Installation pip : commande copiée."""
@@ -1889,6 +2067,11 @@ class App(tk.Tk):
         if running and not messagebox.askyesno(self.t("title_confirm"),
                                                self.t("confirm_quit_running", count=len(running)), parent=self):
             return
+        self._shutdown()
+
+    def _shutdown(self):
+        """Arrête les streams, libère les ressources Windows, enregistre l'état et ferme la fenêtre."""
+        self._app_cancel.set()
         self.streams.stop_all()
         if self._live_job:
             self.after_cancel(self._live_job)
@@ -1907,6 +2090,9 @@ def main():
     from .theme import enable_dpi_awareness, set_app_id
     core.setup_logging()
     core.log.info("Démarrage de Streamlink Launcher %s (données : %s)", __version__, core.DATA_ROOT)
+    waited = core.arg_value("--wait-pid")  # relance après une mise à jour : on attend la fermeture de l'ancienne
+    if waited and waited.isdigit():
+        wintray.wait_for_pid(int(waited), 20)
     if not wintray.acquire_single_instance():
         return  # déjà ouvert : sa fenêtre vient d'être affichée
     enable_dpi_awareness()
