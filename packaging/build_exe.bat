@@ -7,13 +7,23 @@ REM  (sur GitHub Actions, la variable CI supprime les pauses)
 REM =====================================================
 cd /d "%~dp0\.."
 
-where py >nul 2>nul && (set PY=py -3) || (set PY=python)
+REM PY peut etre impose (GitHub Actions : le Python installe par setup-python)
+if not defined PY (where py >nul 2>nul && (set PY=py -3) || (set PY=python))
 
-echo Installation / mise a jour de PyInstaller...
-%PY% -m pip install --upgrade pyinstaller || goto :erreur
+REM Version de PyInstaller figee dans requirements-build.txt.
+REM Sur GitHub Actions, BUILD_BOOTLOADER=1 recompile le chargeur de PyInstaller depuis ses sources :
+REM le chargeur precompile est partage par des milliers de programmes (dont des malveillants),
+REM ce qui provoque des faux positifs antivirus. Il faut alors Visual Studio Build Tools (C++).
+echo Installation de PyInstaller...
+if "%BUILD_BOOTLOADER%"=="1" (
+  set PYINSTALLER_COMPILE_BOOTLOADER=1
+  %PY% -m pip install --no-binary pyinstaller -r packaging\requirements-build.txt || goto :erreur
+) else (
+  %PY% -m pip install -r packaging\requirements-build.txt || goto :erreur
+)
 
 echo Compilation...
-%PY% -m PyInstaller --noconfirm --clean --onefile --windowed ^
+%PY% -m PyInstaller --noconfirm --clean --onefile --windowed --noupx ^
   --name "Streamlink Launcher" ^
   --icon "launcher\app.ico" ^
   --version-file "packaging\version_info.txt" ^
