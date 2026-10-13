@@ -11,11 +11,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-### Changed
-- **Favorites sorted by platform.** The favorites on the main screen now follow the selected platform button: *Twitch* shows only Twitch favorites, *Kick* only Kick favorites, and so on (a script shows the favorites of that script). The section title shows the platform (*Favorites · Kick*), live favorites still come first, and a platform with no favorites says so. Selecting a platform by typing or pasting a link, or by clicking a recent stream, switches the list too. *See all* still opens every favorite, and live notifications still cover all platforms.
-
 ### Planned
 - Viewing statistics (time per channel, peak hours).
+
+## [1.3.0] - 2026-10-13
+
+### Changed
+- **Favorites sorted by platform.** The favorites on the main screen now follow the selected platform button: *Twitch* shows only Twitch favorites, *Kick* only Kick favorites, and so on (a script shows the favorites of that script). The section title shows the platform (*Favorites · Kick*), live favorites still come first, and a platform with no favorites says so. Selecting a platform by typing or pasting a link, or by clicking a recent stream, switches the list too. *See all* still opens every favorite, and live notifications still cover all platforms.
 
 ## [1.2.0] - 2026-10-13
 
@@ -190,11 +192,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Non publié]
 
-### Modifié
-- **Favoris classés par plateforme.** Les favoris de l'écran principal suivent maintenant le bouton de plateforme choisi : *Twitch* n'affiche que les favoris Twitch, *Kick* que les favoris Kick, etc. (un script affiche les favoris de ce script). Le titre de la section indique la plateforme (*Favoris · Kick*), les favoris en direct restent en premier, et une plateforme sans favori l'indique. Choisir une plateforme en tapant ou collant un lien, ou en cliquant sur un stream récent, change aussi la liste. *Tout voir* ouvre toujours tous les favoris, et les notifications de live concernent toujours toutes les plateformes.
-
 ### Prévu
 - Statistiques de visionnage (temps par chaîne, heures de pointe).
+
+## [1.3.0] - 2026-10-13
+
+### Modifié
+- **Favoris classés par plateforme.** Les favoris de l'écran principal suivent maintenant le bouton de plateforme choisi : *Twitch* n'affiche que les favoris Twitch, *Kick* que les favoris Kick, etc. (un script affiche les favoris de ce script). Le titre de la section indique la plateforme (*Favoris · Kick*), les favoris en direct restent en premier, et une plateforme sans favori l'indique. Choisir une plateforme en tapant ou collant un lien, ou en cliquant sur un stream récent, change aussi la liste. *Tout voir* ouvre toujours tous les favoris, et les notifications de live concernent toujours toutes les plateformes.
 
 ## [1.2.0] - 2026-10-13
 
@@ -363,8 +367,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 > Les versions 0.1.0 à 1.0.0 n'ont jamais été publiées sur GitHub ; la 1.0.1 est la première release. La date de la 0.1.0 est la plus ancienne date trouvée dans les données de l'application.
 
-[Unreleased]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.2.0...HEAD
-[Non publié]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.3.0...HEAD
+[Non publié]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.3.0
 [1.2.0]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.2.0
 [1.1.0]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.1.0
 [1.0.2]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.0.2
