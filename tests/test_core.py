@@ -685,5 +685,19 @@ class TestAppUpdate(unittest.TestCase):
             self.assertIn(f"1{sep}5", t.format_size(1_572_864))
 
 
+class TestWingetManifest(unittest.TestCase):
+    def test_manifests(self):
+        sys.path.insert(0, str(ROOT / "packaging" / "winget"))
+        import make_manifest
+        m = make_manifest.manifests("1.4.0", "https://github.com/x/y/releases/download/v1.4.0/a.exe", "AB" * 32, "2026-10-14")
+        self.assertEqual(len(m), 3)
+        for text in m.values():
+            self.assertIn("PackageIdentifier: Bulls64.StreamlinkLauncher", text)
+            self.assertIn("PackageVersion: 1.4.0", text)
+        installer = m["Bulls64.StreamlinkLauncher.installer.yaml"]
+        self.assertIn("InstallerType: portable", installer)
+        self.assertIn("InstallerSha256: " + "AB" * 32, installer)
+
+
 if __name__ == "__main__":
     unittest.main()

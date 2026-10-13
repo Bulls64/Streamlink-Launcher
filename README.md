@@ -46,7 +46,7 @@ Pure Python + Tkinter, **no third-party dependency**. From source, it starts in 
 2. Put it in a folder of your choice, for example `Documents\Streamlink`.
 3. Double-click it.
 
-The release notes say whether the executable is code-signed (see [Code signing policy](#code-signing-policy)). An unsigned executable, or a signed one that Windows does not know yet, may trigger Windows SmartScreen on the first launch (*"Windows protected your PC"*): click **More info** and then **Run anyway**. To check that the file is the one built by GitHub, compare its SHA-256 with `SHA256SUMS.txt` in the release: `Get-FileHash .\StreamlinkLauncher-<version>.exe` in PowerShell.
+The executable is not code-signed (see [Code signing](#code-signing)), so Windows SmartScreen may trigger on the first launch (*"Windows protected your PC"*): click **More info** and then **Run anyway**. To check that the file is the one built by GitHub, compare its SHA-256 with `SHA256SUMS.txt` in the release: `Get-FileHash .\StreamlinkLauncher-<version>.exe` in PowerShell.
 
 #### Option 2: from source
 
@@ -117,7 +117,7 @@ packaging\build_exe.bat
 
 The script installs [PyInstaller](https://pyinstaller.org/) (version pinned in `packaging/requirements-build.txt`) and produces `dist\Streamlink Launcher.exe`: a single file, no console, with the icon and version information embedded.
 
-On GitHub Actions, every pull request builds the executable, and pushing a `v*` tag (for example `v1.4.0`) builds it, has it signed (see below), and publishes it with its `SHA256SUMS.txt`. The CI recompiles PyInstaller's bootloader from source (`BUILD_BOOTLOADER=1`): the prebuilt bootloader is shared by countless programs, including malware, and is the main cause of antivirus false positives.
+On GitHub Actions, every pull request builds the executable, and pushing a `v*` tag (for example `v1.4.0`) builds it and publishes it (signing is optional, see [Code signing](#code-signing)) with its `SHA256SUMS.txt`. The CI recompiles PyInstaller's bootloader from source (`BUILD_BOOTLOADER=1`): the prebuilt bootloader is shared by countless programs, including malware, and is the main cause of antivirus false positives.
 
 ### Tests
 
@@ -165,16 +165,33 @@ Nothing else is sent, and no data is collected.
 - **Antivirus warning on the `.exe`**: PyInstaller executables are sometimes flagged by mistake. Check the SHA-256 against `SHA256SUMS.txt` in the release, report the false positive to your antivirus vendor (for Microsoft Defender: [submit a file](https://www.microsoft.com/wdsi/filesubmission), category *Incorrectly detected as malware*), or run from source instead.
 - **Reporting a bug**: attach `launcher.log` (*Settings › About › Open the data folder*) to your [issue](https://github.com/Bulls64/Streamlink-Launcher/issues).
 
-### Code signing policy
+### If Windows blocks the executable
 
-Windows releases are built by GitHub Actions from this repository, then signed. Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+The executable is not code-signed (see [Code signing](#code-signing)), so Windows or your antivirus may object. Nothing here asks you to trust the file blindly: check it first, then unblock it.
 
-- Committers and reviewers: [Bulls64](https://github.com/Bulls64)
-- Approvers: [Bulls64](https://github.com/Bulls64)
-- Only executables built by this repository's workflow from tagged versions are signed, and each signing request is approved by hand.
-- Privacy: see [Network and privacy](#network-and-privacy). This program does not transfer any information to other networked systems except for the requests listed there, which can be turned off.
+1. **Check the file.** Download it only from the [releases page](https://github.com/Bulls64/Streamlink-Launcher/releases) of this repository, then compare its SHA-256 with the one in `SHA256SUMS.txt` (or shown by GitHub next to the file). In PowerShell, from the folder containing the file:
+   ```powershell
+   Get-FileHash .\StreamlinkLauncher-<version>.exe -Algorithm SHA256
+   ```
+   The two values must be identical. If they are not, delete the file and do not run it.
+2. **SmartScreen ("Windows protected your PC").** Click **More info**, then **Run anyway**. The warning appears because the file is new and unsigned, not because something was detected.
+3. **"This file came from another computer" / nothing happens on double-click.** Right-click the file › **Properties** › tick **Unblock** at the bottom of the *General* tab › **OK**. Or in PowerShell: `Unblock-File .\StreamlinkLauncher-<version>.exe`.
+4. **The antivirus quarantines or deletes it.** Restore it from the quarantine after checking the SHA-256 (step 1), add the folder containing it to the antivirus exclusions, and report the false positive to the vendor so that it is fixed for everyone (Microsoft Defender: [submit a file](https://www.microsoft.com/wdsi/filesubmission), category *Incorrectly detected as malware*, and mention that it is a PyInstaller program built on GitHub Actions).
+5. **Still blocked, or you would rather not trust an unsigned file?** Run it from source (see [Option 2](#option-2-from-source)): the code is the same and nothing has to be unblocked.
 
-Status: signing through the SignPath Foundation program is being set up. Until the project is accepted, releases are published unsigned; the release notes of each version say whether its executable is signed.
+Putting the file in a folder of your own (for example `Documents\Streamlink`) rather than a protected one such as `C:\Program Files` also lets the built-in updater replace it.
+
+### Code signing
+
+The Windows executables are **not code-signed**: free signing programs for open source projects require a project size and track record that this one does not have yet. Windows SmartScreen may therefore warn on the first launch (see [Option 1](#option-1-executable-no-python-needed)), and some antivirus programs may flag the file wrongly.
+
+What protects you instead:
+
+- Releases are built by GitHub Actions from this repository's tagged source, never on a personal computer, and each one comes with `SHA256SUMS.txt` (the SHA-256 is also shown in the release notes and by GitHub next to the file).
+- The built-in updater only installs the release file of this repository, after checking its size and the SHA-256 published by GitHub.
+- The PyInstaller bootloader is compiled from source and UPX is not used, which avoids most false positives.
+
+The release workflow still contains an optional [SignPath](https://about.signpath.io) signing step. It stays off (nothing is signed) unless the `SIGNPATH_ORGANIZATION_ID` variable is set on the repository; the release notes of each version say whether its executable is signed. If one day the executable is signed, the updater will then also require every later version to be signed by the same publisher.
 
 ### Credits
 
@@ -223,7 +240,7 @@ Python et Tkinter uniquement, **sans aucune dépendance externe**. Depuis les so
 2. Place-le dans le dossier de ton choix, par exemple `Documents\Streamlink`.
 3. Double-clique dessus.
 
-Les notes de version indiquent si l'exécutable est signé (voir [Politique de signature du code](#politique-de-signature-du-code)). Un exécutable non signé, ou signé mais encore inconnu de Windows, peut déclencher Windows SmartScreen au premier lancement (*« Windows a protégé votre ordinateur »*) : clique sur **Informations complémentaires** puis **Exécuter quand même**. Pour vérifier que le fichier est bien celui compilé par GitHub, compare son SHA-256 avec `SHA256SUMS.txt` dans la release : `Get-FileHash .\StreamlinkLauncher-<version>.exe` dans PowerShell.
+L'exécutable n'est pas signé (voir [Signature du code](#signature-du-code)), donc Windows SmartScreen peut se déclencher au premier lancement (*« Windows a protégé votre ordinateur »*) : clique sur **Informations complémentaires** puis **Exécuter quand même**. Pour vérifier que le fichier est bien celui compilé par GitHub, compare son SHA-256 avec `SHA256SUMS.txt` dans la release : `Get-FileHash .\StreamlinkLauncher-<version>.exe` dans PowerShell.
 
 #### Option 2 : depuis les sources
 
@@ -276,7 +293,7 @@ packaging\build_exe.bat
 
 Le script installe [PyInstaller](https://pyinstaller.org/) (version figée dans `packaging/requirements-build.txt`) et produit `dist\Streamlink Launcher.exe` : un seul fichier, sans console, avec l'icône et les informations de version intégrées.
 
-Sur GitHub Actions, chaque pull request compile l'exécutable, et pousser un tag `v*` (par exemple `v1.4.0`) le compile, le fait signer (voir plus bas) et le publie avec son `SHA256SUMS.txt`. La CI recompile le chargeur de PyInstaller depuis ses sources (`BUILD_BOOTLOADER=1`) : le chargeur précompilé est partagé par d'innombrables programmes, malveillants compris, et c'est la première cause de faux positifs antivirus.
+Sur GitHub Actions, chaque pull request compile l'exécutable, et pousser un tag `v*` (par exemple `v1.4.0`) le compile et le publie (la signature est facultative, voir [Signature du code](#signature-du-code)) avec son `SHA256SUMS.txt`. La CI recompile le chargeur de PyInstaller depuis ses sources (`BUILD_BOOTLOADER=1`) : le chargeur précompilé est partagé par d'innombrables programmes, malveillants compris, et c'est la première cause de faux positifs antivirus.
 
 ### Tests
 
@@ -324,11 +341,33 @@ Rien d'autre n'est envoyé, et aucune donnée n'est collectée.
 - **Alerte antivirus sur le `.exe`** : les exécutables PyInstaller sont parfois détectés à tort. Vérifie le SHA-256 avec `SHA256SUMS.txt` dans la release, signale le faux positif à l'éditeur de l'antivirus (pour Microsoft Defender : [envoyer un fichier](https://www.microsoft.com/wdsi/filesubmission), catégorie *Incorrectly detected as malware*), ou utilise la version source.
 - **Signaler un bug** : joins `launcher.log` (*Paramètres › À propos › Ouvrir le dossier des données*) à ton [ticket](https://github.com/Bulls64/Streamlink-Launcher/issues).
 
-### Politique de signature du code
+### Si Windows bloque l'exécutable
 
-Les releases Windows sont compilées par GitHub Actions depuis ce dépôt, puis signées. Signature de code gratuite fournie par [SignPath.io](https://about.signpath.io), certificat de la [SignPath Foundation](https://signpath.org). La politique de référence est la [version anglaise](#code-signing-policy) (rôles : Bulls64 pour le code, la relecture et l'approbation ; chaque demande de signature est approuvée à la main ; vie privée : voir [Réseau et vie privée](#réseau-et-vie-privée)).
+L'exécutable n'est pas signé (voir [Signature du code](#signature-du-code)) : Windows ou ton antivirus peuvent donc faire des difficultés. Rien ici ne te demande de faire confiance les yeux fermés : vérifie le fichier d'abord, débloque-le ensuite.
 
-Statut : la signature via le programme de la SignPath Foundation est en cours de mise en place. En attendant que le projet soit accepté, les releases sont publiées sans signature ; les notes de chaque version indiquent si son exécutable est signé.
+1. **Vérifie le fichier.** Télécharge-le uniquement depuis la [page des releases](https://github.com/Bulls64/Streamlink-Launcher/releases) de ce dépôt, puis compare son SHA-256 avec celui de `SHA256SUMS.txt` (ou affiché par GitHub à côté du fichier). Dans PowerShell, depuis le dossier du fichier :
+   ```powershell
+   Get-FileHash .\StreamlinkLauncher-<version>.exe -Algorithm SHA256
+   ```
+   Les deux valeurs doivent être identiques. Sinon, supprime le fichier et ne le lance pas.
+2. **SmartScreen (« Windows a protégé votre ordinateur »).** Clique sur **Informations complémentaires**, puis **Exécuter quand même**. L'avertissement apparaît parce que le fichier est récent et non signé, pas parce que quelque chose a été détecté.
+3. **« Ce fichier provient d'un autre ordinateur » / rien ne se passe au double-clic.** Clic droit sur le fichier › **Propriétés** › coche **Débloquer** en bas de l'onglet *Général* › **OK**. Ou dans PowerShell : `Unblock-File .\StreamlinkLauncher-<version>.exe`.
+4. **L'antivirus le met en quarantaine ou le supprime.** Restaure-le depuis la quarantaine après avoir vérifié le SHA-256 (étape 1), ajoute le dossier qui le contient aux exclusions de l'antivirus, et signale le faux positif à l'éditeur pour que ce soit corrigé pour tout le monde (Microsoft Defender : [envoyer un fichier](https://www.microsoft.com/wdsi/filesubmission), catégorie *Incorrectly detected as malware*, en précisant qu'il s'agit d'un programme PyInstaller compilé sur GitHub Actions).
+5. **Toujours bloqué, ou tu préfères ne pas faire confiance à un fichier non signé ?** Lance-le depuis les sources (voir l'[option 2](#option-2--depuis-les-sources)) : le code est le même et rien n'est à débloquer.
+
+Placer le fichier dans un dossier à toi (par exemple `Documents\Streamlink`) plutôt que dans un dossier protégé comme `C:\Program Files` permet aussi à la mise à jour intégrée de le remplacer.
+
+### Signature du code
+
+Les exécutables Windows ne sont **pas signés** : les programmes gratuits de signature pour l'open source exigent une taille et un historique que ce projet n'a pas encore. Windows SmartScreen peut donc avertir au premier lancement (voir l'[option 1](#option-1--lexécutable-sans-python)), et certains antivirus peuvent détecter le fichier à tort.
+
+Ce qui te protège à la place :
+
+- Les releases sont compilées par GitHub Actions depuis les sources du tag de ce dépôt, jamais sur un ordinateur personnel, et chacune est accompagnée de `SHA256SUMS.txt` (le SHA-256 figure aussi dans les notes de version et chez GitHub à côté du fichier).
+- Le programme de mise à jour n'installe que le fichier de release de ce dépôt, après avoir contrôlé sa taille et le SHA-256 publié par GitHub.
+- Le chargeur de PyInstaller est compilé depuis ses sources et UPX n'est pas utilisé, ce qui évite l'essentiel des faux positifs.
+
+Le workflow de release contient encore une étape de signature [SignPath](https://about.signpath.io) facultative. Elle reste désactivée (rien n'est signé) tant que la variable `SIGNPATH_ORGANIZATION_ID` n'est pas définie sur le dépôt ; les notes de chaque version indiquent si son exécutable est signé. Si l'exécutable devient un jour signé, le programme de mise à jour exigera ensuite que chaque version suivante le soit par le même éditeur.
 
 ### Crédits
 
