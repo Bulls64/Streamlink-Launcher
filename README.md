@@ -46,7 +46,7 @@ Pure Python + Tkinter, **no third-party dependency**. From source, it starts in 
 2. Put it in a folder of your choice, for example `Documents\Streamlink`.
 3. Double-click it.
 
-The executable is not code-signed. On the first launch, Windows SmartScreen may show *"Windows protected your PC"*. Click **More info** and then **Run anyway**.
+The release notes say whether the executable is code-signed (see [Code signing policy](#code-signing-policy)). An unsigned executable, or a signed one that Windows does not know yet, may trigger Windows SmartScreen on the first launch (*"Windows protected your PC"*): click **More info** and then **Run anyway**. To check that the file is the one built by GitHub, compare its SHA-256 with `SHA256SUMS.txt` in the release: `Get-FileHash .\StreamlinkLauncher-<version>.exe` in PowerShell.
 
 #### Option 2: from source
 
@@ -115,9 +115,9 @@ On Windows, with Python installed:
 packaging\build_exe.bat
 ```
 
-The script installs [PyInstaller](https://pyinstaller.org/) and produces `dist\Streamlink Launcher.exe`: a single file, no console, with the icon and version information embedded.
+The script installs [PyInstaller](https://pyinstaller.org/) (version pinned in `packaging/requirements-build.txt`) and produces `dist\Streamlink Launcher.exe`: a single file, no console, with the icon and version information embedded.
 
-Pushing a `v*` tag (for example `v1.0.2`) also builds the executable on GitHub Actions and attaches it to the release.
+On GitHub Actions, every pull request builds the executable, and pushing a `v*` tag (for example `v1.3.0`) builds it, has it signed (see below), and publishes it with its `SHA256SUMS.txt`. The CI recompiles PyInstaller's bootloader from source (`BUILD_BOOTLOADER=1`): the prebuilt bootloader is shared by countless programs, including malware, and is the main cause of antivirus false positives.
 
 ### Tests
 
@@ -162,8 +162,19 @@ Nothing else is sent, and no data is collected.
 - **"Streamlink not found"**: install Streamlink, or set the path to `streamlink.exe` in *Settings › Streamlink*.
 - **The stream does not start**: open the log drawer at the bottom of the window. Streamlink's error message appears there, for example when the channel is offline.
 - **<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd> does nothing**: another application probably uses this shortcut. The launcher warns you, and *Settings › Window and shortcut* shows its status and lets you pick another one. Each shortcut press received is also written to the log drawer.
-- **Antivirus warning on the `.exe`**: this is a common false positive with PyInstaller executables. You can run from source instead.
+- **Antivirus warning on the `.exe`**: PyInstaller executables are sometimes flagged by mistake. Check the SHA-256 against `SHA256SUMS.txt` in the release, report the false positive to your antivirus vendor (for Microsoft Defender: [submit a file](https://www.microsoft.com/wdsi/filesubmission), category *Incorrectly detected as malware*), or run from source instead.
 - **Reporting a bug**: attach `launcher.log` (*Settings › About › Open the data folder*) to your [issue](https://github.com/Bulls64/Streamlink-Launcher/issues).
+
+### Code signing policy
+
+Windows releases are built by GitHub Actions from this repository, then signed. Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+
+- Committers and reviewers: [Bulls64](https://github.com/Bulls64)
+- Approvers: [Bulls64](https://github.com/Bulls64)
+- Only executables built by this repository's workflow from tagged versions are signed, and each signing request is approved by hand.
+- Privacy: see [Network and privacy](#network-and-privacy). This program does not transfer any information to other networked systems except for the requests listed there, which can be turned off.
+
+Status: signing through the SignPath Foundation program is being set up. Until the project is accepted, releases are published unsigned; the release notes of each version say whether its executable is signed.
 
 ### Credits
 
@@ -212,7 +223,7 @@ Python et Tkinter uniquement, **sans aucune dépendance externe**. Depuis les so
 2. Place-le dans le dossier de ton choix, par exemple `Documents\Streamlink`.
 3. Double-clique dessus.
 
-L'exécutable n'est pas signé. Au premier lancement, Windows SmartScreen peut afficher *« Windows a protégé votre ordinateur »*. Clique sur **Informations complémentaires** puis **Exécuter quand même**.
+Les notes de version indiquent si l'exécutable est signé (voir [Politique de signature du code](#politique-de-signature-du-code)). Un exécutable non signé, ou signé mais encore inconnu de Windows, peut déclencher Windows SmartScreen au premier lancement (*« Windows a protégé votre ordinateur »*) : clique sur **Informations complémentaires** puis **Exécuter quand même**. Pour vérifier que le fichier est bien celui compilé par GitHub, compare son SHA-256 avec `SHA256SUMS.txt` dans la release : `Get-FileHash .\StreamlinkLauncher-<version>.exe` dans PowerShell.
 
 #### Option 2 : depuis les sources
 
@@ -263,9 +274,9 @@ Sous Windows, avec Python installé :
 packaging\build_exe.bat
 ```
 
-Le script installe [PyInstaller](https://pyinstaller.org/) et produit `dist\Streamlink Launcher.exe` : un seul fichier, sans console, avec l'icône et les informations de version intégrées.
+Le script installe [PyInstaller](https://pyinstaller.org/) (version figée dans `packaging/requirements-build.txt`) et produit `dist\Streamlink Launcher.exe` : un seul fichier, sans console, avec l'icône et les informations de version intégrées.
 
-Pousser un tag `v*` (par exemple `v1.0.2`) compile aussi l'exécutable sur GitHub Actions et le joint à la release.
+Sur GitHub Actions, chaque pull request compile l'exécutable, et pousser un tag `v*` (par exemple `v1.3.0`) le compile, le fait signer (voir plus bas) et le publie avec son `SHA256SUMS.txt`. La CI recompile le chargeur de PyInstaller depuis ses sources (`BUILD_BOOTLOADER=1`) : le chargeur précompilé est partagé par d'innombrables programmes, malveillants compris, et c'est la première cause de faux positifs antivirus.
 
 ### Tests
 
@@ -310,8 +321,14 @@ Rien d'autre n'est envoyé, et aucune donnée n'est collectée.
 - **« Streamlink introuvable »** : installe Streamlink, ou indique le chemin de `streamlink.exe` dans *Paramètres › Streamlink*.
 - **Le stream ne démarre pas** : ouvre le tiroir du journal en bas de la fenêtre. Le message d'erreur de Streamlink s'y affiche, par exemple quand la chaîne est hors ligne.
 - **<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd> ne fait rien** : une autre application utilise sans doute ce raccourci. Le lanceur t'en avertit, et *Paramètres › Fenêtre et raccourci* affiche son état et te permet d'en choisir un autre. Chaque appui reçu est aussi noté dans le tiroir du journal.
-- **Alerte antivirus sur le `.exe`** : c'est un faux positif fréquent avec les exécutables PyInstaller. Tu peux utiliser la version source à la place.
+- **Alerte antivirus sur le `.exe`** : les exécutables PyInstaller sont parfois détectés à tort. Vérifie le SHA-256 avec `SHA256SUMS.txt` dans la release, signale le faux positif à l'éditeur de l'antivirus (pour Microsoft Defender : [envoyer un fichier](https://www.microsoft.com/wdsi/filesubmission), catégorie *Incorrectly detected as malware*), ou utilise la version source.
 - **Signaler un bug** : joins `launcher.log` (*Paramètres › À propos › Ouvrir le dossier des données*) à ton [ticket](https://github.com/Bulls64/Streamlink-Launcher/issues).
+
+### Politique de signature du code
+
+Les releases Windows sont compilées par GitHub Actions depuis ce dépôt, puis signées. Signature de code gratuite fournie par [SignPath.io](https://about.signpath.io), certificat de la [SignPath Foundation](https://signpath.org). La politique de référence est la [version anglaise](#code-signing-policy) (rôles : Bulls64 pour le code, la relecture et l'approbation ; chaque demande de signature est approuvée à la main ; vie privée : voir [Réseau et vie privée](#réseau-et-vie-privée)).
+
+Statut : la signature via le programme de la SignPath Foundation est en cours de mise en place. En attendant que le projet soit accepté, les releases sont publiées sans signature ; les notes de chaque version indiquent si son exécutable est signé.
 
 ### Crédits
 

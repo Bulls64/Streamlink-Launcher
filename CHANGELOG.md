@@ -11,6 +11,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+- **Code signing ready.** The release workflow can have the executable signed through [SignPath.io](https://about.signpath.io) with a certificate from the [SignPath Foundation](https://signpath.org) (free for open source projects): it waits for the manual approval, checks that the signature is valid and timestamped, and never publishes an unsigned file once signing is enabled. Signing turns on as soon as the project is accepted and configured (see *Code signing policy* in the README); until then, releases stay unsigned and their notes say so.
+- Each release now comes with `SHA256SUMS.txt`, and its notes show the SHA-256 of the executable.
+
+### Changed
+- **Fewer antivirus false positives**: PyInstaller's bootloader is now compiled from source on GitHub Actions instead of using the prebuilt one shared by countless programs, UPX compression is disabled, and the PyInstaller version is pinned (`packaging/requirements-build.txt`).
+- Every pull request now builds the executable, so a build problem shows up before the release.
+
 ### Planned
 - Viewing statistics (time per channel, peak hours).
 
@@ -191,6 +199,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## Français
 
 ## [Non publié]
+
+### Ajouté
+- **Signature du code prête.** Le workflow de release peut faire signer l'exécutable via [SignPath.io](https://about.signpath.io) avec un certificat de la [SignPath Foundation](https://signpath.org) (gratuit pour les projets open source) : il attend l'approbation manuelle, vérifie que la signature est valide et horodatée, et ne publie jamais de fichier non signé une fois la signature activée. La signature s'active dès que le projet est accepté et configuré (voir *Code signing policy* dans le README) ; d'ici là, les releases restent non signées et leurs notes l'indiquent.
+- Chaque release est accompagnée de `SHA256SUMS.txt`, et ses notes affichent le SHA-256 de l'exécutable.
+
+### Modifié
+- **Moins de faux positifs antivirus** : le chargeur de PyInstaller est maintenant compilé depuis ses sources sur GitHub Actions au lieu d'utiliser celui précompilé partagé par d'innombrables programmes, la compression UPX est désactivée, et la version de PyInstaller est figée (`packaging/requirements-build.txt`).
+- Chaque pull request compile maintenant l'exécutable : un problème de compilation se voit avant la release.
 
 ### Prévu
 - Statistiques de visionnage (temps par chaîne, heures de pointe).

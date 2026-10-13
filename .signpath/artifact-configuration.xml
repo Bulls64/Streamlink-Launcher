@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Configuration d'artefact à copier dans le projet SignPath (Artifact configurations).
+     L'exe arrive tel quel (upload-artifact avec archive: false) : la racine est donc <pe-file>.
+     Seul un exe dont les métadonnées (packaging/version_info.txt) sont celles de Streamlink Launcher
+     peut être signé. SignPath valide ce fichier quand on le colle dans son éditeur. -->
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <pe-file product-name="Streamlink Launcher" company-name="Chris">
+    <authenticode-sign />
+  </pe-file>
+</artifact-configuration>

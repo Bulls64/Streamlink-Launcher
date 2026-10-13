@@ -5,6 +5,7 @@ on:
     branches: ["**"]
     tags: ["v*"]
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -28,38 +29,118 @@ jobs:
       - name: Unit tests
         run: python -m unittest discover -s tests -v
 
-  release:
-    name: Build the .exe and publish the release
-    if: startsWith(github.ref, 'refs/tags/v')
+  build:
+    name: Build the .exe
+    # Sur chaque PR (pour vérifier que l'exe se construit) et sur les tags de version
+    if: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     needs: tests
     runs-on: windows-latest
-    permissions:
-      contents: write
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      artifact-id: ${{ steps.upload.outputs.artifact-id }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Check that the tag matches the version
+      - name: Read the version (and check the tag)
+        id: version
         shell: bash
         run: |
           VERSION=$(python -c "import launcher; print(launcher.__version__)")
-          if [ "v$VERSION" != "$GITHUB_REF_NAME" ]; then
+          if [[ "$GITHUB_REF" == refs/tags/v* && "v$VERSION" != "$GITHUB_REF_NAME" ]]; then
             echo "::error::Tag $GITHUB_REF_NAME does not match launcher.__version__ ($VERSION)"
             exit 1
           fi
-          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
-      - name: Build
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+      - name: Build (PyInstaller bootloader compiled from source)
         shell: cmd
+        env:
+          BUILD_BOOTLOADER: "1"
         run: packaging\build_exe.bat
       - name: Rename the executable
         shell: bash
-        run: mv "dist/Streamlink Launcher.exe" "dist/StreamlinkLauncher-$VERSION.exe"
+        run: mv "dist/Streamlink Launcher.exe" "dist/StreamlinkLauncher-${{ steps.version.outputs.version }}.exe"
+      - name: Upload the unsigned executable
+        id: upload
+        uses: actions/upload-artifact@v7
+        with:
+          path: dist/StreamlinkLauncher-${{ steps.version.outputs.version }}.exe
+          archive: false
+          if-no-files-found: error
+          retention-days: 7
+
+  release:
+    name: Sign and publish the release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: windows-latest
+    permissions:
+      contents: write
+      actions: read
+    env:
+      VERSION: ${{ needs.build.outputs.version }}
+      EXE: StreamlinkLauncher-${{ needs.build.outputs.version }}.exe
+      # Signature activée dès que la variable SIGNPATH_ORGANIZATION_ID existe (Settings > Secrets and variables > Actions)
+      SIGN: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Download the unsigned executable
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ env.EXE }}
+          path: unsigned
+      - name: Sign with SignPath (SignPath Foundation certificate)
+        if: env.SIGN == 'true'
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG || 'Streamlink-Launcher' }}
+          signing-policy-slug: ${{ vars.SIGNPATH_POLICY_SLUG || 'release-signing' }}
+          github-artifact-id: ${{ needs.build.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: "3600"   # chaque release est approuvée à la main sur SignPath
+          output-artifact-directory: signed
+          skip-decompress: true
+      - name: Check the signature
+        if: env.SIGN == 'true'
+        shell: pwsh
+        run: |
+          $sig = Get-AuthenticodeSignature "signed/$env:EXE"
+          Write-Host "Status: $($sig.Status) — Signer: $($sig.SignerCertificate.Subject) — Timestamp: $($sig.TimeStamperCertificate.Subject)"
+          if ($sig.Status -ne 'Valid') { throw "Signature invalide : $($sig.StatusMessage)" }
+          if (-not $sig.TimeStamperCertificate) { throw "Signature sans horodatage" }
+      - name: Gather the files
+        shell: bash
+        run: |
+          mkdir -p dist
+          if [ "$SIGN" = "true" ]; then cp "signed/$EXE" dist/; else cp "unsigned/$EXE" dist/; fi
+          cd dist && sha256sum "$EXE" > SHA256SUMS.txt && cat SHA256SUMS.txt
       - name: Release notes from CHANGELOG.md
         shell: bash
-        run: python packaging/release_notes.py "$VERSION" > release_notes.md
+        run: |
+          python packaging/release_notes.py "$VERSION" > release_notes.md
+          HASH=$(cut -d' ' -f1 dist/SHA256SUMS.txt)
+          {
+            echo
+            echo "---"
+            echo
+            if [ "$SIGN" = "true" ]; then
+              echo "**Signed executable** — free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org). *Exécutable signé — signature gratuite fournie par SignPath.io, certificat de la SignPath Foundation.*"
+            else
+              echo "**Unsigned executable** — Windows SmartScreen may show a warning (*More info* → *Run anyway*). *Exécutable non signé — SmartScreen peut afficher un avertissement (Informations complémentaires → Exécuter quand même).*"
+            fi
+            echo
+            echo "SHA-256 \`$HASH\`"
+          } >> release_notes.md
       - uses: softprops/action-gh-release@v2
         with:
           name: Streamlink Launcher ${{ env.VERSION }}
           body_path: release_notes.md
-          files: dist/StreamlinkLauncher-${{ env.VERSION }}.exe
+          files: |
+            dist/${{ env.EXE }}
+            dist/SHA256SUMS.txt

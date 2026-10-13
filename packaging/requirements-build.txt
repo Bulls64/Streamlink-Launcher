@@ -1,0 +1,3 @@
+# Outils de compilation de l'exécutable (version figée : constructions reproductibles,
+# et un chargeur PyInstaller qui ne change pas d'une release à l'autre)
+pyinstaller==6.22.3
