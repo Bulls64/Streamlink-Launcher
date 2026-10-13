@@ -256,6 +256,7 @@ class App(tk.Tk):
         self.recent_box.pack(fill="x", pady=(px(2), 0))
         self.build_recents()
 
+        self._fav_filter = self.target
         self.refresh_target()
         self.refresh_drawer()
         if self.drawer_open:
@@ -270,9 +271,11 @@ class App(tk.Tk):
         c, px = self.c, self.px
         bar = tk.Frame(parent, bg=c.bg)
         bar.pack(fill="x", pady=(px(top), 0))
-        tk.Label(bar, text=title.upper(), font=self.fonts.caps, bg=c.bg, fg=c.muted).pack(side="left")
+        label = tk.Label(bar, text=title.upper(), font=self.fonts.caps, bg=c.bg, fg=c.muted)
+        label.pack(side="left")
         btn = Button(bar, self, text=link, kind="link", command=command, height=24, font=self.fonts.tiny, pad=6)
         btn.pack(side="right")
+        btn.title_label = label
         return btn
 
     # --- pastilles
@@ -357,6 +360,11 @@ class App(tk.Tk):
             self.field.set_disabled(False)
             self.quality_select.set_options([], "—")
             self.quality_select.set_disabled(True)
+        if getattr(self, "_fav_filter", None) != self.target and hasattr(self, "fav_grid"):
+            # Les favoris affichés suivent la plateforme choisie
+            self._fav_filter = self.target
+            self.build_favorites()
+            self.refresh_previews(only_missing=True)
         if self.winfo_ismapped():
             self.apply_chrome()
 
@@ -395,9 +403,27 @@ class App(tk.Tk):
         self.refresh_target()
 
     # --- favoris
-    def _fav_link_text(self):
+    def _fav_link_text(self, shown=None):
         n = len(self.store.favorites)
-        return self.t("link_manage_count", count=n) if n > FAV_SLOTS else self.t("link_manage")
+        shown = len(self.shown_favorites()) if shown is None else shown
+        return self.t("link_manage_count", count=n) if n > shown else self.t("link_manage")
+
+    def favorite_matches(self, fav, target=None):
+        """Le favori appartient-il à la plateforme (ou au script) choisie ?"""
+        kind, value = target or self.target
+        et = self.entry_target(fav)
+        if et is None:  # anciens favoris sans plateforme : lancés sur Twitch
+            return kind == "platform" and value == "twitch" and not fav.get("platform") and not fav.get("script")
+        if et[0] == "platform":
+            return kind == "platform" and et[1]["id"] == value
+        return kind == "script" and et[1] == value
+
+    def favorites_filter_name(self):
+        kind, value = self.target
+        if kind == "platform":
+            p = self.platform_by_id(value)
+            return self.platform_name(p) if p else value
+        return value
 
     def build_favorites(self):
         c, px, t = self.c, self.px, self.t
@@ -435,14 +461,20 @@ class App(tk.Tk):
         Card(self.fav_grid, self, title=t("card_add_favorite"), add=True, media={} if with_media else None,
              command=self.add_current_to_favorites).grid(row=0, column=col, sticky="nsew", padx=pad(col))
         if not favs:
-            tk.Label(self.fav_grid, text=t("hint_no_favorites"), font=self.fonts.small, bg=c.bg, fg=c.faint,
+            hint = (t("hint_no_favorites_platform", platform=self.favorites_filter_name()) if self.store.favorites
+                    else t("hint_no_favorites"))
+            tk.Label(self.fav_grid, text=hint, font=self.fonts.small, bg=c.bg, fg=c.faint,
                      anchor="w", justify="left").grid(row=0, column=1, columnspan=3, sticky="w", padx=px(14))
         if hasattr(self, "fav_link"):
-            self.fav_link.set_text(self._fav_link_text())
+            self.fav_link.set_text(self._fav_link_text(len(favs)))
+            self.fav_link.title_label.configure(
+                text=f"{t('section_favorites')} · {self.favorites_filter_name()}".upper())
 
     def shown_favorites(self):
-        """Favoris des cartes de l'écran principal : ceux en direct d'abord (l'ordre est conservé sinon)."""
-        return sorted(self.store.favorites, key=lambda e: not (self.live_info(e) or {}).get("live"))[:FAV_SLOTS]
+        """Favoris des cartes de l'écran principal : ceux de la plateforme choisie, en direct d'abord
+        (l'ordre est conservé sinon)."""
+        favs = [f for f in self.store.favorites if self.favorite_matches(f)]
+        return sorted(favs, key=lambda e: not (self.live_info(e) or {}).get("live"))[:FAV_SLOTS]
 
     # --- aperçus des lives
     def preview_image(self, key, w, h):
@@ -488,21 +520,22 @@ class App(tk.Tk):
             if isinstance(w, Card) and w.media:
                 w.redraw()
 
-    def refresh_previews(self):
-        """Après une vérification : télécharge l'aperçu des favoris affichés qui sont en direct."""
+    def refresh_previews(self, only_missing=False):
+        """Télécharge l'aperçu des favoris affichés qui sont en direct : tous après une vérification,
+        seulement ceux qui manquent quand on change de plateforme."""
         if not self.cfg.get("live_previews") or not self.cfg.get("live_check"):
             self.previews.clear()
             return
+        for key in list(self.previews):  # on garde les images des autres plateformes tant qu'elles sont en direct
+            if not (self.live.get(key) or {}).get("live"):
+                del self.previews[key]
         urls = {}
         for fav in self.shown_favorites():
             key = self.live_key(fav)
             info = self.live.get(key) if key else None
             url = core.preview_url((info or {}).get("preview")) if info and info.get("live") else None
-            if url:
+            if url and not (only_missing and key in self.previews):
                 urls[key] = url
-        for key in list(self.previews):
-            if key not in urls:
-                del self.previews[key]
         if urls:
             self.run_in_thread(lambda: core.fetch_previews(urls), self._previews_fetched)
 

@@ -11,6 +11,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+- **Favorites sorted by platform.** The favorites on the main screen now follow the selected platform button: *Twitch* shows only Twitch favorites, *Kick* only Kick favorites, and so on (a script shows the favorites of that script). The section title shows the platform (*Favorites · Kick*), live favorites still come first, and a platform with no favorites says so. Selecting a platform by typing or pasting a link, or by clicking a recent stream, switches the list too. *See all* still opens every favorite, and live notifications still cover all platforms.
+
 ### Planned
 - Viewing statistics (time per channel, peak hours).
 
@@ -186,6 +189,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## Français
 
 ## [Non publié]
+
+### Modifié
+- **Favoris classés par plateforme.** Les favoris de l'écran principal suivent maintenant le bouton de plateforme choisi : *Twitch* n'affiche que les favoris Twitch, *Kick* que les favoris Kick, etc. (un script affiche les favoris de ce script). Le titre de la section indique la plateforme (*Favoris · Kick*), les favoris en direct restent en premier, et une plateforme sans favori l'indique. Choisir une plateforme en tapant ou collant un lien, ou en cliquant sur un stream récent, change aussi la liste. *Tout voir* ouvre toujours tous les favoris, et les notifications de live concernent toujours toutes les plateformes.
 
 ### Prévu
 - Statistiques de visionnage (temps par chaîne, heures de pointe).

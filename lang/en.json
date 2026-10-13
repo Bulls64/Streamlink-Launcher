@@ -26,6 +26,7 @@
   "link_full_history": "Full history",
   "card_add_favorite": "Add a favorite",
   "hint_no_favorites": "Type a channel, then “Add a favorite” to launch it here in one click.",
+  "hint_no_favorites_platform": "No {platform} favorites yet: type a channel, then “Add a favorite”.",
   "hint_no_recents": "Your latest streams will show up here.",
   "hint_favorites_panel": "Click a row to fill the field. Right-click a card on the main screen for more options.",
 

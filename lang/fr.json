@@ -26,6 +26,7 @@
   "link_full_history": "Historique complet",
   "card_add_favorite": "Ajouter un favori",
   "hint_no_favorites": "Tape une chaîne puis « Ajouter un favori » pour la retrouver ici en un clic.",
+  "hint_no_favorites_platform": "Aucun favori {platform} pour l’instant : tape une chaîne puis « Ajouter un favori ».",
   "hint_no_recents": "Tes derniers streams apparaîtront ici.",
   "hint_favorites_panel": "Clic sur une ligne : remplit le champ. Clic droit sur une carte de l’écran principal : plus d’options.",
 

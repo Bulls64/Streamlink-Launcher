@@ -26,6 +26,7 @@
   "link_full_history": "Gesamter Verlauf",
   "card_add_favorite": "Favorit hinzufügen",
   "hint_no_favorites": "Gib einen Kanal ein und klicke auf „Favorit hinzufügen“, um ihn hier mit einem Klick wiederzufinden.",
+  "hint_no_favorites_platform": "Noch keine {platform}-Favoriten: Kanal eingeben, dann „Favorit hinzufügen“.",
   "hint_no_recents": "Deine letzten Streams erscheinen hier.",
   "hint_favorites_panel": "Klick auf eine Zeile: füllt das Feld. Rechtsklick auf eine Karte im Hauptfenster: weitere Optionen.",
 
