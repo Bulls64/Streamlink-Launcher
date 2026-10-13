@@ -7,7 +7,8 @@ REM  (sur GitHub Actions, la variable CI supprime les pauses)
 REM =====================================================
 cd /d "%~dp0\.."
 
-where py >nul 2>nul && (set PY=py -3) || (set PY=python)
+REM PY peut etre impose (GitHub Actions : le Python installe par setup-python)
+if not defined PY (where py >nul 2>nul && (set PY=py -3) || (set PY=python))
 
 REM Version de PyInstaller figee dans requirements-build.txt.
 REM Sur GitHub Actions, BUILD_BOOTLOADER=1 recompile le chargeur de PyInstaller depuis ses sources :

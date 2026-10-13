@@ -57,6 +57,7 @@ jobs:
         shell: cmd
         env:
           BUILD_BOOTLOADER: "1"
+          PY: python
         run: packaging\build_exe.bat
       - name: Check that the bootloader was really compiled here
         run: python packaging/check_bootloader.py
