@@ -58,6 +58,22 @@ jobs:
         env:
           BUILD_BOOTLOADER: "1"
         run: packaging\build_exe.bat
+      - name: Check that the bootloader was really compiled here
+        shell: bash
+        run: |
+          # Compare le chargeur installé avec celui du paquet précompilé : ils doivent être différents
+          python -m pip download --quiet --no-deps --only-binary :all: -r packaging/requirements-build.txt -d prebuilt
+          python - <<'PY'
+          import glob, hashlib, os, zipfile, PyInstaller
+          name = "PyInstaller/bootloader/Windows-64bit-intel/runw.exe"
+          with zipfile.ZipFile(glob.glob("prebuilt/pyinstaller-*.whl")[0]) as z:
+              prebuilt = hashlib.sha256(z.read(name)).hexdigest()
+          path = os.path.join(os.path.dirname(PyInstaller.__file__), "bootloader", "Windows-64bit-intel", "runw.exe")
+          local = hashlib.sha256(open(path, "rb").read()).hexdigest()
+          print(f"::notice::Bootloader runw.exe local={local[:16]} prebuilt={prebuilt[:16]}")
+          if local == prebuilt:
+              raise SystemExit("::error::The prebuilt PyInstaller bootloader was used")
+          PY
       - name: Rename the executable
         shell: bash
         run: mv "dist/Streamlink Launcher.exe" "dist/StreamlinkLauncher-${{ steps.version.outputs.version }}.exe"
