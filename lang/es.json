@@ -259,5 +259,7 @@
   "label_auto_update": "Actualizar el lanzador automáticamente",
   "hint_auto_update": "Al iniciar, descarga, verifica e instala la nueva versión y reinicia el lanzador. Requiere «Buscar actualizaciones al iniciar» y el ejecutable (.exe); nunca durante un stream.",
   "toast_app_auto_update": "Actualizando automáticamente a {latest}…",
-  "log_app_auto_update": "Actualización automática del lanzador: {installed} → {latest}"
+  "log_app_auto_update": "Actualización automática del lanzador: {installed} → {latest}",
+  "label_platform_colors": "Colores por plataforma",
+  "hint_platform_colors": "Tiñe las tarjetas de favoritos con el color de su plataforma (morado Twitch, verde Kick…)."
 }

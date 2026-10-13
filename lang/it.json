@@ -259,5 +259,7 @@
   "label_auto_update": "Aggiorna il launcher automaticamente",
   "hint_auto_update": "All’avvio scarica, verifica e installa la nuova versione, poi riavvia il launcher. Richiede «Cerca aggiornamenti all’avvio» e l’eseguibile (.exe); mai durante uno stream.",
   "toast_app_auto_update": "Aggiornamento automatico a {latest}…",
-  "log_app_auto_update": "Aggiornamento automatico del launcher: {installed} → {latest}"
+  "log_app_auto_update": "Aggiornamento automatico del launcher: {installed} → {latest}",
+  "label_platform_colors": "Colori per piattaforma",
+  "hint_platform_colors": "Colora le schede dei preferiti con il colore della piattaforma (viola Twitch, verde Kick…)."
 }

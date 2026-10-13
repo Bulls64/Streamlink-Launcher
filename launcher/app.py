@@ -469,6 +469,7 @@ class App(tk.Tk):
                           else (t("live_off"), False))
             card = Card(self.fav_grid, self, title=fav.get("channel", "?"), subtitle=subtitle, dot=color,
                         command=lambda e=fav: self.launch_favorite(e), status=status, media=media,
+                        accent=color if self.cfg.get("platform_colors") else None,
                         on_menu=lambda ev, e=fav: self.favorite_menu(ev, e))
             card.grid(row=0, column=col, sticky="nsew", padx=pad(col))
         col = len(favs)
@@ -1434,7 +1435,7 @@ class App(tk.Tk):
             return
         s = self.settings_state = {k: self.cfg[k] for k in ("language", "theme", "player", "show_scripts",
                                                              "live_check", "live_interval", "live_notify",
-                                                             "live_previews",
+                                                             "live_previews", "platform_colors",
                                                              "tray", "hotkey", "autostart", "update_check",
                                                              "clipboard_watch", "hotkey_combo", "auto_update")}
         self.v_player_path = tk.StringVar(value=self.cfg["player_path"])
@@ -1472,6 +1473,8 @@ class App(tk.Tk):
                 p, self, [("auto", t("theme_auto")), ("light", t("theme_light")), ("dark", t("theme_dark"))],
                 s["theme"], lambda v: s.update(theme=v)))
             self._hint(sec, t("hint_theme_auto"))
+            self._switch_row(sec, t("label_platform_colors"), t("hint_platform_colors"), s["platform_colors"],
+                             lambda v: s.update(platform_colors=v))
 
             sec = self._section(b, t("settings_live"))
             self._switch_row(sec, t("label_live_check"), t("hint_live_check"), s["live_check"],
@@ -1843,6 +1846,7 @@ class App(tk.Tk):
                         scripts_folder=self.v_folder.get().strip() or str(core.DEFAULT_FOLDER),
                         live_check=bool(s["live_check"]), live_interval=int(s["live_interval"]),
                         live_notify=bool(s["live_notify"]), live_previews=bool(s["live_previews"]),
+                        platform_colors=bool(s["platform_colors"]),
                         tray=bool(s["tray"]), hotkey=bool(s["hotkey"]),
                         update_check=bool(s["update_check"]), auto_update=bool(s["auto_update"]),
                         clipboard_watch=bool(s["clipboard_watch"]),
