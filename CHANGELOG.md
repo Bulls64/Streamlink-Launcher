@@ -11,11 +11,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-### Added
-- **Automatic launcher updates.** New setting *Update the launcher automatically* (Settings → About, off by default). When it is on and *Check for updates at start-up* is on, a newer release found at start-up is downloaded, verified and installed without asking, then the launcher restarts (staying in the notification area if it was started there). It never runs while a stream is running (the update card offers it instead), only for the executable in a writable folder, not on a manual check, and not right after an update (no update loop). A failure (network, checksum, signature) is shown on the update card and in the log, and the current version stays in place.
-
 ### Planned
 - Viewing statistics (time per channel, peak hours).
+
+## [1.4.1] - 2026-10-14
+
+### Added
+- **Automatic launcher updates.** New setting *Update the launcher automatically* (Settings → About, off by default). When it is on and *Check for updates at start-up* is on, a newer release found at start-up is downloaded, verified and installed without asking, then the launcher restarts (staying in the notification area if it was started there). It never runs while a stream is running (the update card offers it instead), only for the executable in a writable folder, not on a manual check, and not right after an update (no update loop). A failure (network, checksum, signature) is shown on the update card and in the log, and the current version stays in place.
 
 ## [1.4.0] - 2026-10-14
 
@@ -207,11 +209,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Non publié]
 
-### Ajouté
-- **Mise à jour automatique du lanceur.** Nouveau réglage *Mises à jour automatiques du lanceur* (Paramètres → À propos, désactivé par défaut). Quand il est activé avec *Vérifier les mises à jour au démarrage*, une version plus récente trouvée au démarrage est téléchargée, vérifiée et installée sans demander, puis le lanceur redémarre (en restant dans la zone de notification s'il y était). Rien ne se fait pendant un stream (la carte de mise à jour la propose alors), ni pour une vérification manuelle, ni juste après une mise à jour (pas de boucle), et seulement pour l'exécutable dans un dossier modifiable. Un échec (réseau, empreinte, signature) s'affiche sur la carte et dans le journal, et la version actuelle reste en place.
-
 ### Prévu
 - Statistiques de visionnage (temps par chaîne, heures de pointe).
+
+## [1.4.1] - 2026-10-14
+
+### Ajouté
+- **Mise à jour automatique du lanceur.** Nouveau réglage *Mises à jour automatiques du lanceur* (Paramètres → À propos, désactivé par défaut). Quand il est activé avec *Vérifier les mises à jour au démarrage*, une version plus récente trouvée au démarrage est téléchargée, vérifiée et installée sans demander, puis le lanceur redémarre (en restant dans la zone de notification s'il y était). Rien ne se fait pendant un stream (la carte de mise à jour la propose alors), ni pour une vérification manuelle, ni juste après une mise à jour (pas de boucle), et seulement pour l'exécutable dans un dossier modifiable. Un échec (réseau, empreinte, signature) s'affiche sur la carte et dans le journal, et la version actuelle reste en place.
 
 ## [1.4.0] - 2026-10-14
 
@@ -397,8 +401,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 > Les versions 0.1.0 à 1.0.0 n'ont jamais été publiées sur GitHub ; la 1.0.1 est la première release. La date de la 0.1.0 est la plus ancienne date trouvée dans les données de l'application.
 
-[Unreleased]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.4.0...HEAD
-[Non publié]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.4.1...HEAD
+[Non publié]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.4.1...HEAD
+[1.4.1]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.1
 [1.4.0]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.0
 [1.3.0]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.3.0
 [1.2.0]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.2.0

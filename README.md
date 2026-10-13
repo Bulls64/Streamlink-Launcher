@@ -117,7 +117,7 @@ packaging\build_exe.bat
 
 The script installs [PyInstaller](https://pyinstaller.org/) (version pinned in `packaging/requirements-build.txt`) and produces `dist\Streamlink Launcher.exe`: a single file, no console, with the icon and version information embedded.
 
-On GitHub Actions, every pull request builds the executable, and pushing a `v*` tag (for example `v1.4.0`) builds it and publishes it (signing is optional, see [Code signing](#code-signing)) with its `SHA256SUMS.txt`. The CI recompiles PyInstaller's bootloader from source (`BUILD_BOOTLOADER=1`): the prebuilt bootloader is shared by countless programs, including malware, and is the main cause of antivirus false positives.
+On GitHub Actions, every pull request builds the executable, and pushing a `v*` tag (for example `v1.4.1`) builds it and publishes it (signing is optional, see [Code signing](#code-signing)) with its `SHA256SUMS.txt`. The CI recompiles PyInstaller's bootloader from source (`BUILD_BOOTLOADER=1`): the prebuilt bootloader is shared by countless programs, including malware, and is the main cause of antivirus false positives.
 
 ### Tests
 
@@ -293,7 +293,7 @@ packaging\build_exe.bat
 
 Le script installe [PyInstaller](https://pyinstaller.org/) (version figée dans `packaging/requirements-build.txt`) et produit `dist\Streamlink Launcher.exe` : un seul fichier, sans console, avec l'icône et les informations de version intégrées.
 
-Sur GitHub Actions, chaque pull request compile l'exécutable, et pousser un tag `v*` (par exemple `v1.4.0`) le compile et le publie (la signature est facultative, voir [Signature du code](#signature-du-code)) avec son `SHA256SUMS.txt`. La CI recompile le chargeur de PyInstaller depuis ses sources (`BUILD_BOOTLOADER=1`) : le chargeur précompilé est partagé par d'innombrables programmes, malveillants compris, et c'est la première cause de faux positifs antivirus.
+Sur GitHub Actions, chaque pull request compile l'exécutable, et pousser un tag `v*` (par exemple `v1.4.1`) le compile et le publie (la signature est facultative, voir [Signature du code](#signature-du-code)) avec son `SHA256SUMS.txt`. La CI recompile le chargeur de PyInstaller depuis ses sources (`BUILD_BOOTLOADER=1`) : le chargeur précompilé est partagé par d'innombrables programmes, malveillants compris, et c'est la première cause de faux positifs antivirus.
 
 ### Tests
 
