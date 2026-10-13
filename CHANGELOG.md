@@ -11,11 +11,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-### Added
-- **Platform colors on favorite cards.** Cards are now tinted with their platform's color (Twitch purple, Kick green, YouTube red…): faint background tint, colored border, solid border when live and on hover. The color comes from the platform definition (`platforms.json`), so custom platforms get theirs too. Can be turned off in Settings → General (*Platform colors*).
-
 ### Planned
 - Viewing statistics (time per channel, peak hours).
+
+## [1.4.2] - 2026-10-14
+
+### Added
+- **Platform colors on favorite cards.** Cards are now tinted with their platform's color (Twitch purple, Kick green, YouTube red…): faint background tint, colored border, solid border when live and on hover. The color comes from the platform definition (`platforms.json`), so custom platforms get theirs too. Can be turned off in Settings → General (*Platform colors*).
 
 ## [1.4.1] - 2026-10-14
 
@@ -212,11 +214,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Non publié]
 
-### Ajouté
-- **Couleurs par plateforme sur les cartes de favoris.** Les cartes prennent la couleur de leur plateforme (violet Twitch, vert Kick, rouge YouTube…) : fond légèrement teinté, contour coloré, contour plein en direct et au survol. La couleur vient de la définition de la plateforme (`platforms.json`), donc les plateformes personnalisées ont aussi la leur. Désactivable dans Paramètres → Général (*Couleurs par plateforme*).
-
 ### Prévu
 - Statistiques de visionnage (temps par chaîne, heures de pointe).
+
+## [1.4.2] - 2026-10-14
+
+### Ajouté
+- **Couleurs par plateforme sur les cartes de favoris.** Les cartes prennent la couleur de leur plateforme (violet Twitch, vert Kick, rouge YouTube…) : fond légèrement teinté, contour coloré, contour plein en direct et au survol. La couleur vient de la définition de la plateforme (`platforms.json`), donc les plateformes personnalisées ont aussi la leur. Désactivable dans Paramètres → Général (*Couleurs par plateforme*).
 
 ## [1.4.1] - 2026-10-14
 
@@ -407,8 +411,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 > Les versions 0.1.0 à 1.0.0 n'ont jamais été publiées sur GitHub ; la 1.0.1 est la première release. La date de la 0.1.0 est la plus ancienne date trouvée dans les données de l'application.
 
-[Unreleased]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.4.1...HEAD
-[Non publié]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.4.1...HEAD
+[Unreleased]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.4.2...HEAD
+[Non publié]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.4.2...HEAD
+[1.4.2]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.2
 [1.4.1]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.1
 [1.4.0]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.0
 [1.3.0]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.3.0
