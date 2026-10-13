@@ -255,5 +255,9 @@
   "toast_updated": "Updated: {old} → {new}",
   "log_app_update_available": "Launcher update available: {installed} → {latest}",
   "log_app_updated": "Launcher updated: {old} → {new}",
-  "log_app_update_failed": "Launcher update failed: {error}"
+  "log_app_update_failed": "Launcher update failed: {error}",
+  "label_auto_update": "Update the launcher automatically",
+  "hint_auto_update": "At start-up, downloads, verifies and installs the new version, then restarts the launcher. Needs “Check for updates at start-up” and the executable (.exe); never while a stream is running.",
+  "toast_app_auto_update": "Updating automatically to {latest}…",
+  "log_app_auto_update": "Automatic launcher update: {installed} → {latest}"
 }

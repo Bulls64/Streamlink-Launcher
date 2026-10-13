@@ -255,5 +255,9 @@
   "toast_updated": "Mis à jour : {old} → {new}",
   "log_app_update_available": "Mise à jour du lanceur disponible : {installed} → {latest}",
   "log_app_updated": "Lanceur mis à jour : {old} → {new}",
-  "log_app_update_failed": "Échec de la mise à jour du lanceur : {error}"
+  "log_app_update_failed": "Échec de la mise à jour du lanceur : {error}",
+  "label_auto_update": "Mises à jour automatiques du lanceur",
+  "hint_auto_update": "Au démarrage, télécharge, vérifie et installe la nouvelle version, puis redémarre le lanceur. Demande « Vérifier les mises à jour au démarrage » et l’exécutable (.exe) ; jamais pendant un stream.",
+  "toast_app_auto_update": "Mise à jour automatique vers {latest}…",
+  "log_app_auto_update": "Mise à jour automatique du lanceur : {installed} → {latest}"
 }

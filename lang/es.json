@@ -255,5 +255,9 @@
   "toast_updated": "Actualizado: {old} → {new}",
   "log_app_update_available": "Actualización del lanzador disponible: {installed} → {latest}",
   "log_app_updated": "Lanzador actualizado: {old} → {new}",
-  "log_app_update_failed": "Error al actualizar el lanzador: {error}"
+  "log_app_update_failed": "Error al actualizar el lanzador: {error}",
+  "label_auto_update": "Actualizar el lanzador automáticamente",
+  "hint_auto_update": "Al iniciar, descarga, verifica e instala la nueva versión y reinicia el lanzador. Requiere «Buscar actualizaciones al iniciar» y el ejecutable (.exe); nunca durante un stream.",
+  "toast_app_auto_update": "Actualizando automáticamente a {latest}…",
+  "log_app_auto_update": "Actualización automática del lanzador: {installed} → {latest}"
 }
