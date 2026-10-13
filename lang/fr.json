@@ -259,5 +259,7 @@
   "label_auto_update": "Mises à jour automatiques du lanceur",
   "hint_auto_update": "Au démarrage, télécharge, vérifie et installe la nouvelle version, puis redémarre le lanceur. Demande « Vérifier les mises à jour au démarrage » et l’exécutable (.exe) ; jamais pendant un stream.",
   "toast_app_auto_update": "Mise à jour automatique vers {latest}…",
-  "log_app_auto_update": "Mise à jour automatique du lanceur : {installed} → {latest}"
+  "log_app_auto_update": "Mise à jour automatique du lanceur : {installed} → {latest}",
+  "label_platform_colors": "Couleurs par plateforme",
+  "hint_platform_colors": "Teinte les cartes de favoris aux couleurs de leur plateforme (violet Twitch, vert Kick…)."
 }

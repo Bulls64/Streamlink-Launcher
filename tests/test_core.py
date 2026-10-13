@@ -680,6 +680,11 @@ class TestAppUpdate(unittest.TestCase):
         self.assertFalse(ok(u="1.3.0"))               # vient d'être mis à jour : pas de boucle
         self.assertFalse(core.DEFAULT_CONFIG["auto_update"])   # désactivé par défaut
 
+    def test_platform_colors_setting(self):
+        self.assertTrue(core.DEFAULT_CONFIG["platform_colors"])
+        self.assertEqual(core.sanitize_settings({"platform_colors": False}).get("platform_colors"), False)
+        self.assertNotIn("platform_colors", core.sanitize_settings({"platform_colors": 1}))
+
     def test_auto_update_setting_is_validated(self):
         out = core.sanitize_settings({"auto_update": True})
         self.assertEqual(out.get("auto_update"), True)

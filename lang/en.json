@@ -259,5 +259,7 @@
   "label_auto_update": "Update the launcher automatically",
   "hint_auto_update": "At start-up, downloads, verifies and installs the new version, then restarts the launcher. Needs “Check for updates at start-up” and the executable (.exe); never while a stream is running.",
   "toast_app_auto_update": "Updating automatically to {latest}…",
-  "log_app_auto_update": "Automatic launcher update: {installed} → {latest}"
+  "log_app_auto_update": "Automatic launcher update: {installed} → {latest}",
+  "label_platform_colors": "Platform colors",
+  "hint_platform_colors": "Tints favorite cards with their platform’s color (Twitch purple, Kick green…)."
 }

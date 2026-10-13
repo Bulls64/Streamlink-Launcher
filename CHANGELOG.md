@@ -11,6 +11,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+- **Platform colors on favorite cards.** Cards are now tinted with their platform's color (Twitch purple, Kick green, YouTube red…): faint background tint, colored border, solid border when live and on hover. The color comes from the platform definition (`platforms.json`), so custom platforms get theirs too. Can be turned off in Settings → General (*Platform colors*).
+
 ### Planned
 - Viewing statistics (time per channel, peak hours).
 
@@ -208,6 +211,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## Français
 
 ## [Non publié]
+
+### Ajouté
+- **Couleurs par plateforme sur les cartes de favoris.** Les cartes prennent la couleur de leur plateforme (violet Twitch, vert Kick, rouge YouTube…) : fond légèrement teinté, contour coloré, contour plein en direct et au survol. La couleur vient de la définition de la plateforme (`platforms.json`), donc les plateformes personnalisées ont aussi la leur. Désactivable dans Paramètres → Général (*Couleurs par plateforme*).
 
 ### Prévu
 - Statistiques de visionnage (temps par chaîne, heures de pointe).

@@ -293,8 +293,9 @@ class Card(Widget):
     LIVE_RED, BADGE_BG = "#E91916", "#0E0E10"
 
     def __init__(self, parent, app, title="", subtitle="", dot=None, command=None, add=False, on_menu=None,
-                 height=86, status=None, media=None):
+                 height=86, status=None, media=None, accent=None):
         self.title, self.subtitle, self.dot, self.add = title, subtitle, dot, add
+        self.accent = accent  # couleur de la plateforme : teinte le fond et le contour (None = carte neutre)
         self.status = status  # None (inconnu) ou (texte, en_direct: bool)
         self.media = media
         self._image = None    # référence de l'aperçu affiché (sinon Tk l'efface)
@@ -330,6 +331,9 @@ class Card(Widget):
         live = bool(self.status and self.status[1]) or bool(self.media and self.media.get("live"))
         fill = c.surface_hover if self.hover else c.surface
         outline = (self.dot or c.border_strong) if self.hover else (c.border_strong if live else c.border)
+        if self.accent:   # accent de la plateforme : fond légèrement teinté, contour coloré (plein en direct)
+            fill = mix(fill, self.accent, 0.13 if self.hover else 0.07)
+            outline = self.accent if (self.hover or live) else mix(c.border, self.accent, 0.5)
         self.P.round_rect(self, 0, 0, w, h, r, fill, outline, bg)
         f = self.app.fonts
         top = px(14)

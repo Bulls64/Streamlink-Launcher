@@ -259,5 +259,7 @@
   "label_auto_update": "Launcher automatisch aktualisieren",
   "hint_auto_update": "Lädt beim Start die neue Version herunter, prüft und installiert sie und startet den Launcher neu. Erfordert „Beim Start nach Updates suchen“ und die .exe; nie während eines Streams.",
   "toast_app_auto_update": "Automatisches Update auf {latest}…",
-  "log_app_auto_update": "Automatisches Launcher-Update: {installed} → {latest}"
+  "log_app_auto_update": "Automatisches Launcher-Update: {installed} → {latest}",
+  "label_platform_colors": "Farben je Plattform",
+  "hint_platform_colors": "Färbt die Favoritenkarten in der Farbe ihrer Plattform (Twitch-Lila, Kick-Grün …)."
 }

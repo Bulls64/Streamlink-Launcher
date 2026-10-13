@@ -77,6 +77,7 @@ DEFAULT_CONFIG = {
     "live_check": True,        # vérifier qui est en direct parmi les favoris
     "live_interval": 5,        # minutes
     "live_notify": True,       # notification Windows au début d'un live
+    "platform_colors": True,   # cartes de favoris teintées aux couleurs de leur plateforme
     "live_previews": True,     # aperçu, titre et spectateurs des favoris en direct (Twitch)
     "tray": True,              # fermer la fenêtre = réduire dans la zone de notification (Windows)
     "hotkey": True,            # raccourci global qui ouvre le mode mini (Windows)
