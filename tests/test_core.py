@@ -14,7 +14,7 @@ from unittest import mock
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from launcher import core, __version__  # noqa: E402
+from launcher import __version__, core  # noqa: E402
 
 
 class TempData(unittest.TestCase):
@@ -190,7 +190,7 @@ class TestLinks(unittest.TestCase):
         self.tmp = Path(tempfile.mkdtemp())
 
     def test_link_in_text(self):
-        f = lambda t: core.link_in_text(self.platforms, t)  # noqa: E731
+        f = lambda t: core.link_in_text(self.platforms, t)
         self.assertEqual(f("https://kick.com/xqc"), ("kick", "https://kick.com/xqc"))
         self.assertEqual(f("twitch.tv/zerator"), ("twitch", "twitch.tv/zerator"))
         self.assertEqual(f("Regarde ça : https://www.twitch.tv/zerator, vite !"),
@@ -394,7 +394,7 @@ class TestThumb(unittest.TestCase):
     def test_rounded_corners_are_transparent_and_smooth(self):
         w, h, r = 40, 20, 8
         rgba = self.thumb.round_corners(bytearray(b"\x10\x20\x30\xff" * (w * h)), w, h, r)
-        alpha = lambda x, y: rgba[(y * w + x) * 4 + 3]  # noqa: E731
+        alpha = lambda x, y: rgba[(y * w + x) * 4 + 3]
         for x, y in ((0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1)):
             self.assertEqual(alpha(x, y), 0)
         self.assertEqual(alpha(w // 2, h // 2), 255)
@@ -633,6 +633,32 @@ class TestAppUpdate(unittest.TestCase):
         self.assertEqual(exe.read_bytes(), b"new")
         self.assertEqual(old.read_bytes(), b"old")
         self.assertFalse(new.exists())
+
+    def test_target_exe(self):
+        t = core.target_exe
+        self.assertEqual(t("C:/x/StreamlinkLauncher-1.4.1.exe", "1.4.1", "1.4.2"), Path("C:/x/StreamlinkLauncher-1.4.2.exe"))
+        self.assertEqual(t("C:/x/slink.exe", "1.4.1", "1.4.2"), Path("C:/x/slink.exe"))
+        self.assertEqual(t("C:/x/App-11.4.1.exe", "1.4.1", "1.4.2"), Path("C:/x/App-11.4.1.exe"))
+        d = Path(tempfile.mkdtemp())
+        (d / "StreamlinkLauncher-1.4.2.exe").write_bytes(b"x")  # déjà pris : on garde le nom actuel
+        cur = d / "StreamlinkLauncher-1.4.1.exe"
+        self.assertEqual(t(cur, "1.4.1", "1.4.2"), cur)
+
+    def test_install_update_renamed(self):
+        d = Path(tempfile.mkdtemp())
+        exe, new, final = d / "app-1.exe", d / "app-1.exe.download", d / "app-2.exe"
+        exe.write_bytes(b"old")
+        new.write_bytes(b"new")
+        old = core.install_update(new, exe, final)
+        self.assertEqual(final.read_bytes(), b"new")
+        self.assertFalse(exe.exists())
+        self.assertEqual(old, d / "app-1.exe.old")
+        self.assertEqual(old.read_bytes(), b"old")
+
+    def test_autostart_command_uses_given_exe(self):
+        from launcher import wintray
+        with mock.patch.object(sys, "frozen", True, create=True):
+            self.assertEqual(wintray.autostart_command("", "", exe="C:/x/new.exe"), '"C:/x/new.exe" --tray')
 
     def test_install_update_rollback(self):
         d = Path(tempfile.mkdtemp())

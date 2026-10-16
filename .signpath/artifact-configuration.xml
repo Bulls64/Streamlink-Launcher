@@ -4,7 +4,7 @@
      Seul un exe dont les métadonnées (packaging/version_info.txt) sont celles de Streamlink Launcher
      peut être signé. SignPath valide ce fichier quand on le colle dans son éditeur. -->
 <artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
-  <pe-file product-name="Streamlink Launcher" company-name="Chris">
+  <pe-file product-name="Streamlink Launcher" company-name="Bulls64">
     <authenticode-sign />
   </pe-file>
 </artifact-configuration>

@@ -1,0 +1,37 @@
+name: Bug report · Signaler un bug
+description: Something does not work as expected · Quelque chose ne fonctionne pas
+labels: ["bug"]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Launcher version · Version du lanceur
+      description: Settings → About · Réglages → À propos
+      placeholder: "1.4.2"
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How do you run it? · Comment le lancez-vous ?
+      options: [".exe (release)", "From source · Depuis les sources", "winget"]
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: Windows and Streamlink versions · Versions de Windows et de Streamlink
+      placeholder: "Windows 11 23H2, Streamlink 8.0.0"
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened? · Que s'est-il passé ?
+      description: Steps to reproduce, what you expected · Étapes pour reproduire, ce que vous attendiez
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Log · Journal
+      description: Open the log drawer or `launcher.log`; remove anything private · Tiroir du journal ou `launcher.log`
+      render: text

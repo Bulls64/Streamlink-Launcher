@@ -1,8 +1,11 @@
 """Composants dessinés sur des Canvas Tk : peu d'objets, aucune image externe, aucune dépendance."""
+import logging
 import tkinter as tk
 
 from .gfx import draw_icon
-from .theme import mix, fit_text, accent_ring, readable_on
+from .theme import accent_ring, fit_text, mix, readable_on
+
+log = logging.getLogger("streamlink_launcher")
 
 
 def _schedule_redraw(widget):
@@ -1238,7 +1241,7 @@ class Toast(tk.Canvas):
         try:
             self.after_cancel(self._job)
         except Exception:
-            pass
+            log.debug("erreur ignorée", exc_info=True)
         try:
             self.destroy()
         except tk.TclError:

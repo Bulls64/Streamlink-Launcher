@@ -11,6 +11,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+- **The executable is renamed after an update.** `StreamlinkLauncher-1.4.1.exe` updated to 1.4.2 becomes `StreamlinkLauncher-1.4.2.exe` (a file name without a version number is kept). Start with Windows follows the new name, and the old file is removed at the next start.
+- Silent `try/except: pass` blocks in the Windows integration (tray, drag and drop, notifications, title bar) now write to `launcher.log` (debug level), which makes problems easier to diagnose.
+- The executable metadata now names *Bulls64* as the publisher, like the repository.
+
+### Added
+- Project hygiene: `ruff` static analysis and a GUI smoke test (Xvfb) in the CI, GitHub Actions pinned by commit and kept up to date by Dependabot, `SECURITY.md`, `CONTRIBUTING.md`, issue and pull request templates.
+- Updated screenshots in the README, and the `packaging/winget/` and `.signpath/` folders listed in the project structure.
+
 ### Planned
 - Viewing statistics (time per channel, peak hours).
 
@@ -29,7 +38,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 - **Update the launcher from GitHub.** Settings → About now has an update card. It checks the latest release of the repository (automatically a few seconds after start-up when *Check for updates* is on, or with the *Check* button) and, when a newer version exists, *Update* downloads the executable, verifies it, replaces the running one and restarts the launcher. Checks: the file must be the release asset of this repository, have the size and the SHA-256 published by GitHub, and look like a Windows executable; if the current executable is signed, the new one must be validly signed by the same publisher (no way back to an unsigned file). Redirects are followed only to GitHub. The previous executable is renamed `.old` and removed at the next start; on any failure it is put back. Running streams are stopped after a confirmation. Run from the sources, or from a write-protected folder, the button opens the release page instead. *Release notes* and *GitHub repository* links sit under the card, and a badge shows when an update is available.
 - **Optional code signing in the release workflow.** The workflow can have the executable signed through [SignPath.io](https://about.signpath.io): it waits for the manual approval, checks that the signature is valid and timestamped, and never publishes an unsigned file once signing is enabled. Signing stays off unless the `SIGNPATH_ORGANIZATION_ID` repository variable is set; **releases are currently unsigned**, and the README (*Code signing*) explains why and what protects you instead (builds by GitHub Actions only, `SHA256SUMS.txt`, hash check by the updater).
-- Each release now comes with `SHA256SUMS.txt`, and its notes show the SHA-256 of the executable.
+- Each release comes with `SHA256SUMS.txt` (attached since v1.3.0), and its notes show the SHA-256 of the executable.
 - README: new *If Windows blocks the executable* section (check the SHA-256, SmartScreen, *Unblock*, antivirus quarantine, run from source), and `packaging/winget/` to generate the [winget](https://learn.microsoft.com/windows/package-manager/) manifests of a release.
 
 ### Changed
@@ -214,6 +223,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Non publié]
 
+### Modifié
+- **L'exécutable est renommé après une mise à jour.** `StreamlinkLauncher-1.4.1.exe` mis à jour vers la 1.4.2 devient `StreamlinkLauncher-1.4.2.exe` (un nom de fichier sans numéro de version est conservé). Le démarrage avec Windows suit le nouveau nom, et l'ancien fichier est supprimé au démarrage suivant.
+- Les blocs `try/except: pass` silencieux de l'intégration Windows (zone de notification, glisser-déposer, notifications, barre de titre) écrivent maintenant dans `launcher.log` (niveau debug), ce qui facilite le diagnostic.
+- Les métadonnées de l'exécutable indiquent *Bulls64* comme éditeur, comme le dépôt.
+
+### Ajouté
+- Hygiène du projet : analyse statique `ruff` et test de fumée de l'interface (Xvfb) dans la CI, GitHub Actions épinglées par commit et tenues à jour par Dependabot, `SECURITY.md`, `CONTRIBUTING.md`, modèles de tickets et de pull requests.
+- Captures d'écran du README mises à jour, et dossiers `packaging/winget/` et `.signpath/` ajoutés à la structure du projet.
+
 ### Prévu
 - Statistiques de visionnage (temps par chaîne, heures de pointe).
 
@@ -232,7 +250,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Ajouté
 - **Mise à jour du lanceur depuis GitHub.** Paramètres → À propos contient maintenant une carte de mise à jour. Elle cherche la dernière release du dépôt (automatiquement quelques secondes après le démarrage si *Vérifier les mises à jour* est activé, ou avec le bouton *Vérifier*) et, quand une version plus récente existe, *Mettre à jour* télécharge l'exécutable, le vérifie, remplace celui qui tourne et redémarre le lanceur. Contrôles : le fichier doit être l'asset de release de ce dépôt, avoir la taille et le SHA-256 publiés par GitHub et ressembler à un exécutable Windows ; si l'exécutable actuel est signé, le nouveau doit l'être valablement par le même éditeur (impossible de revenir à un fichier non signé). Les redirections ne sont suivies que vers GitHub. L'ancien exécutable est renommé en `.old` puis supprimé au démarrage suivant ; en cas d'échec, il est remis en place. Les streams en cours sont arrêtés après confirmation. Lancé depuis les sources ou depuis un dossier protégé en écriture, le bouton ouvre la page de la release. Les liens *Notes de version* et *Dépôt GitHub* sont sous la carte, et un badge signale une mise à jour disponible.
 - **Signature du code facultative dans le workflow de release.** Le workflow peut faire signer l'exécutable via [SignPath.io](https://about.signpath.io) : il attend l'approbation manuelle, vérifie que la signature est valide et horodatée, et ne publie jamais de fichier non signé une fois la signature activée. La signature reste désactivée tant que la variable de dépôt `SIGNPATH_ORGANIZATION_ID` n'est pas définie ; **les releases sont actuellement non signées**, et le README (*Signature du code*) explique pourquoi et ce qui te protège à la place (compilation par GitHub Actions uniquement, `SHA256SUMS.txt`, contrôle du hash par la mise à jour).
-- Chaque release est accompagnée de `SHA256SUMS.txt`, et ses notes affichent le SHA-256 de l'exécutable.
+- Chaque release est accompagnée de `SHA256SUMS.txt` (joint depuis la v1.3.0), et ses notes affichent le SHA-256 de l'exécutable.
 - README : nouvelle section *Si Windows bloque l'exécutable* (vérifier le SHA-256, SmartScreen, *Débloquer*, quarantaine de l'antivirus, lancement depuis les sources), et `packaging/winget/` pour générer les manifestes [winget](https://learn.microsoft.com/windows/package-manager/) d'une release.
 
 ### Modifié

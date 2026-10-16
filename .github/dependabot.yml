@@ -1,0 +1,14 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"   # actions épinglées par SHA : Dependabot propose les mises à jour
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "ci"
+  - package-ecosystem: "pip"              # PyInstaller (packaging/requirements*.txt, le cas échéant)
+    directory: "/packaging"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "build"

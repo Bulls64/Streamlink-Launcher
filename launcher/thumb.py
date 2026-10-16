@@ -5,11 +5,11 @@ Le décodage passe par GDI+ (inclus dans Windows, appelé via ctypes : aucune d�
 Ailleurs, decode_scaled() renvoie None et la carte affiche un aperçu de remplacement.
 Tout ici peut tourner hors de l'interface (thread) : seul PhotoImage(data=...) se fait dans Tk.
 """
+import logging
 import os
 import struct
 import threading
 import zlib
-import logging
 
 log = logging.getLogger("streamlink_launcher")
 

@@ -7,8 +7,8 @@ import tkinter as tk
 
 from . import core
 from .theme import apply_window_chrome
+from .widgets import Button, Field, Pill, SuggestionList
 from .wintray import bring_to_front
-from .widgets import Field, Pill, Button, SuggestionList
 
 WIDTH = 580
 MAX_ITEMS = 5

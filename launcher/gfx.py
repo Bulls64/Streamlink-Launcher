@@ -26,7 +26,7 @@ class Painter:
         img = self._corners.get(key)
         if img is not None:
             return img
-        F, O, B = hex_to_rgb(fill), hex_to_rgb(outline), hex_to_rgb(bg)
+        F, Oc, B = hex_to_rgb(fill), hex_to_rgb(outline), hex_to_rgb(bg)
         inner2 = (r - bw) ** 2 if r > bw else -1
         r2 = r * r
         rows = []
@@ -40,7 +40,7 @@ class Painter:
                     dy2 = (cy + sy) ** 2
                     for sx in _SAMPLES:
                         d2 = (cx + sx) ** 2 + dy2
-                        col = F if d2 <= inner2 else (O if d2 <= r2 else B)
+                        col = F if d2 <= inner2 else (Oc if d2 <= r2 else B)
                         tr += col[0]
                         tg += col[1]
                         tb += col[2]
