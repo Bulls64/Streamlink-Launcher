@@ -11,6 +11,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Planned
+- Viewing statistics (time per channel, peak hours).
+
+## [1.4.3] - 2026-10-16
+
 ### Changed
 - **The executable is renamed after an update.** `StreamlinkLauncher-1.4.1.exe` updated to 1.4.2 becomes `StreamlinkLauncher-1.4.2.exe` (a file name without a version number is kept). Start with Windows follows the new name, and the old file is removed at the next start.
 - Silent `try/except: pass` blocks in the Windows integration (tray, drag and drop, notifications, title bar) now write to `launcher.log` (debug level), which makes problems easier to diagnose.
@@ -19,9 +24,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 - Project hygiene: `ruff` static analysis and a GUI smoke test (Xvfb) in the CI, GitHub Actions pinned by commit and kept up to date by Dependabot, `SECURITY.md`, `CONTRIBUTING.md`, issue and pull request templates.
 - Updated screenshots in the README, and the `packaging/winget/` and `.signpath/` folders listed in the project structure.
-
-### Planned
-- Viewing statistics (time per channel, peak hours).
 
 ## [1.4.2] - 2026-10-14
 
@@ -223,6 +225,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Non publié]
 
+### Prévu
+- Statistiques de visionnage (temps par chaîne, heures de pointe).
+
+## [1.4.3] - 2026-10-16
+
 ### Modifié
 - **L'exécutable est renommé après une mise à jour.** `StreamlinkLauncher-1.4.1.exe` mis à jour vers la 1.4.2 devient `StreamlinkLauncher-1.4.2.exe` (un nom de fichier sans numéro de version est conservé). Le démarrage avec Windows suit le nouveau nom, et l'ancien fichier est supprimé au démarrage suivant.
 - Les blocs `try/except: pass` silencieux de l'intégration Windows (zone de notification, glisser-déposer, notifications, barre de titre) écrivent maintenant dans `launcher.log` (niveau debug), ce qui facilite le diagnostic.
@@ -231,9 +238,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Ajouté
 - Hygiène du projet : analyse statique `ruff` et test de fumée de l'interface (Xvfb) dans la CI, GitHub Actions épinglées par commit et tenues à jour par Dependabot, `SECURITY.md`, `CONTRIBUTING.md`, modèles de tickets et de pull requests.
 - Captures d'écran du README mises à jour, et dossiers `packaging/winget/` et `.signpath/` ajoutés à la structure du projet.
-
-### Prévu
-- Statistiques de visionnage (temps par chaîne, heures de pointe).
 
 ## [1.4.2] - 2026-10-14
 
@@ -429,8 +433,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 > Les versions 0.1.0 à 1.0.0 n'ont jamais été publiées sur GitHub ; la 1.0.1 est la première release. La date de la 0.1.0 est la plus ancienne date trouvée dans les données de l'application.
 
-[Unreleased]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.4.2...HEAD
-[Non publié]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.4.2...HEAD
+[Unreleased]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.4.3...HEAD
+[1.4.3]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.3
+[Non publié]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.4.3...HEAD
 [1.4.2]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.2
 [1.4.1]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.1
 [1.4.0]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.0
