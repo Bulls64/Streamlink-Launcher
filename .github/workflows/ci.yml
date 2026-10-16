@@ -20,7 +20,7 @@ jobs:
         os: [windows-latest, ubuntu-latest]
         python: ["3.10", "3.12"]
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
         with:
           python-version: ${{ matrix.python }}
@@ -49,7 +49,7 @@ jobs:
       version: ${{ steps.version.outputs.version }}
       artifact-id: ${{ steps.upload.outputs.artifact-id }}
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
         with:
           python-version: "3.12"
@@ -91,7 +91,7 @@ jobs:
     # Ubuntu 22.04 : l'AppImage fonctionne ensuite avec la glibc 2.35 ou plus récente
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
       - name: Check the tag
         run: |
           VERSION=$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' launcher/__init__.py)
@@ -151,7 +151,7 @@ jobs:
       # Signature activée dès que la variable SIGNPATH_ORGANIZATION_ID existe (Settings > Secrets and variables > Actions)
       SIGN: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
         with:
           python-version: "3.12"
