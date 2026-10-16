@@ -34,7 +34,7 @@ Pure Python + Tkinter, **no third-party dependency**. From source, it starts in 
 
 ### Requirements
 
-- Windows 10 or 11. The interface also runs on Linux, but the tray icon, global shortcut and start-up options are Windows-only.
+- Windows 10 or 11, or Linux (AppImage, see below). On Linux, the tray icon, global shortcut, start-up option, drag and drop, go-live notifications, preview images and in-app updates are not available.
 - [Streamlink](https://streamlink.github.io/install.html) installed. The launcher finds it automatically, or you can set its path in the settings.
 - A video player supported by Streamlink (VLC by default).
 
@@ -48,7 +48,18 @@ Pure Python + Tkinter, **no third-party dependency**. From source, it starts in 
 
 The executable is not code-signed (see [Code signing](#code-signing)), so Windows SmartScreen may trigger on the first launch (*"Windows protected your PC"*): click **More info** and then **Run anyway**. To check that the file is the one built by GitHub, compare its SHA-256 with `SHA256SUMS.txt` in the release: `Get-FileHash .\StreamlinkLauncher-<version>.exe` in PowerShell.
 
-#### Option 2: from source
+#### Option 2: Linux (AppImage)
+
+1. Download `StreamlinkLauncher-<version>-x86_64.AppImage` from the [latest release](https://github.com/Bulls64/Streamlink-Launcher/releases/latest).
+2. Make it executable and run it:
+   ```sh
+   chmod +x StreamlinkLauncher-*-x86_64.AppImage
+   ./StreamlinkLauncher-*-x86_64.AppImage
+   ```
+
+It includes its own Python and Tcl/Tk, so nothing else is needed besides Streamlink and a player (`sudo apt install streamlink mpv`, `pipx install streamlink`…). It needs glibc 2.35 or newer (Ubuntu 22.04, Debian 12, Fedora 36, Linux Mint 21 or newer). If your system has no FUSE (`libfuse2`), run it with `--appimage-extract-and-run`. Settings and favorites are stored in `~/.config/streamlink-launcher`. To get a menu entry, use a tool such as [Gear Lever](https://flathub.org/apps/it.mijorus.gearlever) or AppImageLauncher. Updates: download the new AppImage from the releases page (the in-app update card opens it).
+
+#### Option 3: from source
 
 Requirements: Python 3.10 or newer, with Tcl/Tk (included by default in the python.org installer). Tested with Python 3.12.
 
@@ -76,7 +87,7 @@ Use `python` instead of `pythonw` if you want to see a console. The `--tray` arg
 
 ### Configuration and data
 
-All files are stored next to `slink_launcher.py` or the `.exe`. If that folder is read-only (for example `C:\Program Files`), they go to `%APPDATA%\Streamlink Launcher` instead. *Settings › About* shows where they are.
+All files are stored next to `slink_launcher.py` or the `.exe`. If that folder is read-only (for example `C:\Program Files`), they go to `%APPDATA%\Streamlink Launcher` instead (`~/.config/streamlink-launcher` on Linux, always for the AppImage). *Settings › About* shows where they are.
 
 | File | Content |
 |---|---|
@@ -119,6 +130,24 @@ The script installs [PyInstaller](https://pyinstaller.org/) (version pinned in `
 
 On GitHub Actions, every pull request builds the executable, and pushing a `v*` tag (for example `v1.4.2`) builds it and publishes it (signing is optional, see [Code signing](#code-signing)) with its `SHA256SUMS.txt`. The CI recompiles PyInstaller's bootloader from source (`BUILD_BOOTLOADER=1`): the prebuilt bootloader is shared by countless programs, including malware, and is the main cause of antivirus false positives.
 
+### Building the AppImage (Linux)
+
+```sh
+sudo apt install build-essential libx11-dev libxft-dev libxss-dev libfontconfig-dev patchelf
+bash packaging/appimage/build_appimage.sh        # -> dist/StreamlinkLauncher-<version>-x86_64.AppImage
+```
+
+The script downloads a standalone Python ([python-build-standalone](https://github.com/astral-sh/python-build-standalone)) and [appimagetool](https://github.com/AppImage/appimagetool), both pinned with their SHA-256, and recompiles Tcl/Tk with Xft (the bundled one only has the basic X11 fonts: no smoothing, no system fonts). The CI builds it on Ubuntu 22.04 for every pull request and attaches it to every release.
+
+### Créer l'AppImage (Linux)
+
+```sh
+sudo apt install build-essential libx11-dev libxft-dev libxss-dev libfontconfig-dev patchelf
+bash packaging/appimage/build_appimage.sh        # -> dist/StreamlinkLauncher-<version>-x86_64.AppImage
+```
+
+Le script télécharge un Python autonome ([python-build-standalone](https://github.com/astral-sh/python-build-standalone)) et [appimagetool](https://github.com/AppImage/appimagetool), tous deux figés avec leur SHA-256, et recompile Tcl/Tk avec Xft (celui fourni n'a que les polices X11 de base : texte non lissé, sans les polices du système). La CI la construit sous Ubuntu 22.04 à chaque pull request et la joint à chaque release.
+
 ### Tests
 
 ```bat
@@ -142,7 +171,7 @@ launcher/
   wintray.py           Tray icon, global shortcut, single instance, start with Windows (ctypes)
   winnotify.py         Windows notifications, taskbar flashing
 lang/                  Translations
-packaging/             Executable build script, version information, winget manifests
+packaging/             Executable build script, version information, winget manifests, AppImage (appimage/)
 .signpath/             Code-signing configuration (dormant, see Code signing)
 tests/                 Unit tests (standard library only) and GUI smoke test
 .github/workflows/     Tests at every push, executable built at every tag
@@ -229,7 +258,7 @@ Python et Tkinter uniquement, **sans aucune dépendance externe**. Depuis les so
 
 ### Prérequis
 
-- Windows 10 ou 11. L'interface fonctionne aussi sous Linux, mais l'icône de notification, le raccourci global et le démarrage avec Windows sont réservés à Windows.
+- Windows 10 ou 11, ou Linux (AppImage, voir plus bas). Sous Linux, l'icône de notification, le raccourci global, le démarrage automatique, le glisser-déposer, les notifications de début de live, les images d'aperçu et la mise à jour intégrée ne sont pas disponibles.
 - [Streamlink](https://streamlink.github.io/install.html) installé. Le lanceur le trouve tout seul, ou tu peux indiquer son chemin dans les Paramètres.
 - Un lecteur vidéo pris en charge par Streamlink (VLC par défaut).
 
@@ -243,7 +272,18 @@ Python et Tkinter uniquement, **sans aucune dépendance externe**. Depuis les so
 
 L'exécutable n'est pas signé (voir [Signature du code](#signature-du-code)), donc Windows SmartScreen peut se déclencher au premier lancement (*« Windows a protégé votre ordinateur »*) : clique sur **Informations complémentaires** puis **Exécuter quand même**. Pour vérifier que le fichier est bien celui compilé par GitHub, compare son SHA-256 avec `SHA256SUMS.txt` dans la release : `Get-FileHash .\StreamlinkLauncher-<version>.exe` dans PowerShell.
 
-#### Option 2 : depuis les sources
+#### Option 2 : Linux (AppImage)
+
+1. Télécharge `StreamlinkLauncher-<version>-x86_64.AppImage` depuis la [dernière release](https://github.com/Bulls64/Streamlink-Launcher/releases/latest).
+2. Rends-la exécutable et lance-la :
+   ```sh
+   chmod +x StreamlinkLauncher-*-x86_64.AppImage
+   ./StreamlinkLauncher-*-x86_64.AppImage
+   ```
+
+Elle embarque son propre Python et Tcl/Tk : il suffit d'avoir Streamlink et un lecteur (`sudo apt install streamlink mpv`, `pipx install streamlink`…). Il faut la glibc 2.35 ou plus récente (Ubuntu 22.04, Debian 12, Fedora 36, Linux Mint 21 ou plus récents). Si ton système n'a pas FUSE (`libfuse2`), lance-la avec `--appimage-extract-and-run`. Les réglages et favoris sont dans `~/.config/streamlink-launcher`. Pour une entrée dans le menu, utilise un outil comme [Gear Lever](https://flathub.org/apps/it.mijorus.gearlever) ou AppImageLauncher. Mises à jour : télécharge la nouvelle AppImage depuis la page des releases (la carte de mise à jour l'ouvre).
+
+#### Option 3 : depuis les sources
 
 Prérequis : Python 3.10 ou plus récent, avec Tcl/Tk (inclus par défaut dans l'installateur de python.org). Testé avec Python 3.12.
 
@@ -271,7 +311,7 @@ Utilise `python` au lieu de `pythonw` si tu veux voir une console. L'argument `-
 
 ### Configuration et données
 
-Tous les fichiers sont rangés à côté de `slink_launcher.py` ou du `.exe`. Si ce dossier est protégé en écriture (par exemple `C:\Program Files`), ils vont dans `%APPDATA%\Streamlink Launcher`. *Paramètres › À propos* indique où ils se trouvent.
+Tous les fichiers sont rangés à côté de `slink_launcher.py` ou du `.exe`. Si ce dossier est protégé en écriture (par exemple `C:\Program Files`), ils vont dans `%APPDATA%\Streamlink Launcher` (`~/.config/streamlink-launcher` sous Linux, toujours pour l'AppImage). *Paramètres › À propos* indique où ils se trouvent.
 
 | Fichier | Contenu |
 |---|---|
@@ -319,7 +359,7 @@ launcher/
   wintray.py           Icône de notification, raccourci global, instance unique, démarrage avec Windows (ctypes)
   winnotify.py         Notifications Windows, clignotement de la barre des tâches
 lang/                  Traductions
-packaging/             Script de création de l'exécutable, informations de version, manifestes winget
+packaging/             Script de création de l'exécutable, informations de version, manifestes winget, AppImage (appimage/)
 .signpath/             Configuration de signature du code (en sommeil, voir Signature du code)
 tests/                 Tests unitaires (bibliothèque standard uniquement) et test de fumée de l'interface
 .github/workflows/     Tests à chaque push, exécutable compilé à chaque tag

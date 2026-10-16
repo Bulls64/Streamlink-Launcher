@@ -47,7 +47,7 @@ if not os.path.isfile(ICON_FILE):
 
 class App(tk.Tk):
     def __init__(self):
-        super().__init__()
+        super().__init__(className="StreamlinkLauncher")  # WM_CLASS sous Linux (fichier .desktop de l'AppImage)
         self.withdraw()
         self.scale = max(1.0, min(3.0, self.winfo_fpixels("1i") / 96.0))
         self.cfg = core.load_config()
@@ -2068,7 +2068,7 @@ class App(tk.Tk):
     def _startup_checks(self):
         t = self.t
         core.set_issue_handler(lambda: self.after(0, self._report_data_issues))
-        if not core.PORTABLE:
+        if not core.PORTABLE and not core.APPIMAGE:  # AppImage : données dans ~/.config, c'est normal
             self.log(t("log_data_folder", path=core.DATA_ROOT), "warn")
         if self.platforms_error:
             self.log(t("log_platforms_error", error=self.platforms_error), "err")

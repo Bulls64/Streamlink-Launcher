@@ -83,10 +83,60 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  appimage:
+    name: Build the Linux AppImage
+    # Même règle que l'exe : à chaque PR et à chaque tag de version
+    if: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    needs: tests
+    # Ubuntu 22.04 : l'AppImage fonctionne ensuite avec la glibc 2.35 ou plus récente
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - name: Check the tag
+        run: |
+          VERSION=$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' launcher/__init__.py)
+          if [[ "$GITHUB_REF" == refs/tags/v* && "v$VERSION" != "$GITHUB_REF_NAME" ]]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match launcher.__version__ ($VERSION)"
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+      - name: Install the build dependencies (Tcl/Tk with Xft)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential libx11-dev libxft-dev libxss-dev libfontconfig-dev patchelf xvfb
+      - name: Build
+        run: bash packaging/appimage/build_appimage.sh dist
+      - name: Smoke test (starts the AppImage under Xvfb)
+        run: |
+          APP="dist/StreamlinkLauncher-$VERSION-x86_64.AppImage"
+          export APPIMAGE_EXTRACT_AND_RUN=1 HOME="$RUNNER_TEMP/home"
+          mkdir -p "$HOME"
+          # La fenêtre doit tenir 8 s sans erreur ; timeout l'arrête ensuite (code 124 = attendu)
+          set +e
+          xvfb-run -a timeout 8 "$APP" > run.log 2>&1
+          code=$?
+          set -e
+          cat run.log
+          [ "$code" = "124" ] || { echo "::error::The AppImage exited early (code $code)"; exit 1; }
+          test -f "$HOME/.config/streamlink-launcher/platforms.json"
+          ! grep -q "Traceback" run.log
+      - name: Check the glibc requirement
+        run: |
+          mkdir x && cd x && "../dist/StreamlinkLauncher-$VERSION-x86_64.AppImage" --appimage-extract >/dev/null
+          objdump -T squashfs-root/usr/python/lib/*.so* squashfs-root/usr/python/bin/python3 2>/dev/null \
+            | grep -o "GLIBC_[0-9.]*" | sort -uV | tail -1
+      - name: Upload the AppImage
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7
+        with:
+          path: dist/StreamlinkLauncher-${{ env.VERSION }}-x86_64.AppImage
+          archive: false
+          if-no-files-found: error
+          retention-days: 7
+
   release:
     name: Sign and publish the release
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: build
+    needs: [build, appimage]
     runs-on: windows-latest
     permissions:
       contents: write
@@ -94,6 +144,7 @@ jobs:
     env:
       VERSION: ${{ needs.build.outputs.version }}
       EXE: StreamlinkLauncher-${{ needs.build.outputs.version }}.exe
+      APPIMAGE: StreamlinkLauncher-${{ needs.build.outputs.version }}-x86_64.AppImage
       # Signature activée dès que la variable SIGNPATH_ORGANIZATION_ID existe (Settings > Secrets and variables > Actions)
       SIGN: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
     steps:
@@ -106,6 +157,11 @@ jobs:
         with:
           name: ${{ env.EXE }}
           path: unsigned
+      - name: Download the AppImage
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333  # v8
+        with:
+          name: ${{ env.APPIMAGE }}
+          path: linux
       - name: Sign with SignPath (SignPath Foundation certificate)
         if: env.SIGN == 'true'
         uses: signpath/github-action-submit-signing-request@f6d04783b4569d051e0c80105fe66e82819d0092  # v3
@@ -132,12 +188,14 @@ jobs:
         run: |
           mkdir -p dist
           if [ "$SIGN" = "true" ]; then cp "signed/$EXE" dist/; else cp "unsigned/$EXE" dist/; fi
-          cd dist && sha256sum "$EXE" > SHA256SUMS.txt && cat SHA256SUMS.txt
+          cp "linux/$APPIMAGE" dist/
+          cd dist && sha256sum "$EXE" "$APPIMAGE" > SHA256SUMS.txt && cat SHA256SUMS.txt
       - name: Release notes from CHANGELOG.md
         shell: bash
         run: |
           python packaging/release_notes.py "$VERSION" > release_notes.md
-          HASH=$(cut -d' ' -f1 dist/SHA256SUMS.txt)
+          HASH=$(sha256sum "dist/$EXE" | cut -d' ' -f1)
+          HASH_LINUX=$(sha256sum "dist/$APPIMAGE" | cut -d' ' -f1)
           {
             echo
             echo "---"
@@ -148,7 +206,11 @@ jobs:
               echo "**Unsigned executable** — Windows SmartScreen may show a warning (*More info* → *Run anyway*). *Exécutable non signé — SmartScreen peut afficher un avertissement (Informations complémentaires → Exécuter quand même).*"
             fi
             echo
-            echo "SHA-256 \`$HASH\`"
+            echo "**Linux:** \`$APPIMAGE\` — \`chmod +x\` then run it (glibc 2.35+, e.g. Ubuntu 22.04, Debian 12, Fedora 36 or newer; Streamlink must be installed). *Linux : rendre le fichier exécutable puis le lancer.*"
+            echo
+            echo "SHA-256 \`$EXE\` \`$HASH\`"
+            echo
+            echo "SHA-256 \`$APPIMAGE\` \`$HASH_LINUX\`"
           } >> release_notes.md
       - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65  # v2
         with:
@@ -156,4 +218,5 @@ jobs:
           body_path: release_notes.md
           files: |
             dist/${{ env.EXE }}
+            dist/${{ env.APPIMAGE }}
             dist/SHA256SUMS.txt

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.bulls64.StreamlinkLauncher</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Streamlink Launcher</name>
+  <summary>Open live streams in your video player with Streamlink</summary>
+  <description>
+    <p>A lightweight launcher for Streamlink: type a channel or paste a link, press Enter, and the stream
+      opens in your video player (VLC, mpv…) instead of the browser. Favorites with live status, history,
+      light and dark themes, five languages.</p>
+  </description>
+  <launchable type="desktop-id">io.github.bulls64.StreamlinkLauncher.desktop</launchable>
+  <url type="homepage">https://github.com/Bulls64/Streamlink-Launcher</url>
+  <url type="bugtracker">https://github.com/Bulls64/Streamlink-Launcher/issues</url>
+  <developer id="io.github.bulls64">
+    <name>Bulls64</name>
+  </developer>
+  <content_rating type="oars-1.1"/>
+  <requires>
+    <display_length compare="ge">768</display_length>
+  </requires>
+</component>

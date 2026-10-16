@@ -40,6 +40,34 @@ class TempData(unittest.TestCase):
         core.DATA_ISSUES.clear()
 
 
+class TestSystemLanguage(unittest.TestCase):
+    @unittest.skipIf(os.name == "nt", "variables d'environnement de langue : Linux")
+    def test_language_from_environment(self):
+        for env, expected in (({"LANG": "fr_FR.UTF-8"}, "fr"), ({"LC_ALL": "de_DE.UTF-8", "LANG": "fr_FR"}, "de"),
+                              ({"LANG": "C"}, "en"), ({"LANG": "ja_JP.UTF-8"}, "en")):
+            with mock.patch.dict(os.environ, env, clear=True), \
+                    mock.patch.object(core.locale, "getlocale", return_value=(None, None)):
+                self.assertEqual(core.detect_system_language(), expected, env)
+
+
+class TestPlatformsFile(TempData):
+    def test_missing_file_is_seeded_from_bundled_copy(self):
+        target = self.tmp / "user" / "platforms.json"
+        with mock.patch.object(core, "PLATFORMS_FILE", target):
+            platforms, error = core.load_platforms()
+        self.assertIsNone(error)
+        saved = json.loads(target.read_text(encoding="utf-8"))
+        bundled = json.loads((ROOT / "platforms.json").read_text(encoding="utf-8"))
+        self.assertEqual(saved, bundled)  # avec son aide (_aide) et live_check
+        self.assertEqual([p["id"] for p in platforms], [p["id"] for p in bundled["platforms"]])
+
+    def test_missing_file_without_bundled_copy_uses_defaults(self):
+        target = self.tmp / "user" / "platforms.json"
+        with mock.patch.object(core, "PLATFORMS_FILE", target), mock.patch.object(core, "BASE_DIR", self.tmp / "none"):
+            core.load_platforms()
+        self.assertEqual(json.loads(target.read_text(encoding="utf-8")), {"platforms": core.DEFAULT_PLATFORMS})
+
+
 class TestVersion(unittest.TestCase):
     def test_version_matches_exe_metadata(self):
         info = (ROOT / "packaging" / "version_info.txt").read_text(encoding="utf-8")
