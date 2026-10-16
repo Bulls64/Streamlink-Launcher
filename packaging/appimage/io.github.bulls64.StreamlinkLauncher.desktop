@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Streamlink Launcher
+GenericName=Stream launcher
+GenericName[fr]=Lanceur de streams
+Comment=Open Twitch, Kick, YouTube… streams in your video player with Streamlink
+Comment[fr]=Ouvre les streams Twitch, Kick, YouTube… dans ton lecteur vidéo avec Streamlink
+Exec=streamlink-launcher %u
+Icon=streamlink-launcher
+Terminal=false
+Categories=AudioVideo;Video;
+Keywords=streamlink;twitch;kick;youtube;stream;
+StartupWMClass=StreamlinkLauncher

@@ -45,11 +45,15 @@ def _user_data_dir():
 
 # Version portable par défaut : les données restent à côté du lanceur. Si ce dossier est en lecture seule,
 # elles vont dans %APPDATA%\Streamlink Launcher (au lieu de planter au démarrage).
-PORTABLE = _is_writable(BASE_DIR)
+# AppImage (Linux) : le dossier de l'application est en lecture seule, ou extrait dans un dossier temporaire
+# (--appimage-extract-and-run) effacé à la fermeture : les données vont toujours dans ~/.config.
+APPIMAGE = bool(os.environ.get("APPIMAGE")) and not FROZEN and os.name != "nt"
+PORTABLE = not APPIMAGE and _is_writable(BASE_DIR)
 DATA_ROOT = BASE_DIR if PORTABLE else _user_data_dir()
 CONFIG_FILE = DATA_ROOT / "config.json"
-# platforms.json livré à côté du lanceur reste prioritaire, même en lecture seule
-PLATFORMS_FILE = BASE_DIR / "platforms.json" if PORTABLE or (BASE_DIR / "platforms.json").exists() \
+# platforms.json livré à côté du lanceur reste prioritaire, même en lecture seule (sauf dans l'AppImage,
+# où il doit rester modifiable : il est créé dans le dossier des données)
+PLATFORMS_FILE = BASE_DIR / "platforms.json" if not APPIMAGE and (PORTABLE or (BASE_DIR / "platforms.json").exists()) \
     else DATA_ROOT / "platforms.json"
 LOG_FILE = DATA_ROOT / "launcher.log"
 LANG_DIR = BASE_DIR / "lang" if (BASE_DIR / "lang").is_dir() else RES_DIR / "lang"  # dossier lang/ modifiable prioritaire
@@ -284,6 +288,9 @@ def save_config(cfg):
 def detect_system_language():
     try:
         name = locale.getlocale()[0] or ""
+        if os.name != "nt":  # Linux : la langue d'affichage, même si la locale n'est pas générée sur la machine
+            name = next((os.environ[v] for v in ("LC_ALL", "LC_MESSAGES", "LANG")
+                         if os.environ.get(v) and os.environ[v] not in ("C", "POSIX")), name)
         if os.name == "nt":
             import ctypes
             name = locale.windows_locale.get(ctypes.windll.kernel32.GetUserDefaultUILanguage(), name)
@@ -384,7 +391,14 @@ def load_platforms():
             raw, error = [], str(e)
     else:
         raw = DEFAULT_PLATFORMS
-        save_json(PLATFORMS_FILE, {"platforms": DEFAULT_PLATFORMS})
+        bundled = BASE_DIR / "platforms.json"  # AppImage : copie modifiable du fichier livré (avec son aide)
+        try:
+            data = json.loads(bundled.read_text(encoding="utf-8")) if bundled != PLATFORMS_FILE else None
+            if isinstance(data, dict) and isinstance(data.get("platforms"), list):
+                raw = data["platforms"]
+        except (OSError, ValueError):
+            data = None
+        save_json(PLATFORMS_FILE, data if raw is not DEFAULT_PLATFORMS else {"platforms": DEFAULT_PLATFORMS})
 
     platforms, seen = [], set()
     for p in raw:

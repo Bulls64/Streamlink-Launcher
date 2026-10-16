@@ -18,3 +18,5 @@ dist/
 *.exe
 *.zip
 CHANGELOG.pdf
+packaging/appimage/.cache/
+dist/
