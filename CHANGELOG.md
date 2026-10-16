@@ -11,15 +11,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Planned
+- Viewing statistics (time per channel, peak hours).
+
+## [1.5.0] - 2026-10-16
+
 ### Added
 - **Linux AppImage.** Each release now also comes with `StreamlinkLauncher-<version>-x86_64.AppImage`: one file with its own Python and Tcl/Tk (recompiled with Xft for smooth text and system fonts), for any distribution with glibc 2.35 or newer. Streamlink and the video player are the ones installed on the system. Settings and favorites go to `~/.config/streamlink-launcher`, including `platforms.json` (a copy of the bundled file, so it stays editable). Built by `packaging/appimage/build_appimage.sh`, with pinned and checksummed downloads, and smoke-tested under Xvfb by the CI.
 
 ### Changed
 - On Linux, the interface language follows `LC_ALL` / `LC_MESSAGES` / `LANG` even when that locale is not generated on the system.
 - The window class is now `StreamlinkLauncher` (Linux), so desktop environments match the window with its menu entry.
-
-### Planned
-- Viewing statistics (time per channel, peak hours).
 
 ## [1.4.3] - 2026-10-16
 
@@ -232,15 +234,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Non publié]
 
+### Prévu
+- Statistiques de visionnage (temps par chaîne, heures de pointe).
+
+## [1.5.0] - 2026-10-16
+
 ### Ajouté
 - **AppImage pour Linux.** Chaque release contient aussi `StreamlinkLauncher-<version>-x86_64.AppImage` : un seul fichier avec son propre Python et Tcl/Tk (recompilé avec Xft pour un texte lissé et les polices du système), pour toute distribution avec la glibc 2.35 ou plus récente. Streamlink et le lecteur vidéo sont ceux installés sur le système. Réglages et favoris vont dans `~/.config/streamlink-launcher`, y compris `platforms.json` (copie du fichier livré, pour qu'il reste modifiable). Construite par `packaging/appimage/build_appimage.sh`, téléchargements figés et vérifiés, et testée au démarrage sous Xvfb par la CI.
 
 ### Modifié
 - Sous Linux, la langue de l'interface suit `LC_ALL` / `LC_MESSAGES` / `LANG` même quand cette locale n'est pas générée sur le système.
 - La classe de fenêtre est maintenant `StreamlinkLauncher` (Linux), pour que les environnements de bureau associent la fenêtre à son entrée de menu.
-
-### Prévu
-- Statistiques de visionnage (temps par chaîne, heures de pointe).
 
 ## [1.4.3] - 2026-10-16
 
@@ -447,9 +451,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 > Les versions 0.1.0 à 1.0.0 n'ont jamais été publiées sur GitHub ; la 1.0.1 est la première release. La date de la 0.1.0 est la plus ancienne date trouvée dans les données de l'application.
 
-[Unreleased]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.4.3...HEAD
+[Unreleased]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.5.0
 [1.4.3]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.3
-[Non publié]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.4.3...HEAD
+[Non publié]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.5.0...HEAD
 [1.4.2]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.2
 [1.4.1]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.1
 [1.4.0]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.0

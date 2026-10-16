@@ -10,7 +10,9 @@
 
 ## English
 
-A lightweight Windows launcher for [Streamlink](https://streamlink.github.io/): paste a link or type a channel name, press <kbd>Enter</kbd>, and the stream opens in your video player (VLC, mpv, PotPlayer…) instead of the browser.
+A lightweight Windows and Linux launcher for [Streamlink](https://streamlink.github.io/): paste a link or type a channel name, press <kbd>Enter</kbd>, and the stream opens in your video player (VLC, mpv, PotPlayer…) instead of the browser.
+
+> **New in 1.5.0: Linux AppImage.** One file, no installation, with its own Python: download `StreamlinkLauncher-<version>-x86_64.AppImage` from the [latest release](https://github.com/Bulls64/Streamlink-Launcher/releases/latest), `chmod +x` it and run it. See [Option 2](#option-2-linux-appimage).
 
 Pure Python + Tkinter, **no third-party dependency**. From source, it starts in about 0.25 s and uses around 30 MB of RAM (the single-file `.exe` takes a little longer to start, as it unpacks itself first).
 
@@ -207,7 +209,7 @@ The executable is not code-signed (see [Code signing](#code-signing)), so Window
 2. **SmartScreen ("Windows protected your PC").** Click **More info**, then **Run anyway**. The warning appears because the file is new and unsigned, not because something was detected.
 3. **"This file came from another computer" / nothing happens on double-click.** Right-click the file › **Properties** › tick **Unblock** at the bottom of the *General* tab › **OK**. Or in PowerShell: `Unblock-File .\StreamlinkLauncher-<version>.exe`.
 4. **The antivirus quarantines or deletes it.** Restore it from the quarantine after checking the SHA-256 (step 1), add the folder containing it to the antivirus exclusions, and report the false positive to the vendor so that it is fixed for everyone (Microsoft Defender: [submit a file](https://www.microsoft.com/wdsi/filesubmission), category *Incorrectly detected as malware*, and mention that it is a PyInstaller program built on GitHub Actions).
-5. **Still blocked, or you would rather not trust an unsigned file?** Run it from source (see [Option 2](#option-2-from-source)): the code is the same and nothing has to be unblocked.
+5. **Still blocked, or you would rather not trust an unsigned file?** Run it from source (see [Option 3](#option-3-from-source)): the code is the same and nothing has to be unblocked.
 
 Putting the file in a folder of your own (for example `Documents\Streamlink`) rather than a protected one such as `C:\Program Files` also lets the built-in updater replace it.
 
@@ -234,7 +236,9 @@ License: [MIT](LICENSE)
 
 ## Français
 
-Un lanceur Windows léger pour [Streamlink](https://streamlink.github.io/) : colle un lien ou tape le nom d'une chaîne, appuie sur <kbd>Entrée</kbd>, et le stream s'ouvre dans ton lecteur vidéo (VLC, mpv, PotPlayer…) au lieu du navigateur.
+Un lanceur léger pour Windows et Linux pour [Streamlink](https://streamlink.github.io/) : colle un lien ou tape le nom d'une chaîne, appuie sur <kbd>Entrée</kbd>, et le stream s'ouvre dans ton lecteur vidéo (VLC, mpv, PotPlayer…) au lieu du navigateur.
+
+> **Nouveau en 1.5.0 : AppImage pour Linux.** Un seul fichier, sans installation, avec son propre Python : télécharge `StreamlinkLauncher-<version>-x86_64.AppImage` depuis la [dernière release](https://github.com/Bulls64/Streamlink-Launcher/releases/latest), rends-la exécutable (`chmod +x`) et lance-la. Voir l'[option 2](#option-2--linux-appimage).
 
 Python et Tkinter uniquement, **sans aucune dépendance externe**. Depuis les sources : démarrage en environ 0,25 s, environ 30 Mo de mémoire (l'`.exe` en un seul fichier démarre un peu plus lentement, car il se décompresse d'abord).
 
@@ -395,7 +399,7 @@ L'exécutable n'est pas signé (voir [Signature du code](#signature-du-code)) : 
 2. **SmartScreen (« Windows a protégé votre ordinateur »).** Clique sur **Informations complémentaires**, puis **Exécuter quand même**. L'avertissement apparaît parce que le fichier est récent et non signé, pas parce que quelque chose a été détecté.
 3. **« Ce fichier provient d'un autre ordinateur » / rien ne se passe au double-clic.** Clic droit sur le fichier › **Propriétés** › coche **Débloquer** en bas de l'onglet *Général* › **OK**. Ou dans PowerShell : `Unblock-File .\StreamlinkLauncher-<version>.exe`.
 4. **L'antivirus le met en quarantaine ou le supprime.** Restaure-le depuis la quarantaine après avoir vérifié le SHA-256 (étape 1), ajoute le dossier qui le contient aux exclusions de l'antivirus, et signale le faux positif à l'éditeur pour que ce soit corrigé pour tout le monde (Microsoft Defender : [envoyer un fichier](https://www.microsoft.com/wdsi/filesubmission), catégorie *Incorrectly detected as malware*, en précisant qu'il s'agit d'un programme PyInstaller compilé sur GitHub Actions).
-5. **Toujours bloqué, ou tu préfères ne pas faire confiance à un fichier non signé ?** Lance-le depuis les sources (voir l'[option 2](#option-2--depuis-les-sources)) : le code est le même et rien n'est à débloquer.
+5. **Toujours bloqué, ou tu préfères ne pas faire confiance à un fichier non signé ?** Lance-le depuis les sources (voir l'[option 3](#option-3--depuis-les-sources)) : le code est le même et rien n'est à débloquer.
 
 Placer le fichier dans un dossier à toi (par exemple `Documents\Streamlink`) plutôt que dans un dossier protégé comme `C:\Program Files` permet aussi à la mise à jour intégrée de le remplacer.
 
