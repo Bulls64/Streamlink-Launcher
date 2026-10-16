@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability · Faille de sécurité
+    url: https://github.com/Bulls64/Streamlink-Launcher/security/advisories/new
+    about: Report it privately, not in a public issue · Signalez-la en privé

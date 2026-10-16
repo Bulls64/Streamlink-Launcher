@@ -142,8 +142,9 @@ launcher/
   wintray.py           Tray icon, global shortcut, single instance, start with Windows (ctypes)
   winnotify.py         Windows notifications, taskbar flashing
 lang/                  Translations
-packaging/             Executable build script and version information
-tests/                 Unit tests (standard library only)
+packaging/             Executable build script, version information, winget manifests
+.signpath/             Code-signing configuration (dormant, see Code signing)
+tests/                 Unit tests (standard library only) and GUI smoke test
 .github/workflows/     Tests at every push, executable built at every tag
 ```
 
@@ -224,7 +225,7 @@ Python et Tkinter uniquement, **sans aucune dépendance externe**. Depuis les so
 
 | Thème clair | Mode mini | Paramètres |
 |---|---|---|
-| ![Thème clair](docs/main-light.png) | ![Mode mini](docs/mini-mode.png) | ![Paramètres](docs/settings.png) |
+| ![Thème clair](docs/fr/main-light.png) | ![Mode mini](docs/fr/mini-mode.png) | ![Paramètres](docs/fr/settings.png) |
 
 ### Prérequis
 
@@ -318,8 +319,9 @@ launcher/
   wintray.py           Icône de notification, raccourci global, instance unique, démarrage avec Windows (ctypes)
   winnotify.py         Notifications Windows, clignotement de la barre des tâches
 lang/                  Traductions
-packaging/             Script de création de l'exécutable et informations de version
-tests/                 Tests unitaires (bibliothèque standard uniquement)
+packaging/             Script de création de l'exécutable, informations de version, manifestes winget
+.signpath/             Configuration de signature du code (en sommeil, voir Signature du code)
+tests/                 Tests unitaires (bibliothèque standard uniquement) et test de fumée de l'interface
 .github/workflows/     Tests à chaque push, exécutable compilé à chaque tag
 ```
 

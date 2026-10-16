@@ -1,0 +1,16 @@
+# Analyse statique (ruff) : erreurs réelles, imports triés, pas d'erreur silencieuse.
+# Lancer :  python -m ruff check .
+target-version = "py310"
+line-length = 120
+
+[lint]
+select = ["E", "F", "W", "I", "B", "S110", "RUF100"]
+ignore = [
+    "E501",   # lignes longues : le code et les textes ne sont pas coupés à la main
+    "E731",   # petits lambdas nommés : voulus dans l'interface
+    "B905",   # zip() sans strict= : longueurs toujours égales ici
+    "B023",   # fermetures dans des boucles : paramètres par défaut utilisés partout (lambda e=fav: ...)
+]
+
+[lint.isort]
+known-first-party = ["launcher"]

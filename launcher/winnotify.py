@@ -1,7 +1,7 @@
 """Notifications Windows sans dépendance : toast natif (via Windows PowerShell) et clignotement
 de la barre des tâches. Tout est ignoré silencieusement hors de Windows ou en cas d'échec."""
-import os
 import logging
+import os
 import subprocess
 
 _log = logging.getLogger("streamlink_launcher")
@@ -53,4 +53,4 @@ def flash_taskbar(win, count=3):
         info = FLASHWINFO(ctypes.sizeof(FLASHWINFO), hwnd, 0x2 | 0xC, count, 0)  # TRAY | TIMERNOFG
         ctypes.windll.user32.FlashWindowEx(ctypes.byref(info))
     except Exception:
-        pass
+        _log.debug("erreur ignorée", exc_info=True)

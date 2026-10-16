@@ -10,8 +10,8 @@ RÈGLE : les rappels OLE ne touchent JAMAIS à Tk. Ils déposent des événement
 de notification). Événements : ("enter",) ("leave",) ("text", str) ("files", [chemins]).
 Hors Windows, la classe existe mais ne fait rien (register() renvoie False).
 """
-import os
 import logging
+import os
 
 log = logging.getLogger("streamlink_launcher")
 
@@ -174,7 +174,7 @@ if os.name == "nt":
                     self._refs += 1
                     return S_OK
             except Exception:
-                pass
+                log.debug("erreur ignorée", exc_info=True)
             ppv[0] = None
             return E_NOINTERFACE
 
@@ -241,7 +241,7 @@ if os.name == "nt":
                 try:
                     ole32.RevokeDragDrop(self.hwnd)
                 except Exception:
-                    pass
+                    log.debug("erreur ignorée", exc_info=True)
                 self.registered = False
 
     def toplevel_hwnd(widget):

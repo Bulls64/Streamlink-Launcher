@@ -1,26 +1,39 @@
 """Fenêtre principale : écran de lancement, tiroir du journal, panneaux latéraux."""
-import os
-import re
-import json
 import base64
-import sys
+import json
+import os
 import queue
-import threading
+import re
 import subprocess
+import sys
+import threading
 import tkinter as tk
 from collections import deque
 from tkinter import filedialog, messagebox, simpledialog
 
-from . import core
-from . import winnotify
-from . import wintray
-from . import windrop
-from . import thumb
-from .mini import MiniBar
+from . import core, thumb, windrop, winnotify, wintray
 from .gfx import Painter
-from .theme import palette, resolve_theme, Fonts, apply_window_chrome
-from .widgets import (Button, IconButton, Pill, Card, RecentRow, Field, Select, Segmented, Switch, Popover,
-                      ScrollArea, ListRow, StreamRow, DrawerBar, StatusCard, Toast, _is_inside)
+from .mini import MiniBar
+from .theme import Fonts, apply_window_chrome, palette, resolve_theme
+from .widgets import (
+    Button,
+    Card,
+    DrawerBar,
+    Field,
+    IconButton,
+    ListRow,
+    Pill,
+    Popover,
+    RecentRow,
+    ScrollArea,
+    Segmented,
+    Select,
+    StatusCard,
+    StreamRow,
+    Switch,
+    Toast,
+    _is_inside,
+)
 
 LOG_LIMIT = 500
 RECENTS = 3
@@ -1462,10 +1475,10 @@ class App(tk.Tk):
         def body(b):
             sec = self._section(b, t("settings_general"), first=True)
             if len(langs) <= 3:
-                make_lang = lambda p: Segmented(  # noqa: E731
+                make_lang = lambda p: Segmented(
                     p, self, list(langs.items()), s["language"], lambda v: s.update(language=v))
             else:  # 5 langues ne tiennent plus côte à côte dans le panneau : liste déroulante
-                make_lang = lambda p: Select(  # noqa: E731
+                make_lang = lambda p: Select(
                     p, self, list(langs.items()), s["language"], lambda v: s.update(language=v),
                     height=36, width=130, font=self.fonts.small, popup_width=180)
             self._setting_row(sec, t("label_language"), make_lang)
@@ -1797,8 +1810,9 @@ class App(tk.Tk):
                     core.log.error("Mise à jour : %r", result)
             self._update_app_card()
             return
+        final = core.target_exe(sys.executable, __version__, rel["version"])
         try:
-            core.install_update(result)
+            core.install_update(result, final=final)
         except core.UpdateError as e:
             try:
                 os.remove(result)
@@ -1809,7 +1823,9 @@ class App(tk.Tk):
             self._update_app_card()
             return
         self.log(t("log_app_updated", old=__version__, new=rel["version"]))
-        if core.relaunch(old_version=__version__, extra_args=("--tray",) if "--tray" in sys.argv else ()):
+        if str(final) != sys.executable and self.cfg.get("autostart"):  # le démarrage avec Windows suit le nouveau nom
+            wintray.set_autostart(True, "", sys.executable, exe=str(final))
+        if core.relaunch(final, old_version=__version__, extra_args=("--tray",) if "--tray" in sys.argv else ()):
             self._shutdown()
         else:  # nouvelle version en place, mais impossible de la démarrer : à relancer à la main
             self._app_state = "restart"

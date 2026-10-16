@@ -4,9 +4,9 @@ Une petite fenêtre Windows invisible reçoit les clics sur l'icône et le racco
 distribue déjà les messages Windows de son thread, donc aucun thread supplémentaire n'est nécessaire.
 Les actions sont transmises à l'interface via 'callback(nom)' ; tout échec est silencieux.
 """
-import os
-import logging
 import ctypes
+import logging
+import os
 
 _log = logging.getLogger("streamlink_launcher")
 
@@ -188,7 +188,7 @@ class Tray:
                 if h:
                     return h
         except Exception:
-            pass
+            _log.debug("erreur ignorée", exc_info=True)
         return user32.LoadIconW(None, ctypes.c_void_p(32512))  # IDI_APPLICATION
 
     def _nid(self, flags):
@@ -218,7 +218,7 @@ class Tray:
             try:
                 shell32.Shell_NotifyIconW(NIM_DELETE, ctypes.byref(self._nid(0)))
             except Exception:
-                pass
+                _log.debug("erreur ignorée", exc_info=True)
         self.icon_shown = False
 
     def set_tooltip(self, text):
@@ -227,7 +227,7 @@ class Tray:
             try:
                 shell32.Shell_NotifyIconW(NIM_MODIFY, ctypes.byref(self._nid(NIF_TIP)))
             except Exception:
-                pass
+                _log.debug("erreur ignorée", exc_info=True)
 
     def notify(self, title, body):
         """Notification Windows attachée à l'icône (cliquable). Renvoie False si impossible."""
@@ -269,7 +269,7 @@ class Tray:
             try:
                 user32.UnregisterHotKey(self.hwnd, HOTKEY_ID)
             except Exception:
-                pass
+                _log.debug("erreur ignorée", exc_info=True)
         self.hotkey = False
         self.hotkey_combo = None
 
@@ -310,7 +310,7 @@ class Tray:
                 user32.DestroyWindow(self.hwnd)
                 user32.UnregisterClassW(CLASS_NAME, self._hinst)
             except Exception:
-                pass
+                _log.debug("erreur ignorée", exc_info=True)
         self.hwnd = None
 
     def _wndproc(self, hwnd, msg, wparam, lparam):
@@ -370,24 +370,24 @@ RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
 RUN_NAME = "StreamlinkLauncher"
 
 
-def autostart_command(script_path, python_exe):
+def autostart_command(script_path, python_exe, exe=None):
     import sys
     if getattr(sys, "frozen", False):  # version .exe : on lance l'exécutable lui-même
-        return f'"{sys.executable}" --tray'
+        return f'"{exe or sys.executable}" --tray'
     folder = os.path.dirname(python_exe)
     pythonw = os.path.join(folder, "pythonw.exe")
     exe = pythonw if os.path.isfile(pythonw) else python_exe
     return f'"{exe}" "{script_path}" --tray'
 
 
-def set_autostart(enabled, script_path, python_exe):
+def set_autostart(enabled, script_path, python_exe, exe=None):
     if os.name != "nt":
         return False
     try:
         import winreg
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, RUN_KEY, 0, winreg.KEY_SET_VALUE) as key:
             if enabled:
-                winreg.SetValueEx(key, RUN_NAME, 0, winreg.REG_SZ, autostart_command(script_path, python_exe))
+                winreg.SetValueEx(key, RUN_NAME, 0, winreg.REG_SZ, autostart_command(script_path, python_exe, exe))
             else:
                 try:
                     winreg.DeleteValue(key, RUN_NAME)

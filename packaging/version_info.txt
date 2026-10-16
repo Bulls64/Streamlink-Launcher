@@ -13,7 +13,7 @@ VSVersionInfo(
   kids=[
     StringFileInfo([
       StringTable('040C04B0', [
-        StringStruct('CompanyName', 'Chris'),
+        StringStruct('CompanyName', 'Bulls64'),
         StringStruct('FileDescription', 'Streamlink Launcher'),
         StringStruct('FileVersion', '1.4.2'),
         StringStruct('InternalName', 'StreamlinkLauncher'),

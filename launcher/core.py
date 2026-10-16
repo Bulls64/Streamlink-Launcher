@@ -1,19 +1,19 @@
 """Logique sans interface : configuration, plateformes, saisie, historique, favoris, lancement."""
-import os
-import re
-import sys
-import json
-import queue
 import functools
-import logging
-import shutil
+import json
 import locale
+import logging
+import os
+import queue
+import re
+import shutil
+import subprocess
+import sys
 import threading
 import time
-import subprocess
 from datetime import datetime
 from pathlib import Path
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import parse_qs, urlparse
 
 # ---------------------
 # Chemins (tout est relatif au dossier du lanceur)
@@ -1110,7 +1110,7 @@ def download_update(release, dest_dir, progress=None, cancel=None, opener=None):
             resp = (opener or _open_download)(asset["url"])
         except Exception as e:
             log.warning("Téléchargement impossible : %s", e)
-            raise UpdateError("app_err_network")
+            raise UpdateError("app_err_network") from e
         try:
             with resp, open(dest, "wb") as out:
                 while True:
@@ -1130,7 +1130,7 @@ def download_update(release, dest_dir, progress=None, cancel=None, opener=None):
             raise
         except Exception as e:
             log.warning("Téléchargement interrompu : %s", e)
-            raise UpdateError("app_err_download")
+            raise UpdateError("app_err_download") from e
         if done != asset["size"]:
             raise UpdateError("app_err_download")
         if digest.hexdigest() != asset["sha256"]:
@@ -1192,26 +1192,39 @@ def check_signature(current_file, new_file, probe=None):
     return None if new_status in ("Valid", "NotSigned", "error") else "app_err_signature"
 
 
-def install_update(new_file, exe=None):
+def target_exe(exe, old_version, new_version):
+    """Chemin sous lequel installer la nouvelle version : si le nom de fichier contient l'ancien numéro
+    (StreamlinkLauncher-1.4.1.exe), il prend le nouveau, pour que le nom ne mente pas. Sinon, inchangé."""
+    exe = Path(exe)
+    if not old_version or not new_version or old_version == new_version:
+        return exe
+    renamed = re.sub(r"(?<![\d.])" + re.escape(str(old_version)) + r"(?!\.?\d)", str(new_version), exe.name)
+    target = exe.with_name(renamed)
+    return target if renamed != exe.name and not target.exists() else exe
+
+
+def install_update(new_file, exe=None, final=None):
     """Remplace l'exécutable : l'ancien est renommé en .old (Windows permet de renommer un exécutable en
-    cours d'exécution, pas de l'écraser), le nouveau prend sa place. En cas d'échec, l'ancien est remis."""
+    cours d'exécution, pas de l'écraser), le nouveau prend sa place (sous le nom `final` si donné, sinon
+    celui de l'ancien). En cas d'échec, l'ancien est remis."""
     exe, new_file = Path(exe or sys.executable), Path(new_file)
+    final = Path(final) if final else exe
     old = exe.with_name(exe.name + OLD_SUFFIX)
     try:
         old.unlink(missing_ok=True)
         os.replace(exe, old)
     except OSError as e:
         log.warning("Remplacement impossible : %s", e)
-        raise UpdateError("app_err_install")
+        raise UpdateError("app_err_install") from e
     try:
-        os.replace(new_file, exe)
+        os.replace(new_file, final)
     except OSError as e:
         log.warning("Remplacement impossible : %s", e)
         try:
             os.replace(old, exe)
         except OSError:
             log.error("L'ancien exécutable n'a pas pu être remis en place (%s)", old)
-        raise UpdateError("app_err_install")
+        raise UpdateError("app_err_install") from e
     return old
 
 
@@ -1220,7 +1233,7 @@ def cleanup_old_executable(exe=None, tries=30, delay=1.0):
     mettre quelques secondes à se fermer). Renvoie True si rien ne reste."""
     exe = Path(exe or sys.executable)
     old = exe.with_name(exe.name + OLD_SUFFIX)
-    for i in range(tries):
+    for _i in range(tries):
         if not old.exists():
             return True
         try:
@@ -1235,7 +1248,8 @@ def cleanup_update_leftovers(exe=None):
     """Au démarrage : ancien exécutable d'une mise à jour, et téléchargements interrompus."""
     exe = Path(exe or sys.executable)
     cleanup_old_executable(exe)
-    for f in exe.parent.glob("StreamlinkLauncher-*.exe.download"):
+    for f in [*exe.parent.glob("StreamlinkLauncher-*.exe.download"),
+              *exe.parent.glob("StreamlinkLauncher-*.exe" + OLD_SUFFIX)]:  # .old d'avant un renommage
         try:
             f.unlink()
         except OSError:
@@ -1300,7 +1314,7 @@ def _offline():
 
 def twitch_live(logins, timeout=8):
     """Une seule requête pour toutes les chaînes Twitch : {login: info}."""
-    logins = sorted({l.lower() for l in logins if TWITCH_LOGIN_RE.match(l or "")})
+    logins = sorted({n.lower() for n in logins if TWITCH_LOGIN_RE.match(n or "")})
     result = {}
     query = ("query($logins:[String!]){users(logins:$logins){login stream{title viewersCount "
              "previewImageURL(width:%d,height:%d) game{displayName}}}}" % PREVIEW_SIZE)

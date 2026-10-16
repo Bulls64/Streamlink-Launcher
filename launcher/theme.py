@@ -1,6 +1,9 @@
 """Couleurs, polices et réglages de fenêtre propres à Windows (tous facultatifs ailleurs)."""
+import logging
 import os
 import tkinter.font as tkfont
+
+log = logging.getLogger("streamlink_launcher")
 
 
 # ---------------------
@@ -204,7 +207,7 @@ def enable_dpi_awareness():
         try:
             ctypes.windll.user32.SetProcessDPIAware()
         except Exception:
-            pass
+            log.debug("erreur ignorée", exc_info=True)
 
 
 def set_app_id(app_id="Chris.StreamlinkLauncher"):
@@ -214,7 +217,7 @@ def set_app_id(app_id="Chris.StreamlinkLauncher"):
         import ctypes
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(app_id)
     except Exception:
-        pass
+        log.debug("erreur ignorée", exc_info=True)
 
 
 def _colorref(h):
@@ -245,4 +248,4 @@ def apply_window_chrome(win, dark, border=None, caption=None, text=None):
         if text:
             set_attr(36, _colorref(text))
     except Exception:
-        pass
+        log.debug("erreur ignorée", exc_info=True)
