@@ -109,7 +109,7 @@ jobs:
       - name: Smoke test (starts the AppImage under Xvfb)
         run: |
           APP="dist/StreamlinkLauncher-$VERSION-x86_64.AppImage"
-          export APPIMAGE_EXTRACT_AND_RUN=1 HOME="$RUNNER_TEMP/home"
+          export APPIMAGE_EXTRACT_AND_RUN=1 HOME="$RUNNER_TEMP/home" XDG_CONFIG_HOME="$RUNNER_TEMP/home/.config"
           mkdir -p "$HOME"
           # La fenêtre doit tenir 8 s sans erreur ; timeout l'arrête ensuite (code 124 = attendu)
           set +e
@@ -117,9 +117,10 @@ jobs:
           code=$?
           set -e
           cat run.log
-          [ "$code" = "124" ] || { echo "::error::The AppImage exited early (code $code)"; exit 1; }
-          test -f "$HOME/.config/streamlink-launcher/platforms.json"
-          ! grep -q "Traceback" run.log
+          fail() { echo "::error::$1"; sed 's/^/::error::  /' run.log | head -40; exit 1; }
+          [ "$code" = "124" ] || fail "The AppImage exited early (code $code)"
+          ! grep -q "Traceback" run.log || fail "Python traceback at start-up"
+          [ -f "$XDG_CONFIG_HOME/streamlink-launcher/platforms.json" ] || fail "No data written to $XDG_CONFIG_HOME/streamlink-launcher"
       - name: Check the glibc requirement
         run: |
           mkdir x && cd x && "../dist/StreamlinkLauncher-$VERSION-x86_64.AppImage" --appimage-extract >/dev/null
