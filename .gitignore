@@ -20,3 +20,5 @@ dist/
 CHANGELOG.pdf
 packaging/appimage/.cache/
 dist/
+chat.json
+cache/

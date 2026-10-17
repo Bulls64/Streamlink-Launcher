@@ -91,7 +91,7 @@ for so in "$PY"/lib/libtcl9.0.so "$PY"/lib/libtcl9tk9.0.so "$PY"/lib/libXft.so.2
 done
 
 APP="$APPDIR/usr/share/streamlink-launcher"
-cp -r "$ROOT/slink_launcher.py" "$ROOT/launcher" "$ROOT/lang" "$ROOT/platforms.json" "$ROOT/LICENSE" "$APP/"
+cp -r "$ROOT/slink_launcher.py" "$ROOT/slink_chat.py" "$ROOT/launcher" "$ROOT/chat" "$ROOT/lang" "$ROOT/platforms.json" "$ROOT/LICENSE" "$APP/"
 find "$APP" -name "__pycache__" -type d -prune -exec rm -rf {} +
 # Pré-compilation (démarrage plus rapide ; le dossier de l'AppImage est en lecture seule)
 "$PY/bin/python3" -E -s -m compileall -q -j 0 "$STDLIB" "$APP" >/dev/null

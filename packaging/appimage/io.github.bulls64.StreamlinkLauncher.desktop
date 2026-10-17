@@ -11,3 +11,9 @@ Terminal=false
 Categories=AudioVideo;Video;
 Keywords=streamlink;twitch;kick;youtube;stream;
 StartupWMClass=StreamlinkLauncher
+Actions=Chat;
+
+[Desktop Action Chat]
+Name=Streamlink Chat
+Name[fr]=Streamlink Chat
+Exec=streamlink-launcher --chat

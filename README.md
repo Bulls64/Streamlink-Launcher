@@ -27,6 +27,7 @@ Pure Python + Tkinter, **no third-party dependency**. From source, it starts in 
 - **Notification area**: closing the window keeps it running in the tray, with streams and live checks still active. It can optionally start with Windows.
 - **Log drawer**: Streamlink output, running streams and a *Stop* button for each.
 - **Updates**: Streamlink update check, and the launcher itself can update from its GitHub releases (Settings → About): download, SHA-256 and signature checks, automatic restart. An optional setting installs updates by itself at start-up.
+- **Streamlink Chat**: the Twitch, Kick and Steam TV chats in a separate window with the same look, Chatterino-style: tabs, badges, emotes (Twitch, BetterTTV, FrankerFaceZ, 7TV), mentions, links. Open it with the chat button at the top or by right-clicking a favorite (see [Streamlink Chat](#streamlink-chat)).
 - **Backup**: export your settings and favorites to a single file and import them on another computer (Settings → Backup).
 - **Interface**: light, dark or automatic theme (follows Windows), in English, French, Spanish, German and Italian.
 
@@ -87,6 +88,20 @@ Use `python` instead of `pythonw` if you want to see a console. The `--tray` arg
 | Favorite options | Right-click a favorite card |
 | Quit | Right-click the tray icon, then **Quit** |
 
+### Streamlink Chat
+
+![Streamlink Chat](docs/chat.png)
+
+A chat window in the same style as the launcher, for **Twitch, Kick and Steam TV**. Open it with the chat button at the top of the launcher (it opens the chat of the channel you typed), with *Open chat* when right-clicking a favorite, or directly: `pythonw slink_launcher.py --chat` (or `slink_chat.py`, or the `.exe` / AppImage with `--chat`). Arguments such as `--open twitch:channel` or a channel link open those chats.
+
+- **Reading needs no account**: type a channel name (the platform list on the right is used for plain names) or paste a link, then press <kbd>Enter</kbd>. Each chat gets a tab; the tabs come back at the next start.
+- **Display**: badges, username colors adjusted to stay readable, emotes as images (Twitch, plus BetterTTV, FrankerFaceZ and 7TV, animated GIFs included), clickable links, messages that mention you (or words you choose) highlighted, deleted messages struck out. Scrolling up pauses the chat; *New messages* takes you back down.
+- **Writing** needs an account, through an application of your own (free, a few minutes): *Settings › Accounts*. **Twitch**: create an application on [dev.twitch.tv](https://dev.twitch.tv/console/apps/create) (*Public* client, redirect URL `http://localhost`), paste its Client ID, then confirm the code shown on twitch.tv. **Kick**: create an application in Kick's developer settings with the redirect URL `http://localhost:48125/callback`, then paste its Client ID and Client Secret. **Steam TV** chats are read-only.
+- **Keyboard**: <kbd>Enter</kbd> sends, <kbd>↑</kbd> recalls your last messages, <kbd>Tab</kbd> completes usernames and emotes, <kbd>Ctrl</kbd>+<kbd>Tab</kbd> switches chat, <kbd>Ctrl</kbd>+<kbd>W</kbd> closes it, <kbd>Ctrl</kbd>+<kbd>T</kbd> adds one. Right-click a username or a message for more.
+- The ▶ button starts the stream with Streamlink, with the launcher's player and quality settings.
+
+**Kick is experimental.** On 13 October 2026, Kick moved its chat to a new, undocumented real-time system (Centrifugo, negotiated through `web.kick.com`). Streamlink Chat follows what is known of it, and Kick's anti-bot protection can block some requests: if a Kick chat stays in error, please [open an issue](https://github.com/Bulls64/Streamlink-Launcher/issues). **Steam TV** uses Steam's internal web API, which is not documented either.
+
 ### Configuration and data
 
 All files are stored next to `slink_launcher.py` or the `.exe`. If that folder is read-only (for example `C:\Program Files`), they go to `%APPDATA%\Streamlink Launcher` instead (`~/.config/streamlink-launcher` on Linux, always for the AppImage). *Settings › About* shows where they are.
@@ -98,6 +113,7 @@ All files are stored next to `slink_launcher.py` or the `.exe`. If that folder i
 | `streams/favorites.json`, `streams/history.json` | Your favorites and history (last 200 launches) |
 | `lang/*.json` (`fr`, `en`, `es`, `de`, `it`) | Interface texts. Add a file to add a language |
 | `launcher.log` | Error log, useful when reporting a problem |
+| `chat.json`, `cache/emotes/` | Streamlink Chat: open chats, settings, accounts (tokens encrypted with Windows DPAPI on Windows), emote images |
 | `*.bak` | Previous version of each file, used to recover from a damaged file |
 
 Example `platforms.json` entry:
@@ -141,15 +157,6 @@ bash packaging/appimage/build_appimage.sh        # -> dist/StreamlinkLauncher-<v
 
 The script downloads a standalone Python ([python-build-standalone](https://github.com/astral-sh/python-build-standalone)) and [appimagetool](https://github.com/AppImage/appimagetool), both pinned with their SHA-256, and recompiles Tcl/Tk with Xft (the bundled one only has the basic X11 fonts: no smoothing, no system fonts). The CI builds it on Ubuntu 22.04 for every pull request and attaches it to every release.
 
-### Créer l'AppImage (Linux)
-
-```sh
-sudo apt install build-essential libx11-dev libxft-dev libxss-dev libfontconfig-dev patchelf
-bash packaging/appimage/build_appimage.sh        # -> dist/StreamlinkLauncher-<version>-x86_64.AppImage
-```
-
-Le script télécharge un Python autonome ([python-build-standalone](https://github.com/astral-sh/python-build-standalone)) et [appimagetool](https://github.com/AppImage/appimagetool), tous deux figés avec leur SHA-256, et recompile Tcl/Tk avec Xft (celui fourni n'a que les polices X11 de base : texte non lissé, sans les polices du système). La CI la construit sous Ubuntu 22.04 à chaque pull request et la joint à chaque release.
-
 ### Tests
 
 ```bat
@@ -172,6 +179,7 @@ launcher/
   windrop.py           Drag and drop of links onto the window (OLE, ctypes)
   wintray.py           Tray icon, global shortcut, single instance, start with Windows (ctypes)
   winnotify.py         Windows notifications, taskbar flashing
+chat/                  Streamlink Chat: window (app.py), Twitch / Kick / Steam connections, WebSocket client, emotes, logins
 lang/                  Translations
 packaging/             Executable build script, version information, winget manifests, AppImage (appimage/)
 .signpath/             Code-signing configuration (dormant, see Code signing)
@@ -184,6 +192,7 @@ tests/                 Unit tests (standard library only) and GUI smoke test
 The launcher only connects to the Internet for:
 - **Live checks** (can be turned off): one request to Twitch's public web endpoint for your Twitch favorites, and `streamlink --json` for Kick favorites. This Twitch endpoint is not an official API: if Twitch changes it, live status shows as unknown until an update. With *Live previews* on, the preview image of the live Twitch favorites shown on the main screen (three at most) is downloaded from Twitch's image server at each check.
 - **Update check** (can be turned off): one request to [PyPI](https://pypi.org/project/streamlink/) to read the latest Streamlink version, and one to `api.github.com` (`/repos/Bulls64/Streamlink-Launcher/releases/latest`) to read the latest launcher release. The launcher's own file is downloaded from `github.com` only when you click *Update*.
+- **Streamlink Chat** (only when you open it): the chats themselves (Twitch IRC at `irc-ws.chat.twitch.tv`, Kick at `kick.com` / `web.kick.com` and its real-time server, Steam at `steamcommunity.com`), emote lists and images from Twitch, BetterTTV, FrankerFaceZ and 7TV (can be turned off), and, for writing, the official Twitch and Kick login and chat APIs. Nothing else is sent.
 
 The clipboard is only read, on this computer, to look for a stream link (you can turn this off in the settings); its content is never stored or sent.
 
@@ -253,6 +262,7 @@ Python et Tkinter uniquement, **sans aucune dépendance externe**. Depuis les so
 - **Zone de notification** : fermer la fenêtre laisse le lanceur actif à côté de l'horloge, avec les streams et la surveillance des lives. Il peut aussi démarrer avec Windows (option).
 - **Tiroir du journal** : sortie de Streamlink, streams en cours et un bouton *Arrêter* pour chacun.
 - **Mises à jour** : vérification des mises à jour de Streamlink, et le lanceur peut se mettre à jour lui-même depuis ses releases GitHub (Paramètres → À propos) : téléchargement, contrôle du SHA-256 et de la signature, redémarrage automatique. Un réglage facultatif les installe tout seul au démarrage.
+- **Streamlink Chat** : les chats Twitch, Kick et Steam TV dans une fenêtre à part, avec le même style, à la manière de Chatterino : onglets, badges, emotes (Twitch, BetterTTV, FrankerFaceZ, 7TV), mentions, liens. Il s'ouvre avec le bouton de chat en haut ou par un clic droit sur un favori (voir [Streamlink Chat](#streamlink-chat-1)).
 - **Sauvegarde** : exporte tes réglages et tes favoris dans un seul fichier et importe-le sur un autre ordinateur (Paramètres → Sauvegarde).
 - **Interface** : thème clair, sombre ou automatique (suit Windows), en français, anglais, espagnol, allemand et italien.
 
@@ -313,6 +323,20 @@ Utilise `python` au lieu de `pythonw` si tu veux voir une console. L'argument `-
 | Options d'un favori | Clic droit sur sa carte |
 | Quitter | Clic droit sur l'icône de notification, puis **Quitter** |
 
+### Streamlink Chat
+
+![Streamlink Chat](docs/fr/chat.png)
+
+Une fenêtre de chat dans le style du lanceur, pour **Twitch, Kick et Steam TV**. Elle s'ouvre avec le bouton de chat en haut du lanceur (avec le chat de la chaîne saisie), par *Ouvrir le chat* dans le clic droit d'un favori, ou directement : `pythonw slink_launcher.py --chat` (ou `slink_chat.py`, ou le `.exe` / l'AppImage avec `--chat`). Des arguments comme `--open twitch:chaîne` ou un lien de chaîne ouvrent ces chats.
+
+- **La lecture se passe de compte** : tape un nom de chaîne (la plateforme choisie à droite sert pour les noms seuls) ou colle un lien, puis <kbd>Entrée</kbd>. Chaque chat a son onglet ; les onglets reviennent au démarrage suivant.
+- **Affichage** : badges, couleurs des pseudos ajustées pour rester lisibles, emotes en images (Twitch, plus BetterTTV, FrankerFaceZ et 7TV, GIF animés compris), liens cliquables, messages qui te citent (ou contiennent les mots de ton choix) surlignés, messages supprimés barrés. Remonter dans le chat met le défilement en pause ; *Nouveaux messages* ramène en bas.
+- **Écrire** demande un compte, via une application à ton nom (gratuit, quelques minutes) : *Paramètres › Comptes*. **Twitch** : crée une application sur [dev.twitch.tv](https://dev.twitch.tv/console/apps/create) (client *Public*, URL de redirection `http://localhost`), colle son Client ID, puis valide le code affiché sur twitch.tv. **Kick** : crée une application dans les paramètres développeur de Kick avec l'URL de redirection `http://localhost:48125/callback`, puis colle son Client ID et son Client Secret. Les chats **Steam TV** sont en lecture seule.
+- **Clavier** : <kbd>Entrée</kbd> envoie, <kbd>↑</kbd> rappelle tes derniers messages, <kbd>Tab</kbd> complète pseudos et emotes, <kbd>Ctrl</kbd>+<kbd>Tab</kbd> change de chat, <kbd>Ctrl</kbd>+<kbd>W</kbd> le ferme, <kbd>Ctrl</kbd>+<kbd>T</kbd> en ajoute un. Clic droit sur un pseudo ou un message pour plus d'options.
+- Le bouton ▶ lance le stream avec Streamlink, avec le lecteur et la qualité réglés dans le lanceur.
+
+**Kick est expérimental.** Le 13 octobre 2026, Kick a basculé son chat sur un nouveau système temps réel non documenté (Centrifugo, négocié via `web.kick.com`). Streamlink Chat suit ce qu'on en sait, et la protection anti-robots de Kick peut bloquer certaines requêtes : si un chat Kick reste en erreur, [ouvre un ticket](https://github.com/Bulls64/Streamlink-Launcher/issues). **Steam TV** passe par l'API web interne de Steam, elle non plus pas documentée.
+
 ### Configuration et données
 
 Tous les fichiers sont rangés à côté de `slink_launcher.py` ou du `.exe`. Si ce dossier est protégé en écriture (par exemple `C:\Program Files`), ils vont dans `%APPDATA%\Streamlink Launcher` (`~/.config/streamlink-launcher` sous Linux, toujours pour l'AppImage). *Paramètres › À propos* indique où ils se trouvent.
@@ -324,6 +348,7 @@ Tous les fichiers sont rangés à côté de `slink_launcher.py` ou du `.exe`. Si
 | `streams/favorites.json`, `streams/history.json` | Tes favoris et ton historique (200 derniers lancements) |
 | `lang/*.json` (`fr`, `en`, `es`, `de`, `it`) | Textes de l'interface. Ajoute un fichier pour ajouter une langue |
 | `launcher.log` | Journal des erreurs, utile pour signaler un problème |
+| `chat.json`, `cache/emotes/` | Streamlink Chat : chats ouverts, réglages, comptes (jetons chiffrés par DPAPI sous Windows), images des emotes |
 | `*.bak` | Version précédente de chaque fichier, utilisée pour récupérer un fichier endommagé |
 
 Les champs de `platforms.json` sont décrits dans la partie anglaise ci-dessus (exemple d'entrée Twitch). `input` accepte `channel`, `youtube`, `video`, `none` (rien à saisir) ou `url` (n'importe quel lien). `live_check` accepte `twitch`, `streamlink` ou `none`.
@@ -339,6 +364,15 @@ packaging\build_exe.bat
 Le script installe [PyInstaller](https://pyinstaller.org/) (version figée dans `packaging/requirements-build.txt`) et produit `dist\Streamlink Launcher.exe` : un seul fichier, sans console, avec l'icône et les informations de version intégrées.
 
 Sur GitHub Actions, chaque pull request compile l'exécutable, et pousser un tag `v*` (par exemple `v1.4.2`) le compile et le publie (la signature est facultative, voir [Signature du code](#signature-du-code)) avec son `SHA256SUMS.txt`. La CI recompile le chargeur de PyInstaller depuis ses sources (`BUILD_BOOTLOADER=1`) : le chargeur précompilé est partagé par d'innombrables programmes, malveillants compris, et c'est la première cause de faux positifs antivirus.
+
+### Créer l'AppImage (Linux)
+
+```sh
+sudo apt install build-essential libx11-dev libxft-dev libxss-dev libfontconfig-dev patchelf
+bash packaging/appimage/build_appimage.sh        # -> dist/StreamlinkLauncher-<version>-x86_64.AppImage
+```
+
+Le script télécharge un Python autonome ([python-build-standalone](https://github.com/astral-sh/python-build-standalone)) et [appimagetool](https://github.com/AppImage/appimagetool), tous deux figés avec leur SHA-256, et recompile Tcl/Tk avec Xft (celui fourni n'a que les polices X11 de base : texte non lissé, sans les polices du système). La CI la construit sous Ubuntu 22.04 à chaque pull request et la joint à chaque release.
 
 ### Tests
 
@@ -362,6 +396,7 @@ launcher/
   windrop.py           Glisser-déposer de liens sur la fenêtre (OLE, ctypes)
   wintray.py           Icône de notification, raccourci global, instance unique, démarrage avec Windows (ctypes)
   winnotify.py         Notifications Windows, clignotement de la barre des tâches
+chat/                  Streamlink Chat : fenêtre (app.py), connexions Twitch / Kick / Steam, client WebSocket, emotes, connexions aux comptes
 lang/                  Traductions
 packaging/             Script de création de l'exécutable, informations de version, manifestes winget, AppImage (appimage/)
 .signpath/             Configuration de signature du code (en sommeil, voir Signature du code)
@@ -374,6 +409,7 @@ tests/                 Tests unitaires (bibliothèque standard uniquement) et te
 Le lanceur ne se connecte à Internet que pour :
 - **Le statut en direct** (désactivable) : une requête vers l'accès web public de Twitch pour tes favoris Twitch, et `streamlink --json` pour tes favoris Kick. Cet accès Twitch n'est pas une API officielle : si Twitch le modifie, le statut reste inconnu jusqu'à une mise à jour. Avec *Aperçu des lives* activé, l'image d'aperçu des favoris Twitch en direct affichés sur l'écran principal (trois au plus) est téléchargée depuis le serveur d'images de Twitch à chaque vérification.
 - **La vérification des mises à jour** (désactivable) : une requête vers [PyPI](https://pypi.org/project/streamlink/) pour lire la dernière version de Streamlink, et une vers `api.github.com` (`/repos/Bulls64/Streamlink-Launcher/releases/latest`) pour lire la dernière version du lanceur. Le fichier du lanceur n'est téléchargé depuis `github.com` que si tu cliques sur *Mettre à jour*.
+- **Streamlink Chat** (seulement s'il est ouvert) : les chats eux-mêmes (IRC Twitch sur `irc-ws.chat.twitch.tv`, Kick via `kick.com` / `web.kick.com` et son serveur temps réel, Steam via `steamcommunity.com`), les listes et images d'emotes de Twitch, BetterTTV, FrankerFaceZ et 7TV (désactivables), et, pour écrire, les API officielles de connexion et de chat de Twitch et Kick. Rien d'autre n'est envoyé.
 
 Le presse-papiers n'est lu que sur ton ordinateur, pour y chercher un lien de stream (désactivable dans les Paramètres) : son contenu n'est ni enregistré ni envoyé.
 

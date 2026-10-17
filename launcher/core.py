@@ -1289,6 +1289,35 @@ def relaunch(exe=None, old_version=None, extra_args=()):
         return False
 
 
+CHAT_PLATFORMS = ("twitch", "kick", "steamtv")
+
+
+def chat_command(targets=()):
+    """Commande qui ouvre Streamlink Chat (même exécutable, option --chat), avec les chats donnés."""
+    args = ["--chat"]
+    for platform, channel in targets:
+        args += ["--open", f"{platform}:{channel}"]
+    if FROZEN:
+        return [sys.executable, *args]
+    exe = sys.executable
+    if os.name == "nt":
+        pythonw = os.path.join(os.path.dirname(exe), "pythonw.exe")
+        exe = pythonw if os.path.isfile(pythonw) else exe
+    return [exe, str(BASE_DIR / "slink_launcher.py"), *args]
+
+
+def open_chat(targets=()):
+    flags = getattr(subprocess, "DETACHED_PROCESS", 0) | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
+    try:
+        subprocess.Popen(chat_command(targets), cwd=str(BASE_DIR), close_fds=True, creationflags=flags,
+                         stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                         env=dict(os.environ, PYINSTALLER_RESET_ENVIRONMENT="1"))
+        return True
+    except OSError as e:
+        log.error("Ouverture des chats impossible : %s", e)
+        return False
+
+
 def arg_value(name, argv=None):
     """Valeur qui suit l'option `name` sur la ligne de commande, ou None."""
     argv = sys.argv if argv is None else argv

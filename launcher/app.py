@@ -248,6 +248,7 @@ class App(tk.Tk):
         self.settings_btn = IconButton(head, self, "settings", command=self.open_settings)
         self.settings_btn.pack(side="right")
         IconButton(head, self, "history", command=self.open_history).pack(side="right", padx=(0, px(4)))
+        IconButton(head, self, "chat", command=self.open_chats).pack(side="right", padx=(0, px(4)))
 
         row = tk.Frame(content, bg=c.bg)
         row.pack(fill="x")
@@ -591,12 +592,30 @@ class App(tk.Tk):
         p = self.platform_by_id("twitch") or self.platforms[0]
         return self.launch_platform(p, fav.get("channel", ""))
 
+    def open_chats(self):
+        """Streamlink Chat, avec le chat de la chaîne en cours si c'est une chaîne Twitch, Kick ou Steam TV."""
+        targets = []
+        kind, value = self.target
+        if kind == "platform" and value in core.CHAT_PLATFORMS:
+            p = self.platform_by_id(value)
+            try:
+                _, channel = core.resolve_target(p, self.query.get())
+                if channel and p["input"] == "channel":
+                    targets.append((value, channel.lower()))
+            except core.InputError:
+                pass
+        if not core.open_chat(targets):
+            self.toast(self.t("toast_launch_failed"), "error")
+
     def favorite_menu(self, event, fav):
         c, t = self.c, self.t
         menu = tk.Menu(self, tearoff=0, bg=c.popover, fg=c.text, activebackground=c.popover_hover,
                        activeforeground=c.text, bd=0, font=self.fonts.small)
         menu.add_command(label=t("menu_launch"), command=lambda: self.launch_favorite(fav))
         menu.add_command(label=t("menu_fill"), command=lambda: self.fill_from_entry(fav))
+        if fav.get("platform") in core.CHAT_PLATFORMS and fav.get("channel"):
+            menu.add_command(label=t("menu_open_chat"),
+                             command=lambda: core.open_chat([(fav["platform"], fav["channel"].lower())]))
         menu.add_separator()
         menu.add_command(label=t("menu_remove_favorite"), command=lambda: self.remove_favorite(fav))
         try:

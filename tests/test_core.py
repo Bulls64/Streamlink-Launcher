@@ -102,7 +102,7 @@ class TestTranslations(unittest.TestCase):
                                  f"{lang}.json : {key}")
 
     def test_no_unused_translation(self):
-        code = "".join(f.read_text(encoding="utf-8") for f in (ROOT / "launcher").glob("*.py"))
+        code = "".join(f.read_text(encoding="utf-8") for d in ("launcher", "chat") for f in (ROOT / d).glob("*.py"))
         code += (ROOT / "platforms.json").read_text(encoding="utf-8")
         dynamic = ("ph_", "player_")  # clés construites : t("ph_" + type), t("player_" + lecteur)
         keys = json.loads((ROOT / "lang" / "fr.json").read_text(encoding="utf-8"))

@@ -168,7 +168,7 @@ GLYPHS = {
     "history": "", "chevron_down": "", "chevron_up": "", "more": "",
     "add": "", "stop": "", "close": "", "star": "", "star_fill": "",
     "check": "", "folder": "", "delete": "", "warning": "", "link": "",
-    "arrow_up": "\ue74a", "sync": "\ue895",
+    "arrow_up": "\ue74a", "sync": "\ue895", "send": "\ue724", "chat": "\ue8bd", "arrow_down": "\ue74b",
 }
 
 
@@ -245,6 +245,15 @@ def _draw_fallback(cv, name, x, y, s, color, tags):
         cv.create_polygon(x, y - s * 0.4, x + s * 0.42, y + s * 0.35, x - s * 0.42, y + s * 0.35, fill="",
                           outline=color, width=w, tags=tags)
         cv.create_line(x, y - s * 0.1, x, y + s * 0.1, **line)
+    elif name == "send":
+        cv.create_polygon(x - s * 0.38, y - s * 0.34, x + s * 0.4, y, x - s * 0.38, y + s * 0.34, x - s * 0.22, y,
+                          fill="", outline=color, width=w, joinstyle="round", tags=tags)
+    elif name == "chat":
+        cv.create_rectangle(x - s * 0.38, y - s * 0.3, x + s * 0.38, y + s * 0.18, outline=color, width=w, tags=tags)
+        cv.create_line(x - s * 0.2, y + s * 0.18, x - s * 0.28, y + s * 0.38, x + s * 0.02, y + s * 0.18, **line)
+    elif name == "arrow_down":
+        cv.create_line(x, y - s * 0.36, x, y + s * 0.32, **line)
+        cv.create_line(x - s * 0.28, y + s * 0.06, x, y + s * 0.36, x + s * 0.28, y + s * 0.06, **line)
     elif name == "arrow_up":
         cv.create_line(x, y + s * 0.36, x, y - s * 0.32, **line)
         cv.create_line(x - s * 0.28, y - s * 0.06, x, y - s * 0.36, x + s * 0.28, y - s * 0.06, **line)

@@ -11,6 +11,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+- **Streamlink Chat**, a companion window for the Twitch, Kick and Steam TV chats, in the launcher's style and in the spirit of Chatterino: one tab per chat (restored at start-up), badges, readable username colors, emotes as images (Twitch, BetterTTV, FrankerFaceZ, 7TV; animated GIFs), clickable links, mentions and chosen words highlighted, deleted messages struck out, scroll pause with a *New messages* button, username and emote completion with <kbd>Tab</kbd>, user and message menus, ▶ to watch the stream with the launcher's settings. Reading needs no account; writing uses your own Twitch application (device-code login) or Kick application (OAuth with PKCE). Tokens are encrypted with DPAPI on Windows. Steam TV chats are read-only.
+- Kick support follows Kick's new real-time chat (Centrifugo, since 13 October 2026), with the old Pusher connection as a fallback; it is **experimental** because the protocol is undocumented.
+- Opens from the launcher (chat button at the top, *Open chat* on a favorite), with `--chat` on the `.exe`, the AppImage or `slink_launcher.py`, or with `slink_chat.py`. A second start sends its chats to the open window.
+- Tests for the chat protocols against local fake Twitch, Kick and Steam servers.
+
+### Fixed
+- README: the French *Créer l'AppImage* section was in the English part.
+
 ### Planned
 - Viewing statistics (time per channel, peak hours).
 
@@ -233,6 +242,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## Français
 
 ## [Non publié]
+
+### Ajouté
+- **Streamlink Chat**, une fenêtre annexe pour les chats Twitch, Kick et Steam TV, dans le style du lanceur et dans l'esprit de Chatterino : un onglet par chat (rouverts au démarrage), badges, couleurs de pseudo lisibles, emotes en images (Twitch, BetterTTV, FrankerFaceZ, 7TV ; GIF animés), liens cliquables, mentions et mots choisis surlignés, messages supprimés barrés, défilement en pause avec un bouton *Nouveaux messages*, complétion des pseudos et emotes avec <kbd>Tab</kbd>, menus sur les pseudos et les messages, ▶ pour regarder le stream avec les réglages du lanceur. La lecture se passe de compte ; l'écriture passe par ta propre application Twitch (connexion par code) ou Kick (OAuth avec PKCE). Les jetons sont chiffrés par DPAPI sous Windows. Les chats Steam TV sont en lecture seule.
+- Kick suit le nouveau chat temps réel de Kick (Centrifugo, depuis le 13 octobre 2026), avec l'ancienne connexion Pusher en secours ; il est **expérimental** car le protocole n'est pas documenté.
+- S'ouvre depuis le lanceur (bouton de chat en haut, *Ouvrir le chat* sur un favori), avec `--chat` sur l'`.exe`, l'AppImage ou `slink_launcher.py`, ou avec `slink_chat.py`. Une seconde ouverture envoie ses chats à la fenêtre déjà ouverte.
+- Tests des protocoles de chat contre de faux serveurs Twitch, Kick et Steam locaux.
+
+### Corrigé
+- README : la section française *Créer l'AppImage* se trouvait dans la partie anglaise.
 
 ### Prévu
 - Statistiques de visionnage (temps par chaîne, heures de pointe).
