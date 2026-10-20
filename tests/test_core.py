@@ -2,6 +2,11 @@
 
 Lancer depuis la racine du dépôt :  python -m unittest discover -s tests -v
 Aucune dépendance : bibliothèque standard uniquement, pas besoin d'écran ni de Streamlink.
+
+Tests of the logic without interface (launcher/core.py).
+
+Run from the root of the repository:  python -m unittest discover -s tests -v
+No dependency: standard library only, no need for a screen or Streamlink.
 """
 import json
 import os
@@ -18,7 +23,9 @@ from launcher import __version__, core  # noqa: E402
 
 
 class TempData(unittest.TestCase):
-    """Redirige tous les fichiers de données vers un dossier temporaire."""
+    """Redirige tous les fichiers de données vers un dossier temporaire.
+
+    Redirects all the data files to a temporary folder."""
 
     def setUp(self):
         self.tmp = Path(tempfile.mkdtemp())
@@ -59,6 +66,7 @@ class TestPlatformsFile(TempData):
         saved = json.loads(target.read_text(encoding="utf-8"))
         bundled = json.loads((ROOT / "platforms.json").read_text(encoding="utf-8"))
         self.assertEqual(saved, bundled)  # avec son aide (_aide) et live_check
+                                          # with its help (_aide) and live_check
         self.assertEqual([p["id"] for p in platforms], [p["id"] for p in bundled["platforms"]])
 
     def test_missing_file_without_bundled_copy_uses_defaults(self):
@@ -105,6 +113,7 @@ class TestTranslations(unittest.TestCase):
         code = "".join(f.read_text(encoding="utf-8") for f in (ROOT / "launcher").glob("*.py"))
         code += (ROOT / "platforms.json").read_text(encoding="utf-8")
         dynamic = ("ph_", "player_")  # clés construites : t("ph_" + type), t("player_" + lecteur)
+                                      # built keys: t("ph_" + type), t("player_" + player)
         keys = json.loads((ROOT / "lang" / "fr.json").read_text(encoding="utf-8"))
         unused = [k for k in keys if not k.startswith("_") and not k.startswith(dynamic)
                   and f'"{k}"' not in code and f"'{k}'" not in code]
@@ -124,6 +133,7 @@ class TestTranslations(unittest.TestCase):
         self.assertEqual(t.format_date("2026-10-11 23:59:59", now), "Hier, 23:59")
         self.assertEqual(t.format_date("2025-10-20 22:35:26", now), "20 oct. 2025")
         for odd in ("pas une date", "", None, ["liste"]):  # valeurs abîmées : rendues telles quelles
+                                                           # damaged values: returned as they are
             self.assertEqual(t.format_date(odd, now), odd or "")
 
     def test_placeholder_named_key_is_allowed(self):
@@ -175,6 +185,7 @@ class TestSaveLoad(TempData):
         core.save_json(path, {"favorites": [1, 2]})
         core.save_json(path, {"favorites": [1, 2, 3]})
         path.write_text(path.read_text(encoding="utf-8")[:12], encoding="utf-8")  # coupure en pleine écriture
+                                                                                  # power cut in the middle of a write
         self.assertEqual(core.load_json(path, {}, recover=True), {"favorites": [1, 2]})
         self.assertEqual(core.DATA_ISSUES[0][0], "data_restored")
         self.assertEqual(len(list(self.tmp.glob("fav.json.*.corrupt"))), 1)
@@ -208,10 +219,13 @@ class TestSaveLoad(TempData):
         core.FAV_FILE.write_text(core.FAV_FILE.read_text(encoding="utf-8")[:30], encoding="utf-8")
         again = core.Store()
         self.assertEqual([f["channel"] for f in again.favorites], ["a"])  # dernière version saine (.bak)
+                                                                          # last healthy version (.bak)
 
 
 class TestLinks(unittest.TestCase):
-    """Presse-papiers intelligent et glisser-déposer : reconnaissance des liens."""
+    """Presse-papiers intelligent et glisser-déposer : reconnaissance des liens.
+
+    Smart clipboard and drag and drop: link recognition."""
 
     def setUp(self):
         self.platforms = core.DEFAULT_PLATFORMS
@@ -428,7 +442,9 @@ class TestThumb(unittest.TestCase):
         self.assertEqual(alpha(w // 2, h // 2), 255)
         self.assertEqual(alpha(r, 0), 255)
         self.assertTrue(any(0 < alpha(x, 1) < 255 for x in range(r)))  # bord lissé
+                                                                       # smoothed edge
         self.assertEqual(rgba[0:3], b"\x10\x20\x30")  # couleurs intactes
+                                                      # colors untouched
 
     def test_cover_box_crops_without_distortion(self):
         cb = self.thumb.cover_box
@@ -439,6 +455,7 @@ class TestThumb(unittest.TestCase):
     def test_bgra_to_rgba_with_padding(self):
         buf = bytes([1, 2, 3, 4, 9, 9, 9, 9,
                      5, 6, 7, 8, 9, 9, 9, 9])  # 1 pixel par ligne, 4 octets de remplissage
+                                               # 1 pixel per row, 4 padding bytes
         self.assertEqual(bytes(self.thumb.bgra_to_rgba(buf, 1, 2, 8)), bytes([3, 2, 1, 4, 7, 6, 5, 8]))
 
     def test_render_refuses_bad_input(self):
@@ -448,12 +465,14 @@ class TestThumb(unittest.TestCase):
             self.assertIsNone(self.thumb.render(b"\xff\xd8xx", 100, 50, 8))
         with mock.patch.object(self.thumb, "decode_scaled", return_value=b"\0" * 10):
             self.assertIsNone(self.thumb.render(b"\xff\xd8xx", 100, 50, 8))  # taille incohérente
+                                                                             # inconsistent size
         with mock.patch.object(self.thumb, "decode_scaled", return_value=b"\xff" * (100 * 50 * 4)):
             self.assertTrue(self.thumb.render(b"\xff\xd8xx", 100, 50, 8).startswith(b"\x89PNG"))
 
     @unittest.skipUnless(os.name == "nt", "GDI+ : Windows uniquement")
     def test_gdiplus_decodes_a_real_jpeg(self):
         # JPEG 16x9 gris généré une fois (aucune dépendance) puis réduit en 8x4
+        # 16x9 grey JPEG generated once (no dependency), then reduced to 8x4
         import base64
         jpeg = base64.b64decode(SMALL_JPEG)
         rgba = self.thumb.decode_scaled(jpeg, 8, 4)
@@ -480,11 +499,14 @@ class TestDataFolder(unittest.TestCase):
                 mock.patch.object(core, "HISTORY_FILE", blocker / "history.json"), \
                 mock.patch.object(core, "FAV_FILE", blocker / "favorites.json"):
             store = core.Store()  # avant la 1.0.2 : exception au démarrage
+                                  # before 1.0.2: exception at start-up
             self.assertEqual(store.favorites, [])
 
 
 class TestAppUpdate(unittest.TestCase):
-    """Mise à jour du lanceur depuis les releases GitHub."""
+    """Mise à jour du lanceur depuis les releases GitHub.
+
+    Launcher update from the GitHub releases."""
     SIZE = 1_500_000
 
     def api(self, **over):
@@ -554,6 +576,7 @@ class TestAppUpdate(unittest.TestCase):
                 h.redirect_request(req, None, 302, "", {}, bad)
 
     # -- téléchargement
+    # -- download
     def release(self, payload, size=None):
         import hashlib
         return {"asset": {"name": "StreamlinkLauncher-9.9.9.exe", "url": "https://x/y",
@@ -605,6 +628,7 @@ class TestAppUpdate(unittest.TestCase):
             self.assertEqual(e.key, key)
             self.assertEqual(list(d.iterdir()), [])
         d, e = self.dl(good, release=self.release(good, size=10))             # plus gros que annoncé
+                                                                              # bigger than announced
         self.assertEqual(e.key, "app_err_hash")
         notpe = b"ZZ" + b"\0" * 1000
         d, e = self.dl(notpe)
@@ -629,6 +653,7 @@ class TestAppUpdate(unittest.TestCase):
             core.download_update({"asset": None}, tempfile.mkdtemp())
 
     # -- signature
+    # -- signature
     def test_parse_authenticode(self):
         self.assertEqual(core._parse_authenticode("Valid|CN=SignPath Foundation, O=SignPath\n"),
                          ("Valid", "CN=SignPath Foundation, O=SignPath"))
@@ -642,6 +667,7 @@ class TestAppUpdate(unittest.TestCase):
         self.assertIsNone(run(v, ("Valid", "CN=Me, O=Y")))
         self.assertEqual(run(v, ("Valid", "CN=Other")), "app_err_signature")
         self.assertEqual(run(v, ("NotSigned", None)), "app_err_signature")      # pas de retour en arrière
+                                                                                # no going back
         self.assertEqual(run(v, ("HashMismatch", "CN=Me")), "app_err_signature")
         self.assertEqual(run(v, ("error", None)), "app_err_signature")
         unsigned = ("NotSigned", None)
@@ -650,6 +676,7 @@ class TestAppUpdate(unittest.TestCase):
         self.assertIsNone(run(unsigned, ("error", None)))
         self.assertEqual(run(unsigned, ("HashMismatch", "CN=Me")), "app_err_signature")
 
+    # -- installation
     # -- installation
     def test_install_update(self):
         d = Path(tempfile.mkdtemp())
@@ -669,6 +696,7 @@ class TestAppUpdate(unittest.TestCase):
         self.assertEqual(t("C:/x/App-11.4.1.exe", "1.4.1", "1.4.2"), Path("C:/x/App-11.4.1.exe"))
         d = Path(tempfile.mkdtemp())
         (d / "StreamlinkLauncher-1.4.2.exe").write_bytes(b"x")  # déjà pris : on garde le nom actuel
+                                                                # already taken: the current name is kept
         cur = d / "StreamlinkLauncher-1.4.1.exe"
         self.assertEqual(t(cur, "1.4.1", "1.4.2"), cur)
 
@@ -732,7 +760,9 @@ class TestAppUpdate(unittest.TestCase):
         self.assertFalse(ok(r=None))
         self.assertFalse(ok(can=False))
         self.assertFalse(ok(u="1.3.0"))               # vient d'être mis à jour : pas de boucle
+                                                      # just updated: no loop
         self.assertFalse(core.DEFAULT_CONFIG["auto_update"])   # désactivé par défaut
+                                                               # disabled by default
 
     def test_platform_colors_setting(self):
         self.assertTrue(core.DEFAULT_CONFIG["platform_colors"])
@@ -756,6 +786,7 @@ class TestAppUpdate(unittest.TestCase):
 
     def test_self_update_needs_frozen_exe(self):
         self.assertFalse(core.can_self_update())          # lancé depuis les sources
+                                                          # started from the sources
 
     def test_wait_for_pid_off_windows(self):
         from launcher import wintray

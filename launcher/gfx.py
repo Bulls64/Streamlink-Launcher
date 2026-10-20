@@ -1,21 +1,30 @@
-"""Dessin : rectangles arrondis lissés (coins pré-calculés et mis en cache) et icônes."""
+"""Dessin : rectangles arrondis lissés (coins pré-calculés et mis en cache) et icônes.
+
+Drawing: smooth rounded rectangles (corners precomputed and cached) and icons."""
 import math
 import tkinter as tk
 
 from .theme import hex_to_rgb
 
 _SAMPLES = (0.125, 0.375, 0.625, 0.875)  # suréchantillonnage 4x4
+                                         # 4x4 supersampling
 
 
 def _tri_crosses(tri, i, j):
     """Un sommet du triangle tombe-t-il dans le pixel (i, j) ? (le triangle pourrait alors l'entamer
-    sans qu'aucun coin du pixel soit dedans)."""
+    sans qu'aucun coin du pixel soit dedans).
+
+    Does a vertex of the triangle fall inside pixel (i, j)? (the triangle could then cut into it
+    without any corner of the pixel being inside)."""
     return any(i <= x <= i + 1 and j <= y <= j + 1 for x, y in tri)
 
 
 class Painter:
     """Les coins sont de petites images (r x r) où la couleur du fond est déjà mélangée :
-    pas de transparence, donc rapide et identique sur toutes les versions de Tk."""
+    pas de transparence, donc rapide et identique sur toutes les versions de Tk.
+
+    The corners are small images (r x r) where the background color is already blended in:
+    no transparency, so fast and identical on every version of Tk."""
 
     def __init__(self, root):
         self.root = root
@@ -100,7 +109,9 @@ class Painter:
         cv.create_arc(x1 - 2 * r, y1 - 2 * r, x1, y1, start=270, **akw)
 
     def app_icon(self, size, color, fg="#FFFFFF"):
-        """Icône de la fenêtre : carré arrondi + triangle « lecture », lissés."""
+        """Icône de la fenêtre : carré arrondi + triangle « lecture », lissés.
+
+        Window icon: rounded square + "play" triangle, smoothed."""
         C, W = hex_to_rgb(color), hex_to_rgb(fg)
         r = size * 0.24
         tri = [(size * 0.38, size * 0.28), (size * 0.38, size * 0.72), (size * 0.76, size * 0.50)]
@@ -119,6 +130,8 @@ class Painter:
 
         # Pixel entièrement dans une forme convexe (ses 4 coins le sont) : tous ses sous-échantillons aussi,
         # inutile de les calculer un par un. Seuls les pixels des bords sont suréchantillonnés : même résultat.
+        # Pixel entirely inside a convex shape (its 4 corners are): all its subsamples are too,
+        # no need to compute them one by one. Only the edge pixels are supersampled: same result.
         def solid(i, j, inside):
             return inside(i, j) and inside(i + 1, j) and inside(i, j + 1) and inside(i + 1, j + 1)
 
@@ -155,6 +168,7 @@ class Painter:
             rows.append("{" + " ".join(row) + "}")
         img = tk.PhotoImage(master=self.root, width=size, height=size)
         img.put(" ".join(rows))  # une seule écriture au lieu d'une par pixel
+                                 # a single write instead of one per pixel
         for i, j in transparent:
             img.transparency_set(i, j, True)
         return img
@@ -162,6 +176,7 @@ class Painter:
 
 # ---------------------
 # Icônes : police Segoe Fluent Icons / MDL2 Assets (Windows), sinon dessin simple
+# Icons: Segoe Fluent Icons / MDL2 Assets font (Windows), otherwise a simple drawing
 # ---------------------
 GLYPHS = {
     "search": "", "play": "", "play_fill": "", "settings": "",

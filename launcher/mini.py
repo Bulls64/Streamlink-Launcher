@@ -1,7 +1,12 @@
 """Mode mini : barre flottante façon Spotlight, ouverte avec Ctrl+Alt+S ou depuis la zone de notification.
 
 Vide, elle propose les favoris (ceux en direct d'abord) ; Entrée lance, Tab change de plateforme,
-Échap ou un clic ailleurs la ferme. Elle est recréée à chaque ouverture (toujours au bon thème)."""
+Échap ou un clic ailleurs la ferme. Elle est recréée à chaque ouverture (toujours au bon thème).
+
+Mini mode: Spotlight-style floating bar, opened with Ctrl+Alt+S or from the notification area.
+
+When empty, it offers the favorites (live ones first); Enter starts, Tab changes the platform,
+Esc or a click elsewhere closes it. It is recreated at each opening (always with the right theme)."""
 import time
 import tkinter as tk
 
@@ -40,7 +45,9 @@ class MiniBar:
         return focus is not None and str(focus).startswith(str(self.win))
 
     def toggle(self):
-        """Raccourci : ouvre ; s'il est déjà ouvert mais sans le focus, le ramène ; sinon ferme."""
+        """Raccourci : ouvre ; s'il est déjà ouvert mais sans le focus, le ramène ; sinon ferme.
+
+        Shortcut: opens; if it is already open but without focus, brings it back; otherwise closes."""
         if not self.visible:
             self.show()
         elif self.has_focus():
@@ -49,6 +56,7 @@ class MiniBar:
             self._focus()
 
     # --- ouverture / fermeture
+    # --- opening / closing
     def show(self):
         if self.win is not None:
             self._focus()
@@ -57,6 +65,7 @@ class MiniBar:
         self.pid = app.target[1] if app.target[0] == "platform" else app.platforms[0]["id"]
         self.message = None
         offer = app.clipboard_offer()  # lien de stream copié : la barre s'ouvre déjà remplie
+                                       # stream link copied: the bar opens already filled in
         if offer:
             self.pid = offer[0]
             self.message = (t("mini_clip_hint"), "info")
@@ -103,6 +112,8 @@ class MiniBar:
         try:
             # Maj+Tab sous Linux (X11). Ce nom de touche n'existe pas sous Windows : sans ce try,
             # l'erreur interrompait l'ouverture et la barre mini ne s'affichait jamais.
+            # Shift+Tab on Linux (X11). This key name does not exist on Windows: without this try,
+            # the error interrupted the opening and the mini bar never showed up.
             e.bind("<ISO_Left_Tab>", lambda ev: self.next_platform(-1))
         except tk.TclError:
             pass
@@ -120,7 +131,9 @@ class MiniBar:
         self._focus()
         if offer:
             self.field.entry.select_range(0, "end")  # taper remplace le lien proposé
+                                                     # typing replaces the offered link
         win.after(80, self._focus)  # 2e essai : Windows applique parfois le premier plan avec un léger retard
+                                    # 2nd attempt: Windows sometimes applies the foreground with a slight delay
 
     def hide(self):
         if self.win is not None:
@@ -132,7 +145,9 @@ class MiniBar:
         self._set_query("")
 
     def _set_query(self, text):
-        """Change le texte sans déclencher la détection de plateforme ni les suggestions."""
+        """Change le texte sans déclencher la détection de plateforme ni les suggestions.
+
+        Changes the text without triggering the platform detection or the suggestions."""
         self._suppress = True
         self.query.set(text)
         self._suppress = False
@@ -151,7 +166,10 @@ class MiniBar:
 
     def _check_focus(self):
         """Ferme la barre quand on clique ailleurs, mais jamais si elle n'a pas encore eu le focus
-        (sinon elle disparaîtrait aussitôt ouverte quand Windows refuse le premier plan)."""
+        (sinon elle disparaîtrait aussitôt ouverte quand Windows refuse le premier plan).
+
+        Closes the bar on a click elsewhere, but never if it has not had the focus yet
+        (otherwise it would disappear as soon as it opened when Windows refuses the foreground)."""
         if self.win is None or not self._had_focus or time.monotonic() - self._shown_at < 0.6:
             return
         if not self.has_focus():
@@ -167,6 +185,7 @@ class MiniBar:
         win.geometry(f"{w}x{h}+{x}+{y}")
 
     # --- plateforme
+    # --- platform
     def set_platform(self, pid):
         if self.win is None or not self.app.platform_by_id(pid):
             return
@@ -192,6 +211,7 @@ class MiniBar:
         return "break"
 
     # --- contenu
+    # --- content
     def _on_query(self, *args):
         if self._suppress or self.win is None:
             return
@@ -225,10 +245,13 @@ class MiniBar:
         self._place()
 
     def show_message(self, text, kind="warn", action=None, **kwargs):
-        """Même signature que App.toast : les erreurs de lancement s'affichent dans la barre."""
+        """Même signature que App.toast : les erreurs de lancement s'affichent dans la barre.
+
+        Same signature as App.toast: launch errors are shown in the bar."""
         self.message = (text, kind)
         self.refresh()
 
+    # --- actions
     # --- actions
     def _move(self, d):
         self.list.move(d)

@@ -2,6 +2,11 @@
 
 Ignoré s'il n'y a pas d'écran ou de Tk (sous Linux : xvfb-run -a python -m unittest tests.test_gui).
 Tout est redirigé vers un dossier temporaire ; aucun réseau (vérifications de mise à jour désactivées).
+
+Interface smoke test: the window builds, the settings open, the theme changes.
+
+Skipped if there is no screen or Tk (on Linux: xvfb-run -a python -m unittest tests.test_gui).
+Everything is redirected to a temporary folder; no network (update checks disabled).
 """
 import sys
 import unittest
@@ -17,6 +22,7 @@ try:
     _root.destroy()
     HAVE_DISPLAY = True
 except Exception:  # pas de Tk ou pas d'écran
+                   # no Tk or no screen
     HAVE_DISPLAY = False
 
 from tests.test_core import TempData  # noqa: E402

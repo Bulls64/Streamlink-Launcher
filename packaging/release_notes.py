@@ -1,6 +1,10 @@
 """Affiche les notes d'une version, en anglais puis en français, extraites de CHANGELOG.md.
 
 Usage : python packaging/release_notes.py 1.4.2
+
+Prints the notes of a version, in English then in French, extracted from CHANGELOG.md.
+
+Usage: python packaging/release_notes.py 1.4.2
 """
 import re
 import sys
