@@ -653,7 +653,6 @@ class TestAppUpdate(unittest.TestCase):
             core.download_update({"asset": None}, tempfile.mkdtemp())
 
     # -- signature
-    # -- signature
     def test_parse_authenticode(self):
         self.assertEqual(core._parse_authenticode("Valid|CN=SignPath Foundation, O=SignPath\n"),
                          ("Valid", "CN=SignPath Foundation, O=SignPath"))
@@ -676,7 +675,6 @@ class TestAppUpdate(unittest.TestCase):
         self.assertIsNone(run(unsigned, ("error", None)))
         self.assertEqual(run(unsigned, ("HashMismatch", "CN=Me")), "app_err_signature")
 
-    # -- installation
     # -- installation
     def test_install_update(self):
         d = Path(tempfile.mkdtemp())
