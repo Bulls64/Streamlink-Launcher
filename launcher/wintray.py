@@ -3,6 +3,12 @@
 Une petite fenêtre Windows invisible reçoit les clics sur l'icône et le raccourci. La boucle de Tk
 distribue déjà les messages Windows de son thread, donc aucun thread supplémentaire n'est nécessaire.
 Les actions sont transmises à l'interface via 'callback(nom)' ; tout échec est silencieux.
+
+Notification-area icon + global keyboard shortcut (Windows, no dependency).
+
+A small invisible Windows window receives the clicks on the icon and the shortcut. Tk's loop
+already dispatches the Windows messages of its thread, so no extra thread is needed.
+Actions are passed to the interface via 'callback(name)'; any failure is silent.
 """
 import ctypes
 import logging
@@ -38,6 +44,7 @@ if os.name == "nt":
         _fields_ = [("x", wintypes.LONG), ("y", wintypes.LONG)]
 
     # Signatures explicites (indispensable en 64 bits)
+    # Explicit signatures (essential in 64-bit)
     user32.DefWindowProcW.restype = LRESULT
     user32.DefWindowProcW.argtypes = [wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM]
     user32.RegisterClassW.restype = wintypes.ATOM
@@ -74,6 +81,7 @@ if os.name == "nt":
     kernel32.GetModuleHandleW.restype = wintypes.HMODULE
     kernel32.GetModuleHandleW.argtypes = [wintypes.LPCWSTR]
     kernel32_le = ctypes.WinDLL("kernel32", use_last_error=True)  # pour lire GetLastError de façon fiable
+                                                                  # to read GetLastError reliably
     user32_le = ctypes.WinDLL("user32", use_last_error=True)
     user32_le.RegisterHotKey.argtypes = [wintypes.HWND, ctypes.c_int, wintypes.UINT, wintypes.UINT]
     user32_le.RegisterHotKey.restype = wintypes.BOOL
@@ -112,6 +120,7 @@ NIIF_USER, NIIF_LARGE_ICON = 0x4, 0x20
 MOD_ALT, MOD_CONTROL, MOD_SHIFT, MOD_NOREPEAT = 0x1, 0x2, 0x4, 0x4000
 VK_SPACE = 0x20
 # Raccourcis proposés : id -> (modificateurs, touche, libellé)
+# Offered shortcuts: id -> (modifiers, key, label)
 HOTKEYS = {
     "ctrl+alt+s": (MOD_CONTROL | MOD_ALT, ord("S"), "Ctrl+Alt+S"),
     "ctrl+alt+space": (MOD_CONTROL | MOD_ALT, VK_SPACE, "Ctrl+Alt+Space"),
@@ -138,7 +147,13 @@ class Tray:
 
     Attention : callback est appelé depuis la procédure de fenêtre Windows, pendant que Tkinter traite
     ses propres messages. Il ne doit JAMAIS appeler Tkinter (pas même after()) : seulement déposer
-    l'événement quelque part (ex. deque.append), à relire depuis la boucle Tk."""
+    l'événement quelque part (ex. deque.append), à relire depuis la boucle Tk.
+
+    callback(event) receives: 'open', 'menu', 'balloon', 'hotkey'.
+
+    Warning: callback is called from the Windows window procedure, while Tkinter is processing
+    its own messages. It must NEVER call Tkinter (not even after()): only drop
+    the event somewhere (e.g. deque.append), to be read back from the Tk loop."""
 
     def __init__(self, callback, icon_path=None, tooltip="Streamlink Launcher"):
         self.callback = callback
@@ -164,11 +179,13 @@ class Tray:
         try:
             self._hinst = kernel32.GetModuleHandleW(None)
             self._proc = WNDPROC(self._wndproc)  # garder une référence : sinon le callback est libéré
+                                                 # keep a reference: otherwise the callback is freed
             wc = WNDCLASSW()
             wc.lpfnWndProc = self._proc
             wc.hInstance = self._hinst
             wc.lpszClassName = CLASS_NAME
             user32.RegisterClassW(ctypes.byref(wc))  # échoue sans gravité si déjà enregistrée
+                                                     # fails harmlessly if already registered
             self.hwnd = user32.CreateWindowExW(0, CLASS_NAME, "Streamlink Launcher", 0, 0, 0, 0, 0,
                                                None, None, self._hinst, None)
             if not self.hwnd:
@@ -203,6 +220,7 @@ class Tray:
         return nid
 
     # --- icône
+    # --- icon
     def show_icon(self):
         if not self.available or self.icon_shown:
             return self.icon_shown
@@ -230,7 +248,9 @@ class Tray:
                 _log.debug("erreur ignorée", exc_info=True)
 
     def notify(self, title, body):
-        """Notification Windows attachée à l'icône (cliquable). Renvoie False si impossible."""
+        """Notification Windows attachée à l'icône (cliquable). Renvoie False si impossible.
+
+        Windows notification attached to the icon (clickable). Returns False if impossible."""
         if not self.icon_shown:
             return False
         try:
@@ -244,9 +264,13 @@ class Tray:
             return False
 
     # --- raccourci global
+    # --- global shortcut
     def register_hotkey(self, combo=DEFAULT_HOTKEY):
         """Enregistre le raccourci global. En cas d'échec, hotkey_error contient le code Windows
-        (1409 = déjà utilisé par une autre application)."""
+        (1409 = déjà utilisé par une autre application).
+
+        Registers the global shortcut. On failure, hotkey_error holds the Windows code
+        (1409 = already used by another application)."""
         combo = combo if combo in HOTKEYS else DEFAULT_HOTKEY
         if not self.available:
             self.hotkey_error = -1
@@ -274,8 +298,11 @@ class Tray:
         self.hotkey_combo = None
 
     # --- menu contextuel natif
+    # --- native context menu
     def show_menu(self, items):
-        """items : [(id, libellé, défaut: bool)] ou None pour un séparateur. Renvoie l'id choisi ou 0."""
+        """items : [(id, libellé, défaut: bool)] ou None pour un séparateur. Renvoie l'id choisi ou 0.
+
+        items: [(id, label, default: bool)] or None for a separator. Returns the chosen id or 0."""
         if not self.available:
             return 0
         menu = None
@@ -332,16 +359,21 @@ class Tray:
                 return 0
             if self._taskbar_created and msg == self._taskbar_created and self.icon_shown:
                 self.icon_shown = False   # l'Explorateur a redémarré : on remet l'icône
+                                          # Explorer restarted: the icon is put back
                 self.show_icon()
                 return 0
         except Exception as e:  # une erreur ici ne doit jamais remonter dans la boucle de messages Windows
+                                # an error here must never propagate into the Windows message loop
             _log.warning("Message Windows ignoré : %s", e)
         return user32.DefWindowProcW(hwnd, msg, wparam, lparam)
 
 
 def bring_to_front(win):
     """Met une fenêtre Tk au premier plan, même si une autre application avait le focus
-    (Windows bloque sinon SetForegroundWindow : la fenêtre s'ouvrirait sans le focus clavier)."""
+    (Windows bloque sinon SetForegroundWindow : la fenêtre s'ouvrirait sans le focus clavier).
+
+    Brings a Tk window to the foreground, even if another application had the focus
+    (otherwise Windows blocks SetForegroundWindow: the window would open without keyboard focus)."""
     if os.name != "nt":
         return False
     try:
@@ -365,6 +397,7 @@ def bring_to_front(win):
 
 # ---------------------
 # Démarrage avec Windows (clé « Run » de l'utilisateur)
+# Start-up with Windows (the user's "Run" key)
 # ---------------------
 RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
 RUN_NAME = "StreamlinkLauncher"
@@ -373,6 +406,7 @@ RUN_NAME = "StreamlinkLauncher"
 def autostart_command(script_path, python_exe, exe=None):
     import sys
     if getattr(sys, "frozen", False):  # version .exe : on lance l'exécutable lui-même
+                                       # .exe version: the executable itself is started
         return f'"{exe or sys.executable}" --tray'
     folder = os.path.dirname(python_exe)
     pythonw = os.path.join(folder, "pythonw.exe")
@@ -400,13 +434,17 @@ def set_autostart(enabled, script_path, python_exe, exe=None):
 
 # ---------------------
 # Une seule instance (Windows)
+# Single instance (Windows)
 # ---------------------
 _mutex = None
 
 
 def wait_for_pid(pid, timeout=20):
     """Attend la fin d'un processus (après une mise à jour, l'ancienne instance tient encore le verrou
-    d'instance unique). True s'il est terminé ou introuvable, False si le délai est dépassé."""
+    d'instance unique). True s'il est terminé ou introuvable, False si le délai est dépassé.
+
+    Waits for a process to end (after an update, the old instance still holds the single-instance
+    lock). True if it has ended or cannot be found, False if the timeout is exceeded."""
     if os.name != "nt":
         return True
     try:
@@ -424,7 +462,10 @@ def wait_for_pid(pid, timeout=20):
 
 def acquire_single_instance():
     """True si c'est la première instance. Sinon, demande à l'instance déjà ouverte d'afficher
-    sa fenêtre et renvoie False (si elle ne répond pas, on la laisse et on démarre quand même)."""
+    sa fenêtre et renvoie False (si elle ne répond pas, on la laisse et on démarre quand même).
+
+    True if this is the first instance. Otherwise, asks the already open instance to show
+    its window and returns False (if it does not answer, it is left alone and we start anyway)."""
     global _mutex
     if os.name != "nt":
         return True

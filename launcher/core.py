@@ -1,4 +1,6 @@
-"""Logique sans interface : configuration, plateformes, saisie, historique, favoris, lancement."""
+"""Logique sans interface : configuration, plateformes, saisie, historique, favoris, lancement.
+
+Logic without interface: configuration, platforms, input, history, favorites, launch."""
 import functools
 import json
 import locale
@@ -17,15 +19,19 @@ from urllib.parse import parse_qs, urlparse
 
 # ---------------------
 # Chemins (tout est relatif au dossier du lanceur)
+# Paths (everything is relative to the launcher's folder)
 # ---------------------
 # Version empaquetée (.exe) : les données restent à côté de l'exécutable, les ressources sont embarquées.
+# Packaged version (.exe): the data stays next to the executable, the resources are embedded.
 FROZEN = bool(getattr(sys, "frozen", False))
 BASE_DIR = Path(sys.executable).resolve().parent if FROZEN else Path(__file__).resolve().parent.parent
 RES_DIR = Path(getattr(sys, "_MEIPASS", BASE_DIR))
 
 
 def _is_writable(folder):
-    """Vrai si l'on peut créer un fichier dans ce dossier (faux p. ex. dans C:\\Program Files)."""
+    """Vrai si l'on peut créer un fichier dans ce dossier (faux p. ex. dans C:\\Program Files).
+
+    True if a file can be created in this folder (false e.g. in C:\\Program Files)."""
     probe = Path(folder) / f".write_test_{os.getpid()}"
     try:
         probe.write_bytes(b"")
@@ -36,7 +42,9 @@ def _is_writable(folder):
 
 
 def _user_data_dir():
-    """Dossier de repli pour les données quand le dossier du lanceur est protégé en écriture."""
+    """Dossier de repli pour les données quand le dossier du lanceur est protégé en écriture.
+
+    Fallback folder for the data when the launcher's folder is write-protected."""
     if os.name == "nt":
         root = os.environ.get("APPDATA") or str(Path.home() / "AppData" / "Roaming")
         return Path(root) / "Streamlink Launcher"
@@ -47,16 +55,23 @@ def _user_data_dir():
 # elles vont dans %APPDATA%\Streamlink Launcher (au lieu de planter au démarrage).
 # AppImage (Linux) : le dossier de l'application est en lecture seule, ou extrait dans un dossier temporaire
 # (--appimage-extract-and-run) effacé à la fermeture : les données vont toujours dans ~/.config.
+# Portable version by default: the data stays next to the launcher. If this folder is read-only,
+# it goes to %APPDATA%\Streamlink Launcher (instead of crashing at start-up).
+# AppImage (Linux): the application folder is read-only, or extracted to a temporary folder
+# (--appimage-extract-and-run) deleted on exit: the data always goes to ~/.config.
 APPIMAGE = bool(os.environ.get("APPIMAGE")) and not FROZEN and os.name != "nt"
 PORTABLE = not APPIMAGE and _is_writable(BASE_DIR)
 DATA_ROOT = BASE_DIR if PORTABLE else _user_data_dir()
 CONFIG_FILE = DATA_ROOT / "config.json"
 # platforms.json livré à côté du lanceur reste prioritaire, même en lecture seule (sauf dans l'AppImage,
 # où il doit rester modifiable : il est créé dans le dossier des données)
+# platforms.json shipped next to the launcher takes priority, even read-only (except in the AppImage,
+# where it must stay editable: it is created in the data folder)
 PLATFORMS_FILE = BASE_DIR / "platforms.json" if not APPIMAGE and (PORTABLE or (BASE_DIR / "platforms.json").exists()) \
     else DATA_ROOT / "platforms.json"
 LOG_FILE = DATA_ROOT / "launcher.log"
 LANG_DIR = BASE_DIR / "lang" if (BASE_DIR / "lang").is_dir() else RES_DIR / "lang"  # dossier lang/ modifiable prioritaire
+                                                                                    # editable lang/ folder takes priority
 DEFAULT_FOLDER = DATA_ROOT / "streams"
 DATA_FOLDER = DEFAULT_FOLDER
 HISTORY_FILE = DATA_FOLDER / "history.json"
@@ -68,8 +83,10 @@ HISTORY_LIMIT = 200
 
 DEFAULT_CONFIG = {
     "language": None,          # None = langue du système
+                               # None = system language
     "theme": "auto",           # auto, light, dark
     "streamlink_path": "",     # vide = détection automatique
+                               # empty = automatic detection
     "player": "default",       # default, vlc, mpv, potplayer, custom
     "player_path": "",
     "player_args": "",
@@ -79,25 +96,37 @@ DEFAULT_CONFIG = {
     "last_platform": "twitch",
     "geometry": "",
     "live_check": True,        # vérifier qui est en direct parmi les favoris
+                               # check who is live among the favorites
     "live_interval": 5,        # minutes
     "live_notify": True,       # notification Windows au début d'un live
+                               # Windows notification when a live starts
     "platform_colors": True,   # cartes de favoris teintées aux couleurs de leur plateforme
+                               # favorite cards tinted with the colors of their platform
     "live_previews": True,     # aperçu, titre et spectateurs des favoris en direct (Twitch)
+                               # preview, title and viewers of live favorites (Twitch)
     "tray": True,              # fermer la fenêtre = réduire dans la zone de notification (Windows)
+                               # closing the window = minimize to the notification area (Windows)
     "hotkey": True,            # raccourci global qui ouvre le mode mini (Windows)
+                               # global shortcut that opens the mini mode (Windows)
     "hotkey_combo": "ctrl+alt+s",
     "autostart": False,        # lancer au démarrage de Windows, réduit
+                               # start with Windows, minimized
     "tray_hint_shown": False,
     "update_check": True,      # vérifier au démarrage si Streamlink et le lanceur sont à jour
+                               # check at start-up whether Streamlink and the launcher are up to date
     "auto_update": False,      # installer seul, au démarrage, la mise à jour du lanceur (exécutable Windows)
+                               # install the launcher update by itself at start-up (Windows executable)
     "clipboard_watch": True,   # proposer un lien de stream copié dans le presse-papiers
+                               # offer a stream link copied to the clipboard
 }
 
 LIVE_INTERVALS = [2, 5, 10, 15, 30]
 # Méthode de vérification par défaut (si platforms.json ne précise pas "live_check")
+# Default check method (if platforms.json does not set "live_check")
 LIVE_METHODS = {"twitch": "twitch", "kick": "streamlink"}
 
 # Couleurs par défaut (utilisées si platforms.json n'en donne pas)
+# Default colors (used if platforms.json does not give any)
 PLATFORM_STYLE = {
     "twitch": {"color": "#9146FF", "text_color": "#FFFFFF"},
     "kick": {"color": "#53FC18", "text_color": "#0B0D0A"},
@@ -154,6 +183,7 @@ STREAMLINK_CANDIDATES = [
 # ---------------------
 # ---------------------
 # Journal des erreurs (launcher.log, à côté des données ; 2 × 512 Ko maximum)
+# Error log (launcher.log, next to the data; 2 × 512 KB maximum)
 # ---------------------
 log = logging.getLogger("streamlink_launcher")
 log.addHandler(logging.NullHandler())
@@ -161,7 +191,9 @@ _log_ready = False
 
 
 def setup_logging():
-    """Active l'écriture de launcher.log. Appelé une fois au démarrage ; sans effet si le dossier est inaccessible."""
+    """Active l'écriture de launcher.log. Appelé une fois au démarrage ; sans effet si le dossier est inaccessible.
+
+    Enables writing launcher.log. Called once at start-up; no effect if the folder is not accessible."""
     global _log_ready
     if _log_ready:
         return
@@ -178,12 +210,15 @@ def setup_logging():
 
 
 # Problèmes de fichiers à signaler à l'interface : [(clé de traduction, {variables})]
+# File problems to report to the interface: [(translation key, {variables})]
 DATA_ISSUES = []
 _issue_handler = None
 
 
 def set_issue_handler(handler):
-    """L'interface s'inscrit ici pour être prévenue d'un nouveau problème (appelé dans le thread de Tk)."""
+    """L'interface s'inscrit ici pour être prévenue d'un nouveau problème (appelé dans le thread de Tk).
+
+    The interface registers here to be told about a new problem (called in the Tk thread)."""
     global _issue_handler
     _issue_handler = handler
 
@@ -203,7 +238,12 @@ def load_json(path, default, recover=False):
     """Lit un fichier JSON. Absent ou illisible : renvoie default.
     Avec recover=True (config, favoris, historique), un fichier illisible (fichier tronqué, coupure de courant…) :
     le fichier est mis de côté en .corrupt, la sauvegarde .bak est utilisée si elle existe, et le problème
-    est signalé (DATA_ISSUES) au lieu d'être écrasé en silence au prochain enregistrement."""
+    est signalé (DATA_ISSUES) au lieu d'être écrasé en silence au prochain enregistrement.
+
+    Reads a JSON file. Missing or unreadable: returns default.
+    With recover=True (config, favorites, history), an unreadable file (truncated file, power cut…):
+    the file is set aside as .corrupt, the .bak backup is used if it exists, and the problem
+    is reported (DATA_ISSUES) instead of being silently overwritten at the next save."""
     path = Path(path)
     try:
         with open(path, "r", encoding="utf-8") as f:
@@ -211,13 +251,16 @@ def load_json(path, default, recover=False):
     except FileNotFoundError:
         return default
     except OSError as e:  # fichier verrouillé, droits… : on ne touche pas au fichier
+                          # locked file, permissions…: the file is left untouched
         log.warning("Lecture impossible de %s : %s", path, e)
         return default
     except ValueError as e:  # JSON invalide ou tronqué (UnicodeDecodeError compris)
+                             # invalid or truncated JSON (UnicodeDecodeError included)
         log.warning("Fichier illisible %s : %s", path, e)
         if not recover:
             return default
     # Fichier de données présent mais illisible
+    # Data file present but unreadable
     backup = path.with_name(path.name + ".bak")
     corrupt = path.with_name(f"{path.name}.{datetime.now():%Y%m%d-%H%M%S}.corrupt")
     try:
@@ -239,7 +282,10 @@ def load_json(path, default, recover=False):
 
 def save_json(path, data):
     """Écriture atomique : fichier temporaire puis remplacement. La version précédente est gardée en .bak.
-    Renvoie True si l'écriture a réussi."""
+    Renvoie True si l'écriture a réussi.
+
+    Atomic write: temporary file, then replacement. The previous version is kept as .bak.
+    Returns True if the write succeeded."""
     path = Path(path)
     tmp = path.with_name(path.name + ".tmp")
     try:
@@ -284,11 +330,13 @@ def save_config(cfg):
 
 # ---------------------
 # Langues
+# Languages
 # ---------------------
 def detect_system_language():
     try:
         name = locale.getlocale()[0] or ""
         if os.name != "nt":  # Linux : la langue d'affichage, même si la locale n'est pas générée sur la machine
+                             # Linux: the display language, even if the locale is not generated on the machine
             name = next((os.environ[v] for v in ("LC_ALL", "LC_MESSAGES", "LANG")
                          if os.environ.get(v) and os.environ[v] not in ("C", "POSIX")), name)
         if os.name == "nt":
@@ -301,7 +349,9 @@ def detect_system_language():
 
 
 def available_languages():
-    """{code: nom affiché} d'après les fichiers présents dans lang/."""
+    """{code: nom affiché} d'après les fichiers présents dans lang/.
+
+    {code: displayed name} from the files present in lang/."""
     langs = {}
     for f in sorted(LANG_DIR.glob("*.json")):
         langs[f.stem] = load_json(f, {}).get("_language_name", f.stem)
@@ -311,7 +361,10 @@ def available_languages():
 @functools.lru_cache(maxsize=2048)
 def _parse_date(value):
     """Date de l'historique -> datetime (None si illisible). Mise en cache : les mêmes dates sont relues
-    à chaque affichage de l'historique, des récents et des suggestions, et strptime est lent."""
+    à chaque affichage de l'historique, des récents et des suggestions, et strptime est lent.
+
+    History date -> datetime (None if unreadable). Cached: the same dates are read again
+    each time the history, the recent items and the suggestions are shown, and strptime is slow."""
     try:
         return datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
     except Exception:
@@ -331,6 +384,7 @@ class I18n:
         return self.strings.get(key, self.fallback.get(key, default))
 
     def __call__(self, key, /, **kwargs):  # « / » : une variable {key} reste possible dans les textes
+                                           # "/": a {key} variable remains possible in the texts
         text = self.strings.get(key) or self.fallback.get(key) or key
         try:
             return text.format(**kwargs)
@@ -338,7 +392,9 @@ class I18n:
             return text
 
     def format_date(self, value, now=None):
-        """'2026-06-20 22:35:26' -> 'Aujourd'hui, 22:35' / '20 juin, 22:35' / '20 oct. 2025'."""
+        """'2026-06-20 22:35:26' -> 'Aujourd'hui, 22:35' / '20 juin, 22:35' / '20 oct. 2025'.
+
+        '2026-06-20 22:35:26' -> 'Today, 22:35' / '20 June, 22:35' / '20 Oct 2025'."""
         d = _parse_date(value) if isinstance(value, str) else None
         if d is None:
             return value or ""
@@ -356,7 +412,9 @@ class I18n:
         return self("date_other_year", day=d.day, month=months[d.month - 1], year=d.year)
 
     def format_number(self, n):
-        """12 -> '12', 1234 -> '1,2 k', 123456 -> '123 k', 2500000 -> '2,5 M' (arrondi vers le bas, selon la langue)."""
+        """12 -> '12', 1234 -> '1,2 k', 123456 -> '123 k', 2500000 -> '2,5 M' (arrondi vers le bas, selon la langue).
+
+        12 -> '12', 1234 -> '1.2K', 123456 -> '123K', 2500000 -> '2.5M' (rounded down, according to the language)."""
         n = max(0, int(n))
         for div, key in ((1_000_000, "num_millions"), (1000, "num_thousands")):
             if n >= div:
@@ -366,22 +424,29 @@ class I18n:
         return str(n)
 
     def format_size(self, nbytes):
-        """13790309 -> '13,2 Mo' (séparateur décimal et unité selon la langue)."""
+        """13790309 -> '13,2 Mo' (séparateur décimal et unité selon la langue).
+
+        13790309 -> '13.2 MB' (decimal separator and unit according to the language)."""
         return self("size_mb", size=f"{max(0, nbytes) / 1048576:.1f}".replace(".", self.get("decimal_sep") or ","))
 
     def viewers(self, n):
-        """'1 spectateur', '12,3 k spectateurs'…"""
+        """'1 spectateur', '12,3 k spectateurs'…
+
+        '1 viewer', '12.3K viewers'…"""
         return self("viewers_one" if n == 1 else "viewers", count=self.format_number(n))
 
 
 # ---------------------
 # Plateformes
+# Platforms
 # ---------------------
 HEX_RE = re.compile(r"^#[0-9A-Fa-f]{6}$")
 
 
 def load_platforms():
-    """Renvoie (liste des plateformes, message d'erreur éventuel)."""
+    """Renvoie (liste des plateformes, message d'erreur éventuel).
+
+    Returns (list of platforms, error message if any)."""
     error = None
     if PLATFORMS_FILE.exists():
         try:
@@ -392,6 +457,7 @@ def load_platforms():
     else:
         raw = DEFAULT_PLATFORMS
         bundled = BASE_DIR / "platforms.json"  # AppImage : copie modifiable du fichier livré (avec son aide)
+                                               # AppImage: editable copy of the shipped file (with its help)
         try:
             data = json.loads(bundled.read_text(encoding="utf-8")) if bundled != PLATFORMS_FILE else None
             if isinstance(data, dict) and isinstance(data.get("platforms"), list):
@@ -424,7 +490,9 @@ def load_platforms():
 
 
 def platform_from_script(script_name):
-    """Ancien format (avant le lot 2) : retrouve la plateforme d'après le nom du .bat."""
+    """Ancien format (avant le lot 2) : retrouve la plateforme d'après le nom du .bat.
+
+    Old format (before batch 2): finds the platform from the name of the .bat."""
     stem = Path(script_name or "").stem.lower()
     for prefix, pid in (("twitch", "twitch"), ("kick", "kick"), ("youtube", "youtube"), ("yt", "youtube"),
                         ("steam", "steamtv"), ("dailymotion", "dailymotion")):
@@ -442,6 +510,7 @@ def list_scripts(folder):
 
 # ---------------------
 # Validation des entrées
+# Input validation
 # ---------------------
 class InputError(Exception):
     def __init__(self, key):
@@ -463,7 +532,9 @@ def _host_matches(url, hosts):
 
 
 def _as_url(text, hosts):
-    """Transforme 'twitch.tv/xxx' en URL complète ; renvoie None si ce n'est pas une URL."""
+    """Transforme 'twitch.tv/xxx' en URL complète ; renvoie None si ce n'est pas une URL.
+
+    Turns 'twitch.tv/xxx' into a full URL; returns None if it is not a URL."""
     if "://" in text:
         return text
     low = text.lower()
@@ -487,7 +558,10 @@ def _youtube_id(url):
 
 def resolve_target(platform, raw):
     """Renvoie (url à donner à Streamlink, valeur à garder dans l'historique).
-    Lève InputError si la saisie est vide ou invalide."""
+    Lève InputError si la saisie est vide ou invalide.
+
+    Returns (URL to give to Streamlink, value to keep in the history).
+    Raises InputError if the input is empty or invalid."""
     kind = platform["input"]
     hosts = platform.get("hosts", [])
     text = (raw or "").strip()
@@ -531,7 +605,9 @@ def resolve_target(platform, raw):
 
 
 def detect_platform_in_text(platforms, text):
-    """Si le texte est un lien, renvoie l'id de la plateforme correspondante (ou du lien direct)."""
+    """Si le texte est un lien, renvoie l'id de la plateforme correspondante (ou du lien direct).
+
+    If the text is a link, returns the id of the matching platform (or of the direct link)."""
     text = (text or "").strip()
     if not text:
         return None
@@ -549,7 +625,9 @@ def detect_platform_in_text(platforms, text):
 
 
 # --- Liens collés, copiés ou glissés dans l'application ------------------------
+# --- Links pasted, copied or dragged into the application ------------------------
 CLIPBOARD_MAX = 2000   # au-delà, le contenu du presse-papiers est ignoré (texte énorme)
+                       # beyond this, the clipboard content is ignored (huge text)
 _URL_IN_TEXT = re.compile(r"https?://[^\s\"'<>]{3,2000}", re.IGNORECASE)
 
 
@@ -559,6 +637,12 @@ def link_in_text(platforms, text):
     Les liens des plateformes connues passent avant un lien quelconque, et un texte sans
     lien (un simple mot, une phrase) ne donne rien : le presse-papiers n'est pas fouillé
     pour autre chose que des adresses.
+
+    First link recognized in a text -> (platform id, link) or None.
+
+    Links of known platforms come before any other link, and a text without a
+    link (a single word, a sentence) gives nothing: the clipboard is not searched
+    for anything other than addresses.
     """
     text = (text or "").strip()
     if not text or len(text) > CLIPBOARD_MAX:
@@ -566,6 +650,7 @@ def link_in_text(platforms, text):
     candidates = _URL_IN_TEXT.findall(text)
     if not candidates and " " not in text and "\n" not in text:
         candidates = [text]          # « twitch.tv/zerator » sans https://
+                                     # "twitch.tv/zerator" without https://
     generic = None
     for c in candidates:
         c = c.rstrip(".,;)]}")
@@ -579,7 +664,9 @@ def link_in_text(platforms, text):
 
 
 def link_from_url_file(path):
-    """Adresse contenue dans un raccourci Internet .url (INI) ou .webloc simple, sinon None."""
+    """Adresse contenue dans un raccourci Internet .url (INI) ou .webloc simple, sinon None.
+
+    Address contained in a .url Internet shortcut (INI) or a simple .webloc, otherwise None."""
     try:
         if Path(path).stat().st_size > 64 * 1024:
             return None
@@ -601,7 +688,9 @@ def link_from_url_file(path):
 
 
 def links_from_paths(platforms, paths):
-    """Fichiers déposés (.url, .txt) -> premier lien reconnu, ou None."""
+    """Fichiers déposés (.url, .txt) -> premier lien reconnu, ou None.
+
+    Dropped files (.url, .txt) -> first recognized link, or None."""
     for path in paths:
         suffix = Path(path).suffix.lower()
         if suffix == ".url":
@@ -620,7 +709,9 @@ def links_from_paths(platforms, paths):
 
 
 def clipboard_sequence():
-    """Numéro de séquence du presse-papiers Windows (change à chaque copie), 0 ailleurs."""
+    """Numéro de séquence du presse-papiers Windows (change à chaque copie), 0 ailleurs.
+
+    Windows clipboard sequence number (changes with each copy), 0 elsewhere."""
     if os.name != "nt":
         return 0
     try:
@@ -631,17 +722,22 @@ def clipboard_sequence():
 
 
 # --- Sauvegarde : export / import des réglages et des favoris ----------------
+# --- Backup: export / import of the settings and favorites ----------------
 BACKUP_FORMAT = "streamlink-launcher-backup"
 BACKUP_MAX_BYTES = 1024 * 1024
 # Propres à l'ordinateur d'origine : jamais exportés, jamais importés. Surtout les chemins :
 # un fichier reçu d'ailleurs ne doit pas pouvoir désigner un programme à lancer.
+# Specific to the original computer: never exported, never imported. Above all the paths:
+# a file received from elsewhere must not be able to designate a program to run.
 MACHINE_KEYS = ("streamlink_path", "player_path", "scripts_folder", "geometry", "tray_hint_shown")
 PLAYER_CHOICES = ("default", "custom", *PLAYER_NAMES)
 FAVORITES_MAX = 1000
 
 
 class BackupError(Exception):
-    """key : clé de traduction du message d'erreur."""
+    """key : clé de traduction du message d'erreur.
+
+    key: translation key of the error message."""
 
     def __init__(self, key):
         super().__init__(key)
@@ -649,7 +745,9 @@ class BackupError(Exception):
 
 
 def make_backup(cfg, favorites, version):
-    """Contenu du fichier d'export : réglages (sans les chemins de cet ordinateur) + favoris."""
+    """Contenu du fichier d'export : réglages (sans les chemins de cet ordinateur) + favoris.
+
+    Content of the export file: settings (without this computer's paths) + favorites."""
     return {
         "format": BACKUP_FORMAT,
         "app_version": version,
@@ -664,7 +762,9 @@ def _short_text(value, limit):
 
 
 def sanitize_settings(raw, languages=(), hotkeys=()):
-    """Ne garde que les réglages connus, du bon type et dans les valeurs permises."""
+    """Ne garde que les réglages connus, du bon type et dans les valeurs permises.
+
+    Keeps only the known settings, of the right type and within the allowed values."""
     out = {}
     if not isinstance(raw, dict):
         return out
@@ -714,7 +814,10 @@ def sanitize_favorites(raw):
 
 def parse_backup(data, languages=(), hotkeys=()):
     """Contenu d'un fichier JSON -> (réglages, favoris). Accepte une sauvegarde complète, un config.json
-    ou un favorites.json. Lève BackupError('err_backup_invalid') si rien n'est reconnu."""
+    ou un favorites.json. Lève BackupError('err_backup_invalid') si rien n'est reconnu.
+
+    Content of a JSON file -> (settings, favorites). Accepts a full backup, a config.json
+    or a favorites.json. Raises BackupError('err_backup_invalid') if nothing is recognized."""
     if not isinstance(data, dict):
         raise BackupError("err_backup_invalid")
     if data.get("format") == BACKUP_FORMAT:
@@ -739,7 +842,9 @@ def read_backup(path, languages=(), hotkeys=()):
 
 
 def merge_favorites(current, incoming):
-    """Favoris actuels d'abord, puis ceux du fichier qui n'y sont pas déjà -> (liste, nombre ajouté)."""
+    """Favoris actuels d'abord, puis ceux du fichier qui n'y sont pas déjà -> (liste, nombre ajouté).
+
+    Current favorites first, then those of the file that are not already there -> (list, number added)."""
     merged = list(current)
     seen = {(f.get("channel"), target_key(f)) for f in merged}
     added = 0
@@ -753,7 +858,9 @@ def merge_favorites(current, incoming):
 
 
 def build_script_command(path, arg):
-    """Commande pour un script personnalisé (liste, sans shell=True)."""
+    """Commande pour un script personnalisé (liste, sans shell=True).
+
+    Command for a custom script (list, without shell=True)."""
     path = str(path)
     args = [arg] if arg else []
     ext = Path(path).suffix.lower()
@@ -767,6 +874,7 @@ def build_script_command(path, arg):
     if ext == ".exe":
         return [path, *args]
     return None  # .lnk : ouvert via os.startfile, sans argument
+                 # .lnk: opened via os.startfile, without arguments
 
 
 def find_executable(candidates):
@@ -792,7 +900,9 @@ def find_player(player):
 
 
 def player_options(cfg):
-    """Options --player / --player-args. Renvoie (options, joueur introuvable ou None)."""
+    """Options --player / --player-args. Renvoie (options, joueur introuvable ou None).
+
+    --player / --player-args options. Returns (options, player not found or None)."""
     opts, missing = [], None
     player = cfg.get("player", "default")
     if player != "default":
@@ -809,9 +919,12 @@ def player_options(cfg):
 
 # ---------------------
 # Historique et favoris
+# History and favorites
 # ---------------------
 def target_key(entry):
-    """Clé de plateforme (ou de script) d'une entrée d'historique/favori."""
+    """Clé de plateforme (ou de script) d'une entrée d'historique/favori.
+
+    Platform (or script) key of a history/favorite entry."""
     if entry.get("platform"):
         return entry["platform"]
     script = entry.get("script")
@@ -829,6 +942,7 @@ class Store:
         try:
             DATA_FOLDER.mkdir(parents=True, exist_ok=True)
         except OSError as e:  # dossier inaccessible : on démarre quand même, l'enregistrement le signalera
+                              # folder not accessible: start anyway, saving will report it
             log.error("Dossier de données inaccessible %s : %s", DATA_FOLDER, e)
         h = load_json(HISTORY_FILE, {"history": []}, recover=True)
         f = load_json(FAV_FILE, {"favorites": []}, recover=True)
@@ -837,7 +951,9 @@ class Store:
         self._migrate_favorites()
 
     def _migrate_favorites(self):
-        """Anciens favoris sans plateforme : on la retrouve dans l'historique, sinon Twitch (comportement d'avant)."""
+        """Anciens favoris sans plateforme : on la retrouve dans l'historique, sinon Twitch (comportement d'avant).
+
+        Old favorites without a platform: it is found in the history, otherwise Twitch (previous behavior)."""
         changed = False
         for fav in self.favorites:
             if fav.get("platform") or fav.get("script"):
@@ -873,7 +989,9 @@ class Store:
         self.save_history()
 
     def recents(self, count):
-        """Dernières entrées, sans doublon (même chaîne sur la même plateforme)."""
+        """Dernières entrées, sans doublon (même chaîne sur la même plateforme).
+
+        Latest entries, without duplicates (same channel on the same platform)."""
         seen, out = set(), []
         for e in self.history:
             key = (e.get("channel", ""), target_key(e))
@@ -910,7 +1028,9 @@ class Store:
         self.save_favorites()
 
     def suggestions(self, text, limit=5):
-        """Favoris puis historique dont le nom contient le texte (le début d'abord)."""
+        """Favoris puis historique dont le nom contient le texte (le début d'abord).
+
+        Favorites, then history, whose name contains the text (those starting with it first)."""
         q = (text or "").strip().lower()
         if not q:
             return []
@@ -931,6 +1051,7 @@ class Store:
 
 # ---------------------
 # Streamlink est-il à jour ?
+# Is Streamlink up to date?
 # ---------------------
 PYPI_URL = "https://pypi.org/pypi/streamlink/json"
 WINDOWS_BUILDS_URL = "https://github.com/streamlink/windows-builds/releases/latest"
@@ -939,7 +1060,9 @@ VERSION_RE = re.compile(r"(\d+)\.(\d+)(?:\.(\d+))?")
 
 
 def parse_version(text):
-    """'streamlink 7.1.3' / '7.1.3-1' / '8.0.0+12.gabc' -> (7, 1, 3). None si introuvable."""
+    """'streamlink 7.1.3' / '7.1.3-1' / '8.0.0+12.gabc' -> (7, 1, 3). None si introuvable.
+
+    'streamlink 7.1.3' / '7.1.3-1' / '8.0.0+12.gabc' -> (7, 1, 3). None if not found."""
     m = VERSION_RE.search(text or "")
     if not m:
         return None
@@ -952,7 +1075,9 @@ def version_text(text):
 
 
 def streamlink_version(path, timeout=20):
-    """Version installée (ex. '7.1.3'), ou None si Streamlink ne répond pas."""
+    """Version installée (ex. '7.1.3'), ou None si Streamlink ne répond pas.
+
+    Installed version (e.g. '7.1.3'), or None if Streamlink does not answer."""
     flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
     out = subprocess.run([path, "--version"], capture_output=True, text=True, encoding="utf-8", errors="replace",
                          timeout=timeout, creationflags=flags,
@@ -962,25 +1087,32 @@ def streamlink_version(path, timeout=20):
 
 def _http_get_json(url, timeout):
     import urllib.request  # chargé seulement au besoin
+                           # loaded only when needed
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         return json.loads(resp.read().decode("utf-8"))
 
 
 def latest_streamlink_version(timeout=8):
-    """Dernière version stable publiée (PyPI, source officielle des versions de Streamlink)."""
+    """Dernière version stable publiée (PyPI, source officielle des versions de Streamlink).
+
+    Latest stable version published (PyPI, the official source of Streamlink versions)."""
     data = _http_get_json(PYPI_URL, timeout)
     return version_text(((data or {}).get("info") or {}).get("version"))
 
 
 def install_kind(path):
-    """'windows' pour l'installateur officiel (…\\Streamlink\\bin\\streamlink.exe), sinon 'pip'."""
+    """'windows' pour l'installateur officiel (…\\Streamlink\\bin\\streamlink.exe), sinon 'pip'.
+
+    'windows' for the official installer (…\\Streamlink\\bin\\streamlink.exe), otherwise 'pip'."""
     p = (path or "").replace("/", "\\").lower()
     return "windows" if "\\streamlink\\bin\\" in p or p.endswith("\\streamlink\\bin") else "pip"
 
 
 def check_streamlink_update(streamlink_path=""):
-    """Renvoie {path, installed, latest, update, kind, error} ; 'update' vaut None si on ne peut pas conclure."""
+    """Renvoie {path, installed, latest, update, kind, error} ; 'update' vaut None si on ne peut pas conclure.
+
+    Returns {path, installed, latest, update, kind, error}; 'update' is None if no conclusion can be drawn."""
     path = find_streamlink(streamlink_path)
     result = {"path": path, "installed": None, "latest": None, "update": None, "kind": install_kind(path),
               "error": None}
@@ -1005,6 +1137,7 @@ def check_streamlink_update(streamlink_path=""):
 
 # ---------------------
 # Mise à jour du lanceur (releases GitHub)
+# Launcher update (GitHub releases)
 # ---------------------
 REPO = "Bulls64/Streamlink-Launcher"
 REPO_URL = f"https://github.com/{REPO}"
@@ -1013,10 +1146,13 @@ UPDATE_TAG_RE = re.compile(r"^v(\d+\.\d+\.\d+)$")
 SHA256_RE = re.compile(r"^sha256:([0-9a-f]{64})$")
 UPDATE_MIN_BYTES, UPDATE_MAX_BYTES = 1_000_000, 100 * 1024 * 1024
 OLD_SUFFIX = ".old"      # ancien exécutable, gardé le temps du redémarrage puis supprimé
+                         # old executable, kept during the restart, then deleted
 
 
 class UpdateError(Exception):
-    """Échec de mise à jour ; .key est la clé de traduction du message à afficher."""
+    """Échec de mise à jour ; .key est la clé de traduction du message à afficher.
+
+    Update failure; .key is the translation key of the message to show."""
 
     def __init__(self, key):
         super().__init__(key)
@@ -1027,7 +1163,12 @@ def parse_release(data):
     """Réponse de l'API GitHub -> {version, tag, page, asset} ou None si elle ne convient pas.
     asset = {name, url, size, sha256} ou None quand la version n'a pas d'exécutable téléchargeable.
     Tout est contrôlé : seules une release publiée (ni brouillon ni préversion) et une adresse de
-    téléchargement qui est exactement celle attendue sur ce dépôt sont acceptées."""
+    téléchargement qui est exactement celle attendue sur ce dépôt sont acceptées.
+
+    GitHub API response -> {version, tag, page, asset} or None if it is not suitable.
+    asset = {name, url, size, sha256} or None when the version has no downloadable executable.
+    Everything is checked: only a published release (neither draft nor pre-release) and a
+    download address that is exactly the one expected on this repository are accepted."""
     if not isinstance(data, dict) or data.get("draft") or data.get("prerelease"):
         return None
     tag = str(data.get("tag_name") or "")
@@ -1050,7 +1191,10 @@ def parse_release(data):
 
 def check_app_update(current=None):
     """Compare la version du lanceur à la dernière release publiée.
-    Renvoie {current, latest, update, release, error} ; 'update' vaut None si on ne peut pas conclure."""
+    Renvoie {current, latest, update, release, error} ; 'update' vaut None si on ne peut pas conclure.
+
+    Compares the launcher's version with the latest published release.
+    Returns {current, latest, update, release, error}; 'update' is None if no conclusion can be drawn."""
     if current is None:
         from . import __version__ as current
     result = {"current": current, "latest": None, "update": None, "release": None, "error": None}
@@ -1072,7 +1216,11 @@ def check_app_update(current=None):
 def should_auto_update(cfg, result, updated_from=None, can_update=None):
     """Faut-il installer sans demander la mise à jour trouvée au démarrage ? Oui si l'option est active (avec la
     vérification au démarrage), si une version plus récente existe avec un fichier téléchargeable, si cet exécutable
-    peut se remplacer, et si le lanceur ne vient pas lui-même d'être mis à jour (pas de boucle de mises à jour)."""
+    peut se remplacer, et si le lanceur ne vient pas lui-même d'être mis à jour (pas de boucle de mises à jour).
+
+    Should the update found at start-up be installed without asking? Yes if the option is on (along with the
+    start-up check), if a newer version exists with a downloadable file, if this executable
+    can replace itself, and if the launcher was not itself just updated (no update loop)."""
     if can_update is None:
         can_update = can_self_update()
     release = (result or {}).get("release") or {}
@@ -1081,7 +1229,9 @@ def should_auto_update(cfg, result, updated_from=None, can_update=None):
 
 
 def can_self_update():
-    """Vrai pour l'exécutable Windows dont le dossier est modifiable ; sinon, la page de la release s'ouvre."""
+    """Vrai pour l'exécutable Windows dont le dossier est modifiable ; sinon, la page de la release s'ouvre.
+
+    True for the Windows executable whose folder is writable; otherwise, the release page opens."""
     if not (FROZEN and os.name == "nt"):
         return False
     exe = Path(sys.executable)
@@ -1089,7 +1239,9 @@ def can_self_update():
 
 
 def _safe_opener():
-    """Ouvreur d'adresses qui refuse toute redirection hors de GitHub ou en clair (http)."""
+    """Ouvreur d'adresses qui refuse toute redirection hors de GitHub ou en clair (http).
+
+    URL opener that refuses any redirect outside GitHub or in clear text (http)."""
     import urllib.error
     import urllib.request
 
@@ -1112,7 +1264,11 @@ def _open_download(url, timeout=20):
 def download_update(release, dest_dir, progress=None, cancel=None, opener=None):
     """Télécharge l'exécutable de la release dans dest_dir et le contrôle : taille annoncée, empreinte SHA-256
     publiée par GitHub, en-tête d'exécutable Windows. Renvoie son chemin. Lève UpdateError, et le fichier
-    partiel est alors supprimé. progress(octets_reçus, total) ; cancel : threading.Event."""
+    partiel est alors supprimé. progress(octets_reçus, total) ; cancel : threading.Event.
+
+    Downloads the release's executable into dest_dir and checks it: announced size, SHA-256 digest
+    published by GitHub, Windows executable header. Returns its path. Raises UpdateError, and the partial
+    file is then deleted. progress(bytes_received, total); cancel: threading.Event."""
     import hashlib
     asset = (release or {}).get("asset")
     if not asset:
@@ -1163,7 +1319,9 @@ def download_update(release, dest_dir, progress=None, cancel=None, opener=None):
 
 
 def _parse_authenticode(text):
-    """'Valid|CN=Nom, O=…' -> ('Valid', 'CN=Nom, O=…') ; sortie vide ou illisible -> ('error', None)."""
+    """'Valid|CN=Nom, O=…' -> ('Valid', 'CN=Nom, O=…') ; sortie vide ou illisible -> ('error', None).
+
+    'Valid|CN=Name, O=…' -> ('Valid', 'CN=Name, O=…'); empty or unreadable output -> ('error', None)."""
     lines = (text or "").strip().splitlines()
     status, _, subject = (lines[-1] if lines else "").partition("|")
     return (status.strip(), subject.strip() or None) if status.strip() else ("error", None)
@@ -1171,7 +1329,10 @@ def _parse_authenticode(text):
 
 def authenticode(path, timeout=40):
     """Signature d'un exécutable Windows : (statut, signataire). Statut : 'Valid', 'NotSigned', 'HashMismatch',
-    'NotTrusted'… ou 'error' si PowerShell est indisponible."""
+    'NotTrusted'… ou 'error' si PowerShell est indisponible.
+
+    Signature of a Windows executable: (status, signer). Status: 'Valid', 'NotSigned', 'HashMismatch',
+    'NotTrusted'… or 'error' if PowerShell is unavailable."""
     if os.name != "nt":
         return "error", None
     try:
@@ -1196,7 +1357,12 @@ def check_signature(current_file, new_file, probe=None):
     """None si la nouvelle version peut être installée, sinon la clé du message d'erreur.
     Si l'application actuelle est signée (signature valide), la nouvelle doit l'être aussi, par le même
     signataire : impossible de revenir à une version non signée. Sinon, on refuse seulement une signature
-    présente mais invalide (fichier modifié)."""
+    présente mais invalide (fichier modifié).
+
+    None if the new version can be installed, otherwise the key of the error message.
+    If the current application is signed (valid signature), the new one must be too, by the same
+    signer: going back to an unsigned version is impossible. Otherwise, only a signature that is
+    present but invalid (modified file) is refused."""
     probe = probe or authenticode
     cur_status, cur_subject = probe(current_file)
     new_status, new_subject = probe(new_file)
@@ -1208,7 +1374,10 @@ def check_signature(current_file, new_file, probe=None):
 
 def target_exe(exe, old_version, new_version):
     """Chemin sous lequel installer la nouvelle version : si le nom de fichier contient l'ancien numéro
-    (StreamlinkLauncher-1.4.1.exe), il prend le nouveau, pour que le nom ne mente pas. Sinon, inchangé."""
+    (StreamlinkLauncher-1.4.1.exe), il prend le nouveau, pour que le nom ne mente pas. Sinon, inchangé.
+
+    Path under which to install the new version: if the file name contains the old number
+    (StreamlinkLauncher-1.4.1.exe), it takes the new one, so that the name does not lie. Otherwise, unchanged."""
     exe = Path(exe)
     if not old_version or not new_version or old_version == new_version:
         return exe
@@ -1220,7 +1389,11 @@ def target_exe(exe, old_version, new_version):
 def install_update(new_file, exe=None, final=None):
     """Remplace l'exécutable : l'ancien est renommé en .old (Windows permet de renommer un exécutable en
     cours d'exécution, pas de l'écraser), le nouveau prend sa place (sous le nom `final` si donné, sinon
-    celui de l'ancien). En cas d'échec, l'ancien est remis."""
+    celui de l'ancien). En cas d'échec, l'ancien est remis.
+
+    Replaces the executable: the old one is renamed to .old (Windows allows renaming a running
+    executable, not overwriting it), the new one takes its place (under the name `final` if given, otherwise
+    that of the old one). On failure, the old one is put back."""
     exe, new_file = Path(exe or sys.executable), Path(new_file)
     final = Path(final) if final else exe
     old = exe.with_name(exe.name + OLD_SUFFIX)
@@ -1244,7 +1417,10 @@ def install_update(new_file, exe=None, final=None):
 
 def cleanup_old_executable(exe=None, tries=30, delay=1.0):
     """Supprime l'ancien exécutable laissé par une mise à jour (réessaie : l'ancienne instance peut
-    mettre quelques secondes à se fermer). Renvoie True si rien ne reste."""
+    mettre quelques secondes à se fermer). Renvoie True si rien ne reste.
+
+    Deletes the old executable left by an update (retries: the old instance may
+    take a few seconds to close). Returns True if nothing is left."""
     exe = Path(exe or sys.executable)
     old = exe.with_name(exe.name + OLD_SUFFIX)
     for _i in range(tries):
@@ -1259,11 +1435,14 @@ def cleanup_old_executable(exe=None, tries=30, delay=1.0):
 
 
 def cleanup_update_leftovers(exe=None):
-    """Au démarrage : ancien exécutable d'une mise à jour, et téléchargements interrompus."""
+    """Au démarrage : ancien exécutable d'une mise à jour, et téléchargements interrompus.
+
+    At start-up: old executable from an update, and interrupted downloads."""
     exe = Path(exe or sys.executable)
     cleanup_old_executable(exe)
     for f in [*exe.parent.glob("StreamlinkLauncher-*.exe.download"),
               *exe.parent.glob("StreamlinkLauncher-*.exe" + OLD_SUFFIX)]:  # .old d'avant un renommage
+                                                                           # .old from before a rename
         try:
             f.unlink()
         except OSError:
@@ -1273,7 +1452,11 @@ def cleanup_update_leftovers(exe=None):
 def relaunch(exe=None, old_version=None, extra_args=()):
     """Démarre la nouvelle version, détachée de ce processus ; elle attend sa fermeture (--wait-pid) avant de
     prendre le verrou d'instance unique. PYINSTALLER_RESET_ENVIRONMENT : sans cela, un exécutable
-    PyInstaller lancé par lui-même réutiliserait le dossier temporaire de l'ancien, supprimé à sa fermeture."""
+    PyInstaller lancé par lui-même réutiliserait le dossier temporaire de l'ancien, supprimé à sa fermeture.
+
+    Starts the new version, detached from this process; it waits for it to close (--wait-pid) before
+    taking the single-instance lock. PYINSTALLER_RESET_ENVIRONMENT: without it, a PyInstaller
+    executable started by itself would reuse the old one's temporary folder, deleted when it closes."""
     exe = str(exe or sys.executable)
     args = [exe, "--wait-pid", str(os.getpid()), *extra_args]
     if old_version:
@@ -1290,7 +1473,9 @@ def relaunch(exe=None, old_version=None, extra_args=()):
 
 
 def arg_value(name, argv=None):
-    """Valeur qui suit l'option `name` sur la ligne de commande, ou None."""
+    """Valeur qui suit l'option `name` sur la ligne de commande, ou None.
+
+    Value that follows the `name` option on the command line, or None."""
     argv = sys.argv if argv is None else argv
     for i, a in enumerate(argv[:-1]):
         if a == name:
@@ -1300,23 +1485,29 @@ def arg_value(name, argv=None):
 
 # ---------------------
 # Qui est en direct ?
+# Who is live?
 # ---------------------
 TWITCH_GQL_URL = "https://gql.twitch.tv/gql"
 TWITCH_CLIENT_ID = "kimne78kx3ncx6brgo4mv6wki5h1ko"  # identifiant public du site web Twitch (utilisé aussi par Streamlink)
+                                                     # public client id of the Twitch website (also used by Streamlink)
 TWITCH_LOGIN_RE = re.compile(r"^[A-Za-z0-9_]{1,25}$")
 PREVIEW_SIZE = (640, 360)  # taille demandée à Twitch ; réduite ensuite à la taille de la carte
+                           # size requested from Twitch; then reduced to the card's size
 PREVIEW_MAX_BYTES = 2 * 1024 * 1024
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) StreamlinkLauncher"
 
 
 def live_method(platform):
-    """'twitch', 'streamlink' ou 'none'."""
+    """'twitch', 'streamlink' ou 'none'.
+
+    'twitch', 'streamlink' or 'none'."""
     method = platform.get("live_check") or LIVE_METHODS.get(platform["id"], "none")
     return method if method in ("twitch", "streamlink") else "none"
 
 
 def _http_json(url, payload, headers, timeout):
     import urllib.request  # chargé seulement au besoin (économise la mémoire au démarrage)
+                           # loaded only when needed (saves memory at start-up)
     req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers=headers, method="POST")
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         return json.loads(resp.read().decode("utf-8"))
@@ -1327,7 +1518,9 @@ def _offline():
 
 
 def twitch_live(logins, timeout=8):
-    """Une seule requête pour toutes les chaînes Twitch : {login: info}."""
+    """Une seule requête pour toutes les chaînes Twitch : {login: info}.
+
+    A single request for all the Twitch channels: {login: info}."""
     logins = sorted({n.lower() for n in logins if TWITCH_LOGIN_RE.match(n or "")})
     result = {}
     query = ("query($logins:[String!]){users(logins:$logins){login stream{title viewersCount "
@@ -1357,7 +1550,9 @@ def twitch_live(logins, timeout=8):
 
 
 def streamlink_live(streamlink, url, timeout=30):
-    """Vérifie via 'streamlink --json URL'. Renvoie info, ou None si inconnu (plugin absent, erreur réseau…)."""
+    """Vérifie via 'streamlink --json URL'. Renvoie info, ou None si inconnu (plugin absent, erreur réseau…).
+
+    Checks via 'streamlink --json URL'. Returns info, or None if unknown (missing plugin, network error…)."""
     flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
     out = subprocess.run([streamlink, "--json", url], capture_output=True, text=True, encoding="utf-8",
                          errors="replace", timeout=timeout, creationflags=flags,
@@ -1377,7 +1572,9 @@ def streamlink_live(streamlink, url, timeout=30):
 
 
 def check_live(entries, platforms, streamlink_path=""):
-    """entries : [(chaîne, id_plateforme)]. Renvoie {(chaîne en minuscules, id): info ou None}."""
+    """entries : [(chaîne, id_plateforme)]. Renvoie {(chaîne en minuscules, id): info ou None}.
+
+    entries: [(channel, platform_id)]. Returns {(lowercase channel, id): info or None}."""
     by_id = {p["id"]: p for p in platforms}
     results = {}
     twitch = [(ch, pid) for ch, pid in entries if pid in by_id and live_method(by_id[pid]) == "twitch"]
@@ -1407,7 +1604,10 @@ def check_live(entries, platforms, streamlink_path=""):
 
 def preview_url(url, now=None):
     """URL d'aperçu sûre (https uniquement), avec un paramètre qui change toutes les 5 minutes :
-    le CDN de Twitch garde sinon longtemps la même image en cache. None si l'URL ne convient pas."""
+    le CDN de Twitch garde sinon longtemps la même image en cache. None si l'URL ne convient pas.
+
+    Safe preview URL (https only), with a parameter that changes every 5 minutes:
+    otherwise Twitch's CDN keeps the same image cached for a long time. None if the URL is not suitable."""
     if not isinstance(url, str) or not url.startswith("https://") or len(url) > 500:
         return None
     stamp = int((now if now is not None else time.time()) // 300)
@@ -1415,7 +1615,9 @@ def preview_url(url, now=None):
 
 
 def fetch_image(url, timeout=8):
-    """Télécharge une image (JPEG/PNG, 2 Mo maximum). Renvoie les octets, ou None."""
+    """Télécharge une image (JPEG/PNG, 2 Mo maximum). Renvoie les octets, ou None.
+
+    Downloads an image (JPEG/PNG, 2 MB maximum). Returns the bytes, or None."""
     import urllib.request
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     with urllib.request.urlopen(req, timeout=timeout) as resp:
@@ -1426,7 +1628,9 @@ def fetch_image(url, timeout=8):
 
 
 def fetch_previews(urls):
-    """{clé: url} -> {clé: octets ou None}. Une erreur sur une image n'empêche pas les autres."""
+    """{clé: url} -> {clé: octets ou None}. Une erreur sur une image n'empêche pas les autres.
+
+    {key: url} -> {key: bytes or None}. An error on one image does not prevent the others."""
     out = {}
     for key, url in urls.items():
         try:
@@ -1439,9 +1643,12 @@ def fetch_previews(urls):
 
 # ---------------------
 # Streams en cours
+# Running streams
 # ---------------------
 class StreamManager:
-    """Lance Streamlink, lit sa sortie dans des threads et la transmet via une file."""
+    """Lance Streamlink, lit sa sortie dans des threads et la transmet via une file.
+
+    Starts Streamlink, reads its output in threads and passes it on through a queue."""
 
     def __init__(self):
         self.streams = []

@@ -6,6 +6,15 @@ Lit la release publiée (adresse et SHA-256 de l'exécutable donnés par l'API G
 fichiers YAML dans  <sortie>/manifests/b/Bulls64/StreamlinkLauncher/<version>/  prêts à être copiés
 dans un fork de https://github.com/microsoft/winget-pkgs (voir packaging/winget/README.md).
 Aucune dépendance : bibliothèque standard uniquement.
+
+Generates the winget (Windows Package Manager) manifest files of a GitHub release.
+
+Usage:  python packaging/winget/make_manifest.py 1.4.0 [output_folder]
+
+Reads the published release (address and SHA-256 of the executable given by the GitHub API), then writes three
+YAML files into  <output>/manifests/b/Bulls64/StreamlinkLauncher/<version>/  ready to be copied
+into a fork of https://github.com/microsoft/winget-pkgs (see packaging/winget/README.md).
+No dependency: standard library only.
 """
 import json
 import re

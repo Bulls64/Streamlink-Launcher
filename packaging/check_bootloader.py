@@ -2,6 +2,11 @@
 
 Compare runw.exe installé avec celui du paquet précompilé publié sur PyPI : s'ils sont identiques,
 la recompilation n'a pas eu lieu et l'exe garderait le chargeur qui déclenche les faux positifs.
+
+Checks (on GitHub Actions) that the PyInstaller bootloader was indeed recompiled on the spot.
+
+Compares the installed runw.exe with the one from the prebuilt package published on PyPI: if they are identical,
+the recompilation did not happen and the exe would keep the bootloader that triggers false positives.
 """
 import glob
 import hashlib

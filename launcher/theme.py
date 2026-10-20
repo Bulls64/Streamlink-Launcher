@@ -1,4 +1,6 @@
-"""Couleurs, polices et réglages de fenêtre propres à Windows (tous facultatifs ailleurs)."""
+"""Couleurs, polices et réglages de fenêtre propres à Windows (tous facultatifs ailleurs).
+
+Colors, fonts and window settings specific to Windows (all optional elsewhere)."""
 import logging
 import os
 import tkinter.font as tkfont
@@ -8,6 +10,7 @@ log = logging.getLogger("streamlink_launcher")
 
 # ---------------------
 # Couleurs
+# Colors
 # ---------------------
 def hex_to_rgb(h):
     h = h.lstrip("#")
@@ -19,7 +22,9 @@ def rgb_to_hex(rgb):
 
 
 def mix(a, b, t):
-    """Mélange a vers b (t = 0 -> a, t = 1 -> b)."""
+    """Mélange a vers b (t = 0 -> a, t = 1 -> b).
+
+    Blends a towards b (t = 0 -> a, t = 1 -> b)."""
     ra, rb = hex_to_rgb(a), hex_to_rgb(b)
     return rgb_to_hex(tuple(x + (y - x) * t for x, y in zip(ra, rb)))
 
@@ -69,12 +74,16 @@ def palette(mode):
 
 
 def accent_ring(color, bg):
-    """Halo autour du champ actif (accent à ~28 % sur le fond)."""
+    """Halo autour du champ actif (accent à ~28 % sur le fond).
+
+    Halo around the active field (accent at ~28% over the background)."""
     return mix(bg, color, 0.30)
 
 
 def readable_on(bg, color):
-    """Version de 'color' suffisamment contrastée sur 'bg' (pour un texte d'action)."""
+    """Version de 'color' suffisamment contrastée sur 'bg' (pour un texte d'action).
+
+    Version of 'color' with enough contrast on 'bg' (for an action text)."""
     dark_bg = luminance(bg) < 0.4
     return mix(color, "#FFFFFF" if dark_bg else "#000000", 0.45)
 
@@ -98,6 +107,7 @@ def resolve_theme(setting):
 
 # ---------------------
 # Polices
+# Fonts
 # ---------------------
 SANS = ["Segoe UI Variable Text", "Segoe UI", "Figtree", "Inter", "Helvetica Neue", "DejaVu Sans"]
 SEMIBOLD = ["Segoe UI Variable Text Semibold", "Segoe UI Semibold"]
@@ -112,6 +122,12 @@ class CachedFont(tkfont.Font):
     Chaque measure() est un aller-retour vers Tk ; or les mêmes textes (noms de chaînes, libellés) sont
     mesurés à chaque dessin. Les polices de l'application ne changent jamais de taille après leur
     création (une nouvelle échelle recrée l'objet Fonts), le cache reste donc juste.
+
+    Font whose text measurements are memorized.
+
+    Each measure() is a round trip to Tk; yet the same texts (channel names, labels) are
+    measured at every drawing. The application's fonts never change size after their
+    creation (a new scale recreates the Fonts object), so the cache stays correct.
     """
 
     _CACHE_MAX = 4000
@@ -178,12 +194,16 @@ class Fonts:
 
 
 def fit_text(font, text, width):
-    """Coupe le texte avec « … » pour qu'il tienne dans 'width' pixels."""
+    """Coupe le texte avec « … » pour qu'il tienne dans 'width' pixels.
+
+    Cuts the text with "…" so that it fits in 'width' pixels."""
     text = text or ""
     if font.measure(text) <= width:
         return text
     # Plus long préfixe qui tient avec « … » : recherche dichotomique (quelques mesures au lieu d'une
     # par caractère retiré). La largeur croît avec la longueur du préfixe, le résultat est donc le même.
+    # Longest prefix that fits with "…": binary search (a few measurements instead of one
+    # per removed character). The width grows with the prefix length, so the result is the same.
     lo, hi = 0, len(text) - 1
     while lo < hi:
         mid = (lo + hi + 1) // 2
@@ -196,6 +216,7 @@ def fit_text(font, text, width):
 
 # ---------------------
 # Windows : DPI, barre de titre, identité de l'application
+# Windows: DPI, title bar, application identity
 # ---------------------
 def enable_dpi_awareness():
     if os.name != "nt":
@@ -226,7 +247,9 @@ def _colorref(h):
 
 
 def apply_window_chrome(win, dark, border=None, caption=None, text=None):
-    """Barre de titre sombre/claire, coins arrondis et couleurs (Windows 10/11, ignoré ailleurs)."""
+    """Barre de titre sombre/claire, coins arrondis et couleurs (Windows 10/11, ignoré ailleurs).
+
+    Dark/light title bar, rounded corners and colors (Windows 10/11, ignored elsewhere)."""
     if os.name != "nt":
         return
     try:
@@ -240,11 +263,15 @@ def apply_window_chrome(win, dark, border=None, caption=None, text=None):
 
         set_attr(20, 1 if dark else 0)   # DWMWA_USE_IMMERSIVE_DARK_MODE
         set_attr(19, 1 if dark else 0)   # idem, anciennes versions de Windows 10
+                                         # same, older versions of Windows 10
         set_attr(33, 2)                  # coins arrondis (Windows 11)
+                                         # rounded corners (Windows 11)
         if border:
             set_attr(34, _colorref(border))   # couleur de bordure (Windows 11)
+                                              # border color (Windows 11)
         if caption:
             set_attr(35, _colorref(caption))  # couleur de la barre de titre (Windows 11)
+                                              # title bar color (Windows 11)
         if text:
             set_attr(36, _colorref(text))
     except Exception:

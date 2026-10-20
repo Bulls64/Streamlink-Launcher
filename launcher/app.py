@@ -1,4 +1,6 @@
-"""Fenêtre principale : écran de lancement, tiroir du journal, panneaux latéraux."""
+"""Fenêtre principale : écran de lancement, tiroir du journal, panneaux latéraux.
+
+Main window: launch screen, log drawer, side panels."""
 import base64
 import json
 import os
@@ -48,6 +50,7 @@ if not os.path.isfile(ICON_FILE):
 class App(tk.Tk):
     def __init__(self):
         super().__init__(className="StreamlinkLauncher")  # WM_CLASS sous Linux (fichier .desktop de l'AppImage)
+                                                          # WM_CLASS on Linux (the AppImage's .desktop file)
         self.withdraw()
         self.scale = max(1.0, min(3.0, self.winfo_fpixels("1i") / 96.0))
         self.cfg = core.load_config()
@@ -63,20 +66,28 @@ class App(tk.Tk):
         self.mini = MiniBar(self)
         self.tray = None
         self._tray_events = deque()  # événements Windows → interface (thread-safe, sans Tk)
+                                     # Windows events → interface (thread-safe, without Tk)
         self._balloon_fav = None
         self._drop_events = deque()  # glisser-déposer OLE → interface (même règle : jamais de Tk dans les rappels)
+                                     # OLE drag and drop → interface (same rule: never any Tk in the callbacks)
         self.drop_target = None
         self._drop_overlay = None
         self._win_events_running = False
         self._clip_seen = None       # (n° de séquence, texte) du presse-papiers déjà examiné
+                                     # (sequence number, text) of the clipboard already examined
         self.sl_update = None        # dernier résultat de vérification de mise à jour
+                                     # latest update check result
         self._update_busy = False
         self.app_update = None       # idem pour le lanceur lui-même (core.check_app_update)
+                                     # same for the launcher itself (core.check_app_update)
         self._app_state = "idle"     # idle, checking, downloading, verifying, error, restart
         self._app_error = None       # clé de traduction du message d'erreur affiché
+                                     # translation key of the error message shown
         self._app_dl = (0, 0)        # octets reçus, taille totale
+                                     # bytes received, total size
         self._app_cancel = threading.Event()
         self._updated_from = core.arg_value("--updated-from")  # version précédente, après une mise à jour
+                                                               # previous version, after an update
         self.query = tk.StringVar()
         self.query.trace_add("write", self._on_query)
         self.log_lines = deque(maxlen=LOG_LIMIT)
@@ -88,11 +99,15 @@ class App(tk.Tk):
         self._ui_queue = queue.Queue()
         self._ui_jobs = 0
         self.live = {}              # {(chaîne en minuscules, id plateforme): info}
+                                    # {(lowercase channel, platform id): info}
         self._live_job = None
         self._live_busy = False
         self._live_first = True     # pas de notification Windows pour ce qui est déjà en direct au démarrage
+                                    # no Windows notification for what is already live at start-up
         self.previews = {}          # {clé de live: {"data": octets JPEG, "img": PhotoImage, "size": (l, h)}}
+                                    # {live key: {"data": JPEG bytes, "img": PhotoImage, "size": (w, h)}}
         self._preview_render = {}   # {clé: (l, h)} mises à l'échelle en attente (regroupées pendant un redimensionnement)
+                                    # {key: (w, h)} pending rescales (grouped during a resize)
         pid = self.cfg.get("last_platform")
         self.target = ("platform", pid if self.platform_by_id(pid) else self.platforms[0]["id"])
 
@@ -102,6 +117,7 @@ class App(tk.Tk):
         if os.name == "nt" and os.path.isfile(ICON_FILE):
             try:
                 self.iconbitmap(default=ICON_FILE)  # icône nette dans la barre des tâches
+                                                    # sharp icon in the taskbar
             except tk.TclError:
                 pass
         self.minsize(self.px(820), self.px(600))
@@ -119,11 +135,14 @@ class App(tk.Tk):
         self.setup_drop()
         if self.cfg.get("autostart"):
             # Réécrit l'entrée de démarrage : elle pointe toujours vers la version lancée (.py ou .exe)
+            # Rewrites the start-up entry: it always points to the version that was started (.py or .exe)
             wintray.set_autostart(True, os.path.join(str(core.BASE_DIR), "slink_launcher.py"), sys.executable)
         if not ("--tray" in sys.argv and self.tray_active):  # --tray : démarrage réduit (avec Windows)
+                                                             # --tray: minimized start (with Windows)
             self.deiconify()
         self.after(300, self._startup_checks)
         if core.FROZEN:  # restes d'une mise à jour précédente (ancien exécutable, téléchargement interrompu)
+                         # leftovers of a previous update (old executable, interrupted download)
             threading.Thread(target=core.cleanup_update_leftovers, daemon=True).start()
         if self._updated_from:
             from . import __version__
@@ -137,6 +156,7 @@ class App(tk.Tk):
 
     # =====================================================
     # Outils
+    # Tools
     # =====================================================
     def px(self, v):
         return int(round(v * self.scale))
@@ -160,7 +180,9 @@ class App(tk.Tk):
         return self.cfg["qualities"].get(p["id"]) or p["default_quality"]
 
     def entry_target(self, entry):
-        """('platform', dict) ou ('script', nom) pour une entrée d'historique/favori."""
+        """('platform', dict) ou ('script', nom) pour une entrée d'historique/favori.
+
+        ('platform', dict) or ('script', name) for a history/favorite entry."""
         if entry.get("platform"):
             p = self.platform_by_id(entry["platform"])
             return ("platform", p) if p else None
@@ -178,7 +200,9 @@ class App(tk.Tk):
         return target[1], core.NEUTRAL_STYLE["color"]
 
     def run_in_thread(self, work, done):
-        """Exécute 'work' hors de l'interface, puis 'done(résultat)' dans l'interface."""
+        """Exécute 'work' hors de l'interface, puis 'done(résultat)' dans l'interface.
+
+        Runs 'work' outside the interface, then 'done(result)' in the interface."""
         def runner():
             try:
                 result = work()
@@ -233,6 +257,7 @@ class App(tk.Tk):
         self.configure(bg=c.bg)
 
         # Tiroir du journal (en bas)
+        # Log drawer (at the bottom)
         self.drawer = tk.Frame(self, bg=c.title)
         self.drawer.pack(side="bottom", fill="x")
         tk.Frame(self.drawer, bg=c.border, height=1).pack(fill="x")
@@ -306,6 +331,7 @@ class App(tk.Tk):
         return btn
 
     # --- pastilles
+    # --- chips
     def build_pills(self):
         for w in self.pills_row.winfo_children():
             w.destroy()
@@ -355,7 +381,9 @@ class App(tk.Tk):
         self.refresh_target()
 
     def placeholder_for(self, p):
-        """Texte d'aide du champ selon le type de saisie de la plateforme (fenêtre et mode mini)."""
+        """Texte d'aide du champ selon le type de saisie de la plateforme (fenêtre et mode mini).
+
+        Hint text of the field according to the platform's input type (window and mini mode)."""
         kind = p["input"] if p["input"] in ("channel", "youtube", "video", "none", "url") else "channel"
         return self.t("ph_" + kind, name=self.platform_name(p))
 
@@ -389,6 +417,7 @@ class App(tk.Tk):
             self.quality_select.set_disabled(True)
         if getattr(self, "_fav_filter", None) != self.target and hasattr(self, "fav_grid"):
             # Les favoris affichés suivent la plateforme choisie
+            # The favorites shown follow the selected platform
             self._fav_filter = self.target
             self.build_favorites()
             self.refresh_previews(only_missing=True)
@@ -430,16 +459,20 @@ class App(tk.Tk):
         self.refresh_target()
 
     # --- favoris
+    # --- favorites
     def _fav_link_text(self, shown=None):
         n = len(self.store.favorites)
         shown = len(self.shown_favorites()) if shown is None else shown
         return self.t("link_manage_count", count=n) if n > shown else self.t("link_manage")
 
     def favorite_matches(self, fav, target=None):
-        """Le favori appartient-il à la plateforme (ou au script) choisie ?"""
+        """Le favori appartient-il à la plateforme (ou au script) choisie ?
+
+        Does the favorite belong to the selected platform (or script)?"""
         kind, value = target or self.target
         et = self.entry_target(fav)
         if et is None:  # anciens favoris sans plateforme : lancés sur Twitch
+                        # old favorites without a platform: started on Twitch
             return kind == "platform" and value == "twitch" and not fav.get("platform") and not fav.get("script")
         if et[0] == "platform":
             return kind == "platform" and et[1]["id"] == value
@@ -460,6 +493,7 @@ class App(tk.Tk):
             self.fav_grid.columnconfigure(i, weight=1, uniform="fav")
         favs = self.shown_favorites()
         # Avec l'aperçu activé et au moins un favori affiché en direct : cartes avec image (toutes la même hauteur)
+        # With previews on and at least one displayed favorite live: cards with an image (all the same height)
         with_media = bool(self.cfg.get("live_previews")) and any((self.live_info(f) or {}).get("live") for f in favs)
 
         def pad(col):
@@ -500,14 +534,21 @@ class App(tk.Tk):
 
     def shown_favorites(self):
         """Favoris des cartes de l'écran principal : ceux de la plateforme choisie, en direct d'abord
-        (l'ordre est conservé sinon)."""
+        (l'ordre est conservé sinon).
+
+        Favorites of the main screen's cards: those of the selected platform, live ones first
+        (the order is kept otherwise)."""
         favs = [f for f in self.store.favorites if self.favorite_matches(f)]
         return sorted(favs, key=lambda e: not (self.live_info(e) or {}).get("live"))[:FAV_SLOTS]
 
     # --- aperçus des lives
+    # --- live previews
     def preview_image(self, key, w, h):
         """Image d'aperçu à la taille demandée, ou None (la carte affiche alors un fond de remplacement).
-        La mise à l'échelle se fait hors de l'interface ; la carte est redessinée quand elle est prête."""
+        La mise à l'échelle se fait hors de l'interface ; la carte est redessinée quand elle est prête.
+
+        Preview image at the requested size, or None (the card then shows a placeholder background).
+        Scaling happens outside the interface; the card is redrawn when it is ready."""
         p = self.previews.get(key)
         if not p or not p.get("data"):
             return None
@@ -516,6 +557,7 @@ class App(tk.Tk):
             pending = self._preview_render.get(key)
             self._preview_render[key] = (w, h)
             if pending is None:  # pendant un redimensionnement, seule la dernière taille est calculée
+                                 # during a resize, only the last size is computed
                 self.after(150, lambda: self._render_preview(key))
         return p.get("img") if same_size else None
 
@@ -532,6 +574,7 @@ class App(tk.Tk):
         p = self.previews.get(key)
         if not p or p.get("data") is not data:
             return  # image remplacée entre-temps
+                    # image replaced in the meantime
         p["stale"] = False
         try:
             if isinstance(png, Exception) or not png:
@@ -539,6 +582,7 @@ class App(tk.Tk):
             p["img"] = tk.PhotoImage(master=self, data=base64.b64encode(png))
         except tk.TclError:
             p["failed"] = size  # on garde l'image précédente s'il y en a une
+                                # the previous image is kept if there is one
             return
         p["size"] = size
         self._redraw_favorite_cards()
@@ -550,11 +594,15 @@ class App(tk.Tk):
 
     def refresh_previews(self, only_missing=False):
         """Télécharge l'aperçu des favoris affichés qui sont en direct : tous après une vérification,
-        seulement ceux qui manquent quand on change de plateforme."""
+        seulement ceux qui manquent quand on change de plateforme.
+
+        Downloads the preview of the displayed favorites that are live: all of them after a check,
+        only the missing ones when the platform changes."""
         if not self.cfg.get("live_previews") or not self.cfg.get("live_check"):
             self.previews.clear()
             return
         for key in list(self.previews):  # on garde les images des autres plateformes tant qu'elles sont en direct
+                                         # images of the other platforms are kept as long as they are live
             if not (self.live.get(key) or {}).get("live"):
                 del self.previews[key]
         urls = {}
@@ -574,10 +622,12 @@ class App(tk.Tk):
         for key, data in results.items():
             if not data:
                 continue  # échec : on garde l'image précédente s'il y en a une
+                          # failure: the previous image is kept if there is one
             old = self.previews.get(key)
             if old and old.get("data") == data:
                 continue
             # La nouvelle image remplace l'ancienne dès qu'elle est prête (pas de clignotement)
+            # The new image replaces the old one as soon as it is ready (no flicker)
             self.previews[key] = {"data": data, "img": (old or {}).get("img"), "size": (old or {}).get("size"),
                                   "stale": True}
             changed = True
@@ -588,6 +638,7 @@ class App(tk.Tk):
         if self.entry_target(fav):
             return self.launch_entry(fav)
         # Anciens favoris sans plateforme : Twitch
+        # Old favorites without a platform: Twitch
         p = self.platform_by_id("twitch") or self.platforms[0]
         return self.launch_platform(p, fav.get("channel", ""))
 
@@ -651,8 +702,11 @@ class App(tk.Tk):
                        action=(self.t("action_undo"), undo))
 
     # --- en direct
+    # --- live
     def live_key(self, entry):
-        """Clé de vérification d'un favori, ou None si sa plateforme ne se vérifie pas."""
+        """Clé de vérification d'un favori, ou None si sa plateforme ne se vérifie pas.
+
+        Check key of a favorite, or None if its platform cannot be checked."""
         target = self.entry_target(entry)
         if not target or target[0] != "platform" or not entry.get("channel"):
             return None
@@ -673,7 +727,9 @@ class App(tk.Tk):
         return keys
 
     def schedule_live(self, delay_ms=None):
-        """Programme la prochaine vérification (aucune minuterie si rien à vérifier)."""
+        """Programme la prochaine vérification (aucune minuterie si rien à vérifier).
+
+        Schedules the next check (no timer if there is nothing to check)."""
         if self._live_job:
             self.after_cancel(self._live_job)
             self._live_job = None
@@ -702,6 +758,7 @@ class App(tk.Tk):
         for key, info in results.items():
             if info is None:
                 continue  # état inconnu (réseau, plugin absent) : on garde le précédent
+                          # unknown state (network, missing plugin): the previous one is kept
             before = self.live.get(key)
             if info.get("live") and before is not None and not before.get("live"):
                 started.append(key)
@@ -735,6 +792,7 @@ class App(tk.Tk):
             body = " · ".join(x for x in (info.get("game"), info.get("title")) if x) or name
             title = t("notif_live_title", name=channel)
             # Avec l'icône de notification : bulle cliquable (un clic lance le stream). Sinon, toast PowerShell.
+            # With the notification-area icon: clickable balloon (a click starts the stream). Otherwise, PowerShell toast.
             if self.tray_active and self.tray.notify(title, body + "\n" + t("notif_click_to_watch")):
                 self._balloon_fav = fav
             else:
@@ -746,12 +804,15 @@ class App(tk.Tk):
             pass
 
     # --- zone de notification, raccourci global, fermeture
+    # --- notification area, global shortcut, closing
     @property
     def tray_active(self):
         return self.tray is not None and self.tray.icon_shown
 
     def setup_tray(self):
-        """Crée la fenêtre Windows cachée (icône + raccourci) puis applique les réglages."""
+        """Crée la fenêtre Windows cachée (icône + raccourci) puis applique les réglages.
+
+        Creates the hidden Windows window (icon + shortcut), then applies the settings."""
         if os.name != "nt":
             return
         if self.tray is None:
@@ -759,6 +820,10 @@ class App(tk.Tk):
             # Appeler Tkinter à ce moment-là (même un simple after()) casse l'état interne de Python et fait
             # planter l'application (« PyEval_RestoreThread: … GIL is released »). On se contente donc de
             # déposer l'événement dans une file (sans Tk), relue ci-dessous depuis la boucle de Tkinter.
+            # IMPORTANT: the icon's Windows window receives its messages WHILE Tkinter is processing its own.
+            # Calling Tkinter at that moment (even a simple after()) breaks Python's internal state and crashes
+            # the application ("PyEval_RestoreThread: … GIL is released"). So we only drop the event into a
+            # queue (without Tk), read back below from the Tkinter loop.
             tray = wintray.Tray(self._tray_events.append, icon_path=ICON_FILE)
             if not tray.start():
                 self.log(self.t("log_tray_failed"), "err")
@@ -783,6 +848,7 @@ class App(tk.Tk):
                 message = (self.t("toast_hotkey_taken", key=key), "warn",
                            (self.t("action_settings"), self.open_settings))
                 if startup:  # après les vérifications de démarrage, pour ne pas être recouvert
+                             # after the start-up checks, so as not to be covered
                     self.after(1500, lambda: self.toast(message[0], message[1], action=message[2], duration=7000))
                 else:
                     self.toast(message[0], message[1], action=message[2], duration=7000)
@@ -791,7 +857,9 @@ class App(tk.Tk):
         self.update_tray_tooltip()
 
     def _hotkey_status(self):
-        """(texte, couleur) de l'état du raccourci pour les Paramètres, ou None."""
+        """(texte, couleur) de l'état du raccourci pour les Paramètres, ou None.
+
+        (text, color) of the shortcut state for the Settings, or None."""
         if os.name != "nt" or not self.cfg.get("hotkey"):
             return None
         key = wintray.hotkey_label(self.cfg.get("hotkey_combo"))
@@ -813,18 +881,24 @@ class App(tk.Tk):
 
     def _start_win_events(self):
         """Une seule boucle (10 fois par seconde) relit les files de l'icône, du raccourci et du
-        glisser-déposer : deux fois moins de réveils de l'application au repos qu'avec une boucle chacun."""
+        glisser-déposer : deux fois moins de réveils de l'application au repos qu'avec une boucle chacun.
+
+        A single loop (10 times per second) reads the icon, shortcut and drag-and-drop queues:
+        half as many wake-ups of the idle application as with one loop each."""
         if not self._win_events_running:
             self._win_events_running = True
             self.after(100, self._poll_win_events)
 
     def _poll_win_events(self):
-        """Traite les clics sur l'icône, le raccourci global (file remplie par wintray) et les dépôts (windrop)."""
+        """Traite les clics sur l'icône, le raccourci global (file remplie par wintray) et les dépôts (windrop).
+
+        Handles clicks on the icon, the global shortcut (queue filled by wintray) and drops (windrop)."""
         for queue_, handler in ((self._tray_events, self._tray_event), (self._drop_events, self.handle_drop)):
             while queue_:
                 try:
                     handler(queue_.popleft())
                 except Exception as e:  # une erreur ici ne doit jamais arrêter la surveillance
+                                        # an error here must never stop the polling
                     self.log(self.t("log_error", error=e), "err")
         if self.tray is not None or self.drop_target is not None:
             self.after(100, self._poll_win_events)
@@ -886,7 +960,9 @@ class App(tk.Tk):
             self.launch_favorite(live[chosen - 100])
 
     def on_close(self):
-        """Bouton ✕ : réduit dans la zone de notification si elle est active, sinon quitte."""
+        """Bouton ✕ : réduit dans la zone de notification si elle est active, sinon quitte.
+
+        ✕ button: minimizes to the notification area if it is enabled, otherwise quits."""
         if not self.tray_active:
             self.on_quit()
             return
@@ -899,6 +975,7 @@ class App(tk.Tk):
             core.save_config(self.cfg)
 
     # --- récents
+    # --- recent
     def build_recents(self):
         c, t = self.c, self.t
         for w in self.recent_box.winfo_children():
@@ -932,13 +1009,16 @@ class App(tk.Tk):
         self.field.focus()
 
     def set_query(self, text):
-        """Remplit la zone de saisie sans ouvrir les suggestions."""
+        """Remplit la zone de saisie sans ouvrir les suggestions.
+
+        Fills the input field without opening the suggestions."""
         self._suppress_suggest = True
         self.query.set(text)
         self._suppress_suggest = False
 
     # =====================================================
     # Saisie et suggestions
+    # Input and suggestions
     # =====================================================
     def _on_query(self, *args):
         if self._suppress_suggest:
@@ -961,7 +1041,9 @@ class App(tk.Tk):
             self.popover.close()
 
     def suggestion_item(self, source, entry, text, show_live=False):
-        """Ligne de suggestion (favori ou historique) pour le menu du champ et le mode mini."""
+        """Ligne de suggestion (favori ou historique) pour le menu du champ et le mode mini.
+
+        Suggestion row (favorite or history) for the field's menu and the mini mode."""
         name, color = self.target_label(self.entry_target(entry))
         channel = entry.get("channel", "") or name
         fav = source == "favorite"
@@ -1029,11 +1111,13 @@ class App(tk.Tk):
 
     # =====================================================
     # Presse-papiers intelligent
+    # Smart clipboard
     # =====================================================
     def _clip_key(self):
         try:
             text = self.clipboard_get()
         except tk.TclError:  # vide, ou contenu qui n'est pas du texte (image, fichiers…)
+                             # empty, or content that is not text (image, files…)
             return None, ""
         return (core.clipboard_sequence(), text), text
 
@@ -1042,6 +1126,11 @@ class App(tk.Tk):
 
         Un même contenu n'est proposé qu'une fois (numéro de séquence Windows : recopier le même
         lien le repropose), et jamais s'il est déjà dans la zone de saisie.
+
+        Stream link copied and never offered -> (platform id, link), otherwise None.
+
+        The same content is offered only once (Windows sequence number: copying the same
+        link again offers it again), and never if it is already in the input field.
         """
         if not self.cfg.get("clipboard_watch"):
             return None
@@ -1055,7 +1144,9 @@ class App(tk.Tk):
         return hit
 
     def offer_clipboard(self):
-        """Fenêtre principale : propose de lancer le lien copié (bouton dans la notification)."""
+        """Fenêtre principale : propose de lancer le lien copié (bouton dans la notification).
+
+        Main window: offers to start the copied link (button in the notification)."""
         if self.state() != "normal":
             return
         offer = self.clipboard_offer()
@@ -1068,7 +1159,9 @@ class App(tk.Tk):
                    duration=7000, low_priority=True)
 
     def use_link(self, pid, link, launch=False):
-        """Met un lien dans la zone de saisie (plateforme sélectionnée) et le lance si demandé."""
+        """Met un lien dans la zone de saisie (plateforme sélectionnée) et le lance si demandé.
+
+        Puts a link in the input field (selected platform) and starts it if asked."""
         self.select_platform(pid)
         self.set_query(link)
         if launch:
@@ -1078,6 +1171,7 @@ class App(tk.Tk):
 
     # =====================================================
     # Glisser-déposer
+    # Drag and drop
     # =====================================================
     def setup_drop(self):
         if os.name != "nt":
@@ -1085,6 +1179,7 @@ class App(tk.Tk):
         try:
             target = windrop.DropTarget(windrop.toplevel_hwnd(self), self._drop_events.append)
         except Exception as e:  # ne jamais empêcher le démarrage pour cette fonction
+                                # never prevent start-up because of this feature
             core.log.warning("glisser-déposer indisponible : %s", e)
             return
         if target.register():
@@ -1108,6 +1203,7 @@ class App(tk.Tk):
             return
         pid, link = hit
         self._clip_seen = self._clip_key()[0]  # ce qui vient d'être déposé n'est pas à reproposer
+                                               # what has just been dropped must not be offered again
         if self.state() in ("iconic", "withdrawn"):
             self.show_main()
         self.use_link(pid, link)
@@ -1127,6 +1223,7 @@ class App(tk.Tk):
                        font=self.fonts.panel_title)
         cv.create_text(w // 2, h // 2 + self.px(18), text=self.t("drop_sub"), fill=c.muted, font=self.fonts.small)
         tk.Misc.lift(cv)  # Canvas.lift() est tag_raise()
+                          # Canvas.lift() is tag_raise()
         self._drop_overlay = cv
 
     def hide_drop_overlay(self):
@@ -1139,6 +1236,7 @@ class App(tk.Tk):
 
     # =====================================================
     # Lancement
+    # Launch
     # =====================================================
     def launch(self):
         kind, value = self.target
@@ -1147,7 +1245,9 @@ class App(tk.Tk):
         return self.launch_script(value, self.query.get())
 
     def launch_entry(self, entry, report=None):
-        """report : où afficher les erreurs (par défaut les notifications de la fenêtre)."""
+        """report : où afficher les erreurs (par défaut les notifications de la fenêtre).
+
+        report: where to show errors (by default the window's notifications)."""
         report = report or self.toast
         target = self.entry_target(entry)
         if not target:
@@ -1161,6 +1261,7 @@ class App(tk.Tk):
     def launch_platform(self, p, raw, quality=None, report=None):
         t = self.t
         quiet = report is not None  # lancé depuis le mode mini : erreurs affichées dans la barre
+                                    # started from the mini mode: errors shown in the bar
         report = report or self.toast
         streamlink = core.find_streamlink(self.cfg["streamlink_path"])
         if not streamlink:
@@ -1180,6 +1281,8 @@ class App(tk.Tk):
             return False
         # Le lien lancé n'est pas à reproposer. Lu AVANT de démarrer le processus : sous X11, lire le presse-papiers
         # traite des événements, et une notification d'échec pourrait sinon être recouverte par « Lancement ».
+        # The started link must not be offered again. Read BEFORE starting the process: on X11, reading the clipboard
+        # processes events, and a failure notification could otherwise be covered by "Starting".
         self._clip_seen = self._clip_key()[0]
         opts, missing = core.player_options(self.cfg)
         if missing:
@@ -1243,6 +1346,7 @@ class App(tk.Tk):
         self.toast(self.t("toast_stopped", name=stream["name"]), "ok")
 
     # --- suivi des streams (uniquement quand il y en a)
+    # --- stream monitoring (only when there are some)
     def start_polling(self):
         if not self._polling:
             self._polling = True
@@ -1270,6 +1374,7 @@ class App(tk.Tk):
 
     # =====================================================
     # Tiroir du journal
+    # Log drawer
     # =====================================================
     def toggle_drawer(self):
         self.drawer_open = not self.drawer_open
@@ -1346,6 +1451,7 @@ class App(tk.Tk):
 
     # =====================================================
     # Notifications
+    # Notifications
     # =====================================================
     def toast(self, text, kind="ok", action=None, duration=2800, low_priority=False):
         old = getattr(self, "toast_widget", None)
@@ -1356,12 +1462,14 @@ class App(tk.Tk):
                 visible = False
             if low_priority and visible and old.kind in ("error", "warn"):
                 return  # une info secondaire ne cache pas une erreur encore affichée
+                        # a secondary info does not hide an error still on screen
             old.dismiss()
         bottom = self.drawer.winfo_height() + self.px(16) if self.drawer.winfo_ismapped() else self.px(60)
         self.toast_widget = Toast(self, text, kind, action, duration, bottom=bottom)
 
     # =====================================================
     # Panneaux latéraux
+    # Side panels
     # =====================================================
     def open_panel(self, kind, title, body_builder, footer_builder=None):
         self.close_panel()
@@ -1389,6 +1497,8 @@ class App(tk.Tk):
         body.pack(fill="both", expand=True, padx=(0, px(12)))
         # Calcule la largeur du panneau AVANT d'y créer les lignes : chacune est ainsi dessinée une seule fois,
         # directement à la bonne taille (au lieu d'une fois à sa taille demandée puis une fois à la vraie).
+        # Computes the panel width BEFORE creating its rows: each one is thus drawn only once,
+        # directly at the right size (instead of once at its requested size, then once at the real one).
         panel.update_idletasks()
         body_builder(body)
         panel.lift()
@@ -1442,6 +1552,7 @@ class App(tk.Tk):
                  wraplength=self.px(320)).pack(anchor="w", pady=self.px(8))
 
     # --- Paramètres
+    # --- Settings
     def open_settings(self):
         t, c = self.t, self.c
         if self.panel_kind == "settings":
@@ -1478,6 +1589,7 @@ class App(tk.Tk):
                 make_lang = lambda p: Segmented(
                     p, self, list(langs.items()), s["language"], lambda v: s.update(language=v))
             else:  # 5 langues ne tiennent plus côte à côte dans le panneau : liste déroulante
+                   # 5 languages no longer fit side by side in the panel: drop-down list
                 make_lang = lambda p: Select(
                     p, self, list(langs.items()), s["language"], lambda v: s.update(language=v),
                     height=36, width=130, font=self.fonts.small, popup_width=180)
@@ -1580,6 +1692,7 @@ class App(tk.Tk):
         self.open_panel("settings", t("title_settings"), body, footer)
 
     # --- Streamlink : version et mises à jour
+    # --- Streamlink: version and updates
     def _update_sl_card(self, busy=False):
         t = self.t
         try:
@@ -1619,7 +1732,9 @@ class App(tk.Tk):
             self.check_streamlink_update(manual=True)
 
     def check_streamlink_update(self, manual=False):
-        """Compare la version installée à la dernière publiée, hors de l'interface (thread)."""
+        """Compare la version installée à la dernière publiée, hors de l'interface (thread).
+
+        Compares the installed version with the latest published one, outside the interface (thread)."""
         if self._update_busy:
             return
         in_settings = self.panel_kind == "settings" and hasattr(self, "v_streamlink")
@@ -1668,6 +1783,7 @@ class App(tk.Tk):
                 pass
 
     # --- Le lanceur : mise à jour depuis les releases GitHub
+    # --- The launcher: update from the GitHub releases
     def _update_app_card(self):
         t = self.t
         try:
@@ -1718,7 +1834,9 @@ class App(tk.Tk):
         self.open_url(rel["page"] if rel else core.REPO_URL + "/releases")
 
     def check_app_update(self, manual=False):
-        """Cherche une release plus récente sur GitHub, hors de l'interface (thread)."""
+        """Cherche une release plus récente sur GitHub, hors de l'interface (thread).
+
+        Looks for a newer release on GitHub, outside the interface (thread)."""
         if self._app_state in ("checking", "downloading", "verifying", "restart"):
             return
         self._app_state, self._app_error = "checking", None
@@ -1738,6 +1856,7 @@ class App(tk.Tk):
         self._update_app_card()
         self._refresh_update_badge()
         # jamais de mise à jour surprise pendant un stream : la carte propose alors la mise à jour
+        # never a surprise update during a stream: the card offers the update instead
         if not manual and not self.streams.running() and core.should_auto_update(self.cfg, result, self._updated_from):
             self.log(t("log_app_auto_update", installed=result["current"], latest=result["latest"]), "warn")
             self.toast(t("toast_app_auto_update", latest=result["latest"]), "ok", duration=6000)
@@ -1752,7 +1871,10 @@ class App(tk.Tk):
 
     def install_app_update(self, auto=False):
         """Télécharge la release, la contrôle, remplace l'exécutable et redémarre. Sans exécutable
-        remplaçable (lancé depuis les sources, dossier protégé…), ouvre la page de la release."""
+        remplaçable (lancé depuis les sources, dossier protégé…), ouvre la page de la release.
+
+        Downloads the release, checks it, replaces the executable and restarts. Without a replaceable
+        executable (started from the sources, protected folder…), opens the release page."""
         t = self.t
         rel = (self.app_update or {}).get("release")
         if not rel:
@@ -1824,17 +1946,21 @@ class App(tk.Tk):
             return
         self.log(t("log_app_updated", old=__version__, new=rel["version"]))
         if str(final) != sys.executable and self.cfg.get("autostart"):  # le démarrage avec Windows suit le nouveau nom
+                                                                        # start-up with Windows follows the new name
             wintray.set_autostart(True, "", sys.executable, exe=str(final))
         if core.relaunch(final, old_version=__version__, extra_args=("--tray",) if "--tray" in sys.argv else ()):
             self._shutdown()
         else:  # nouvelle version en place, mais impossible de la démarrer : à relancer à la main
+               # new version in place, but it cannot be started: to be restarted by hand
             self._app_state = "restart"
             self._update_app_card()
             self.toast(t("app_restart_title") + " — " + t("app_restart_detail", latest=rel["version"]), "ok",
                        duration=8000)
 
     def open_update(self):
-        """Installateur Windows : page de téléchargement. Installation pip : commande copiée."""
+        """Installateur Windows : page de téléchargement. Installation pip : commande copiée.
+
+        Windows installer: download page. pip installation: command copied."""
         t = self.t
         r = self.sl_update or {}
         if r.get("kind") == "windows":
@@ -1869,6 +1995,7 @@ class App(tk.Tk):
                         hotkey_combo=s["hotkey_combo"])
         if self.sl_update and self.sl_update.get("path") != core.find_streamlink(self.cfg["streamlink_path"]):
             self.sl_update = None  # autre Streamlink choisi : l'ancien résultat ne vaut plus
+                                   # another Streamlink chosen: the old result no longer applies
         autostart_error = not self._apply_autostart(bool(s["autostart"]))
         core.save_config(self.cfg)
         self.platforms, error = core.load_platforms()
@@ -1884,7 +2011,9 @@ class App(tk.Tk):
             self.toast(self.t("toast_settings_saved"), "ok")
 
     def _apply_autostart(self, wanted):
-        """Active ou désactive le lancement avec Windows ; False si Windows a refusé."""
+        """Active ou désactive le lancement avec Windows ; False si Windows a refusé.
+
+        Enables or disables start-up with Windows; False if Windows refused."""
         if wanted == bool(self.cfg.get("autostart")):
             return True
         script = os.path.join(str(core.BASE_DIR), "slink_launcher.py")
@@ -1895,6 +2024,7 @@ class App(tk.Tk):
 
     # =====================================================
     # Sauvegarde : export / import des réglages et des favoris
+    # Backup: export / import of the settings and favorites
     # =====================================================
     def export_data(self):
         from . import __version__
@@ -1940,6 +2070,7 @@ class App(tk.Tk):
             replace = False
         old_lang = self.cfg["language"]
         autostart = settings.pop("autostart", None)  # appliqué à Windows ci-dessous, pas seulement noté
+                                                     # applied to Windows below, not only recorded
         self.cfg.update(settings)
         self.cfg["qualities"] = dict(self.cfg.get("qualities") or {})
         autostart_ok = autostart is None or self._apply_autostart(autostart)
@@ -1951,13 +2082,16 @@ class App(tk.Tk):
                 self.store.favorites, m = core.merge_favorites(self.store.favorites, favorites)
             self.store.save_favorites()
         self._settings_changed(old_lang, clear_live=True)  # favoris peut-être changés : statuts à revérifier
+                                                           # favorites may have changed: statuses to check again
         self.log(self.t("log_import_ok", settings=n, favorites=m), "dim")
         self.toast(self.t("toast_import_ok", settings=n, favorites=m) if autostart_ok
                    else self.t("toast_autostart_failed"), "ok" if autostart_ok else "error")
         return True
 
     def _settings_changed(self, old_lang, clear_live):
-        """Après « Enregistrer » ou un import : langue, cible, statuts en direct, icône et raccourci, affichage."""
+        """Après « Enregistrer » ou un import : langue, cible, statuts en direct, icône et raccourci, affichage.
+
+        After "Save" or an import: language, target, live statuses, icon and shortcut, display."""
         if self.cfg["language"] != old_lang:
             self.t.set(self.cfg["language"])
         if self.target[0] == "script" and not self.cfg["show_scripts"]:
@@ -1965,6 +2099,7 @@ class App(tk.Tk):
         if clear_live:
             self.live.clear()
         self.apply_tray_settings(startup=True)  # avant la reconstruction : l'état affiché est à jour
+                                                # before the rebuild: the displayed state is up to date
         self.build(reopen="settings")
         self.refresh_previews()
         self.schedule_live(1500)
@@ -1990,6 +2125,7 @@ class App(tk.Tk):
             self.toast(self.t("log_error", error=e), "error")
 
     # --- Historique
+    # --- History
     def open_history(self):
         t = self.t
 
@@ -2026,6 +2162,7 @@ class App(tk.Tk):
             self.open_history()
 
     # --- Favoris
+    # --- Favorites
     def open_favorites(self):
         t = self.t
 
@@ -2055,9 +2192,12 @@ class App(tk.Tk):
 
     # =====================================================
     # Démarrage et fermeture
+    # Start-up and closing
     # =====================================================
     def _report_data_issues(self):
-        """Affiche les problèmes de fichiers signalés par core (fichier endommagé, enregistrement impossible)."""
+        """Affiche les problèmes de fichiers signalés par core (fichier endommagé, enregistrement impossible).
+
+        Shows the file problems reported by core (damaged file, saving impossible)."""
         t = self.t
         while core.DATA_ISSUES:
             key, values = core.DATA_ISSUES.pop(0)
@@ -2069,6 +2209,7 @@ class App(tk.Tk):
         t = self.t
         core.set_issue_handler(lambda: self.after(0, self._report_data_issues))
         if not core.PORTABLE and not core.APPIMAGE:  # AppImage : données dans ~/.config, c'est normal
+                                                     # AppImage: data in ~/.config, this is normal
             self.log(t("log_data_folder", path=core.DATA_ROOT), "warn")
         if self.platforms_error:
             self.log(t("log_platforms_error", error=self.platforms_error), "err")
@@ -2078,6 +2219,7 @@ class App(tk.Tk):
             self.toast(t("toast_no_streamlink"), "error", action=(t("action_settings"), self.open_settings),
                        duration=6000)
         self._report_data_issues()  # en dernier : un fichier endommagé est l'alerte la plus importante
+                                    # last: a damaged file is the most important alert
 
     def _save_window_state(self):
         try:
@@ -2093,13 +2235,16 @@ class App(tk.Tk):
         running = self.streams.running()
         if running and self.state() == "withdrawn":
             self.show_main()  # la confirmation doit être visible
+                              # the confirmation must be visible
         if running and not messagebox.askyesno(self.t("title_confirm"),
                                                self.t("confirm_quit_running", count=len(running)), parent=self):
             return
         self._shutdown()
 
     def _shutdown(self):
-        """Arrête les streams, libère les ressources Windows, enregistre l'état et ferme la fenêtre."""
+        """Arrête les streams, libère les ressources Windows, enregistre l'état et ferme la fenêtre.
+
+        Stops the streams, frees the Windows resources, saves the state and closes the window."""
         self._app_cancel.set()
         self.streams.stop_all()
         if self._live_job:
@@ -2120,10 +2265,12 @@ def main():
     core.setup_logging()
     core.log.info("Démarrage de Streamlink Launcher %s (données : %s)", __version__, core.DATA_ROOT)
     waited = core.arg_value("--wait-pid")  # relance après une mise à jour : on attend la fermeture de l'ancienne
+                                           # restart after an update: wait for the old one to close
     if waited and waited.isdigit():
         wintray.wait_for_pid(int(waited), 20)
     if not wintray.acquire_single_instance():
         return  # déjà ouvert : sa fenêtre vient d'être affichée
+                # already open: its window has just been shown
     enable_dpi_awareness()
     set_app_id()
     App().mainloop()

@@ -4,6 +4,13 @@ prêt pour tk.PhotoImage (Tk 8.6 ne lit ni JPEG ni ne redimensionne proprement).
 Le décodage passe par GDI+ (inclus dans Windows, appelé via ctypes : aucune dépendance).
 Ailleurs, decode_scaled() renvoie None et la carte affiche un aperçu de remplacement.
 Tout ici peut tourner hors de l'interface (thread) : seul PhotoImage(data=...) se fait dans Tk.
+
+Previews of live streams: downloaded JPEG image -> scaled and rounded PNG,
+ready for tk.PhotoImage (Tk 8.6 neither reads JPEG nor resizes properly).
+
+Decoding goes through GDI+ (included in Windows, called via ctypes: no dependency).
+Elsewhere, decode_scaled() returns None and the card shows a placeholder preview.
+Everything here can run outside the interface (thread): only PhotoImage(data=...) happens in Tk.
 """
 import logging
 import os
@@ -14,13 +21,17 @@ import zlib
 log = logging.getLogger("streamlink_launcher")
 
 _SAMPLES = (0.125, 0.375, 0.625, 0.875)  # suréchantillonnage 4x4 des pixels des coins
+                                         # 4x4 supersampling of the corner pixels
 
 
 # ---------------------
 # PNG et coins arrondis (pur Python)
+# PNG and rounded corners (pure Python)
 # ---------------------
 def png_rgba(width, height, rgba):
-    """Encode des pixels RGBA (octets, ligne par ligne) en PNG."""
+    """Encode des pixels RGBA (octets, ligne par ligne) en PNG.
+
+    Encodes RGBA pixels (bytes, row by row) as PNG."""
     row = width * 4
     raw = b"".join(b"\0" + bytes(rgba[y * row:(y + 1) * row]) for y in range(height))
 
@@ -32,7 +43,9 @@ def png_rgba(width, height, rgba):
 
 
 def _coverage(r):
-    """Part de chaque pixel d'un coin (r x r, coin haut-gauche) située dans l'arrondi : 0..16."""
+    """Part de chaque pixel d'un coin (r x r, coin haut-gauche) située dans l'arrondi : 0..16.
+
+    Share of each pixel of a corner (r x r, top-left corner) that lies inside the rounding: 0..16."""
     table = []
     for j in range(r):
         line = []
@@ -50,7 +63,9 @@ def _coverage(r):
 
 
 def round_corners(rgba, width, height, radius):
-    """Rend les quatre coins transparents (bord lissé). Modifie le bytearray `rgba` sur place."""
+    """Rend les quatre coins transparents (bord lissé). Modifie le bytearray `rgba` sur place.
+
+    Makes the four corners transparent (smoothed edge). Modifies the `rgba` bytearray in place."""
     r = min(int(radius), width // 2, height // 2)
     if r <= 0:
         return rgba
@@ -67,7 +82,9 @@ def round_corners(rgba, width, height, radius):
 
 
 def bgra_to_rgba(buf, width, height, stride):
-    """Pixels GDI+ (B, G, R, A par pixel, `stride` octets par ligne) -> RGBA compact."""
+    """Pixels GDI+ (B, G, R, A par pixel, `stride` octets par ligne) -> RGBA compact.
+
+    GDI+ pixels (B, G, R, A per pixel, `stride` bytes per row) -> compact RGBA."""
     row = width * 4
     if stride != row:
         buf = b"".join(buf[y * stride:y * stride + row] for y in range(height))
@@ -77,21 +94,28 @@ def bgra_to_rgba(buf, width, height, stride):
 
 
 def cover_box(src_w, src_h, dst_w, dst_h):
-    """Zone de l'image source à garder pour remplir dst sans déformer (recadrage centré)."""
+    """Zone de l'image source à garder pour remplir dst sans déformer (recadrage centré).
+
+    Area of the source image to keep to fill dst without distortion (centered crop)."""
     if src_w * dst_h > dst_w * src_h:              # source plus large : on rogne les côtés
+                                                   # wider source: the sides are cropped
         w = max(1, round(src_h * dst_w / dst_h))
         return (src_w - w) // 2, 0, w, src_h
     h = max(1, round(src_w * dst_h / dst_w))       # source plus haute : on rogne en haut et en bas
+                                                   # taller source: the top and bottom are cropped
     return 0, (src_h - h) // 2, src_w, h
 
 
 def render(data, width, height, radius):
-    """JPEG/PNG (octets) -> PNG RGBA de width x height aux coins arrondis, ou None si illisible."""
+    """JPEG/PNG (octets) -> PNG RGBA de width x height aux coins arrondis, ou None si illisible.
+
+    JPEG/PNG (bytes) -> RGBA PNG of width x height with rounded corners, or None if unreadable."""
     if not data or width < 8 or height < 8:
         return None
     try:
         rgba = decode_scaled(data, width, height)
     except OSError as e:          # image abîmée ou format inconnu : la carte garde son fond de remplacement
+                                  # damaged image or unknown format: the card keeps its placeholder background
         log.info("Aperçu illisible : %s", e)
         return None
     except Exception:
@@ -104,6 +128,7 @@ def render(data, width, height, radius):
 
 # ---------------------
 # Décodage (GDI+ sous Windows)
+# Decoding (GDI+ on Windows)
 # ---------------------
 if os.name == "nt":
     import ctypes
@@ -166,7 +191,9 @@ if os.name == "nt":
         ctypes.WINFUNCTYPE(ctypes.c_ulong, _VP)(vtbl[2])(com)
 
     def decode_scaled(data, width, height):
-        """Décode l'image, la recadre et la met à l'échelle (bicubique) : pixels RGBA, ou None."""
+        """Décode l'image, la recadre et la met à l'échelle (bicubique) : pixels RGBA, ou None.
+
+        Decodes the image, crops it and scales it (bicubic): RGBA pixels, or None."""
         with _lock:
             if not _token.value:
                 _check(_gdip.GdiplusStartup(ctypes.byref(_token), ctypes.byref(_StartupInput(1)), None), "startup")
@@ -189,6 +216,7 @@ if os.name == "nt":
                 _gdip.GdipSetPixelOffsetMode(gfx, PixelOffsetModeHighQuality)
                 _check(_gdip.GdipCreateImageAttributes(ctypes.byref(attrs)), "attributes")
                 _gdip.GdipSetImageAttributesWrapMode(attrs, WrapModeTileFlipXY, 0, False)  # pas de halo au bord
+                                                                                           # no halo at the edge
                 _check(_gdip.GdipDrawImageRectRectI(gfx, src, 0, 0, width, height, sx, sy, cw, ch, UnitPixel,
                                                     attrs, None, None), "draw")
                 bd = _BitmapData()

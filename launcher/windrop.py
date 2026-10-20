@@ -9,6 +9,18 @@ RÈGLE : les rappels OLE ne touchent JAMAIS à Tk. Ils déposent des événement
 `push` (deque.append) ; la boucle Tk les relit toutes les 100 ms (comme pour l'icône de zone
 de notification). Événements : ("enter",) ("leave",) ("text", str) ("files", [chemins]).
 Hors Windows, la classe existe mais ne fait rien (register() renvoie False).
+
+Drag and drop of links onto the window (Windows, OLE via ctypes, no dependency).
+
+An OLE drop target (IDropTarget) is registered on the main window. It accepts:
+  - a link dragged from a browser's address bar or tab,
+  - selected text, then dragged,
+  - files (.url Internet shortcuts, text files).
+
+RULE: the OLE callbacks NEVER touch Tk. They drop events into the `push`
+queue (deque.append); the Tk loop reads them every 100 ms (as for the notification
+area icon). Events: ("enter",) ("leave",) ("text", str) ("files", [paths]).
+Outside Windows, the class exists but does nothing (register() returns False).
 """
 import logging
 import os
@@ -85,7 +97,9 @@ if os.name == "nt":
     _QUERY = ctypes.WINFUNCTYPE(HRESULT, _VP, ctypes.POINTER(FORMATETC))
 
     def _call(obj, index, proto, *args):
-        """Appelle la méthode n° `index` de la table virtuelle d'un objet COM."""
+        """Appelle la méthode n° `index` de la table virtuelle d'un objet COM.
+
+        Calls method number `index` of a COM object's virtual table."""
         vtbl = ctypes.cast(obj, ctypes.POINTER(ctypes.POINTER(_VP)))[0]
         return proto(vtbl[index])(obj, *args)
 
@@ -93,7 +107,9 @@ if os.name == "nt":
         return FORMATETC(cf, None, 1, -1, TYMED_HGLOBAL)
 
     def _hglobal(data_obj, cf):
-        """Contenu (octets) d'un format HGLOBAL de l'objet de données, ou None."""
+        """Contenu (octets) d'un format HGLOBAL de l'objet de données, ou None.
+
+        Content (bytes) of an HGLOBAL format of the data object, or None."""
         fe, sm = _fmt(cf), STGMEDIUM()
         if _call(data_obj, 3, _GETDATA, ctypes.byref(fe), ctypes.byref(sm)) != S_OK:
             return None
@@ -133,7 +149,10 @@ if os.name == "nt":
 
     def read_data_object(data_obj):
         """-> ("text", str) | ("files", [chemins]) | None, en lisant un IDataObject.
-        Ordre : lien (Unicode puis ANSI, glissé depuis un navigateur), texte, puis fichiers."""
+        Ordre : lien (Unicode puis ANSI, glissé depuis un navigateur), texte, puis fichiers.
+
+        -> ("text", str) | ("files", [paths]) | None, by reading an IDataObject.
+        Order: link (Unicode then ANSI, dragged from a browser), text, then files."""
         data_obj = _as_ptr(data_obj)
         for cf, encoding in ((user32.RegisterClipboardFormatW(FORMAT_URL_W), "utf-16-le"),
                              (user32.RegisterClipboardFormatW(FORMAT_URL_A), "cp1252"),
@@ -151,7 +170,9 @@ if os.name == "nt":
         return any(_has(data_obj, cf) for cf in formats)
 
     class DropTarget:
-        """Cible de dépôt OLE enregistrée sur une fenêtre de premier niveau."""
+        """Cible de dépôt OLE enregistrée sur une fenêtre de premier niveau.
+
+        OLE drop target registered on a top-level window."""
 
         def __init__(self, hwnd, push):
             self.hwnd, self.push = hwnd, push
@@ -167,6 +188,7 @@ if os.name == "nt":
             self._obj = _VP(ctypes.addressof(self._vtbl))
 
         # --- méthodes COM (jamais de Tk ici) ---
+        # --- COM methods (never any Tk here) ---
         def _query(self, this, riid, ppv):
             try:
                 if bytes(ctypes.cast(riid, ctypes.POINTER(GUID))[0]) in self._iid:
@@ -221,9 +243,11 @@ if os.name == "nt":
             return S_OK
 
         # --- cycle de vie ---
+        # --- life cycle ---
         def register(self):
             try:
                 hr = ole32.OleInitialize(None)          # S_OK / S_FALSE (déjà fait) : tous deux acceptables
+                                                        # S_OK / S_FALSE (already done): both acceptable
                 if hr not in (0, 1):
                     log.warning("OleInitialize: 0x%08X", hr & 0xFFFFFFFF)
                     return False
@@ -245,7 +269,9 @@ if os.name == "nt":
                 self.registered = False
 
     def toplevel_hwnd(widget):
-        """HWND de la fenêtre de premier niveau d'un widget Tk."""
+        """HWND de la fenêtre de premier niveau d'un widget Tk.
+
+        HWND of the top-level window of a Tk widget."""
         wid = widget.winfo_id()
         return user32.GetParent(wid) or wid
 

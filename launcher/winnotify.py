@@ -1,5 +1,8 @@
 """Notifications Windows sans dépendance : toast natif (via Windows PowerShell) et clignotement
-de la barre des tâches. Tout est ignoré silencieusement hors de Windows ou en cas d'échec."""
+de la barre des tâches. Tout est ignoré silencieusement hors de Windows ou en cas d'échec.
+
+Windows notifications without dependencies: native toast (via Windows PowerShell) and taskbar
+flashing. Everything is silently ignored outside Windows or on failure."""
 import logging
 import os
 import subprocess
@@ -8,6 +11,8 @@ _log = logging.getLogger("streamlink_launcher")
 
 # Script lancé seulement au début d'un live (rare) ; le texte passe par des variables d'environnement
 # pour éviter tout problème de guillemets.
+# Script started only when a live begins (rare); the text goes through environment variables
+# to avoid any quoting problem.
 _TOAST_SCRIPT = r"""
 $ErrorActionPreference = 'Stop'
 [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] > $null
@@ -22,7 +27,9 @@ $app = '{1AC14E77-02E7-4E5D-B744-2EB1AE5198B7}\WindowsPowerShell\v1.0\powershell
 
 
 def toast(title, body):
-    """Affiche une notification Windows. Renvoie True si la commande a pu être lancée."""
+    """Affiche une notification Windows. Renvoie True si la commande a pu être lancée.
+
+    Shows a Windows notification. Returns True if the command could be started."""
     if os.name != "nt":
         return False
     try:
@@ -38,7 +45,9 @@ def toast(title, body):
 
 
 def flash_taskbar(win, count=3):
-    """Fait clignoter le bouton de la fenêtre dans la barre des tâches (si elle n'a pas le focus)."""
+    """Fait clignoter le bouton de la fenêtre dans la barre des tâches (si elle n'a pas le focus).
+
+    Flashes the window's button in the taskbar (if it does not have the focus)."""
     if os.name != "nt":
         return
     try:
