@@ -1,0 +1,192 @@
+<script>
+/* Section Docs : vit dans #docs, la langue est pilotée par le site (window.SLDocs). */
+window.SLDocs = (() => {
+  const view = document.getElementById("docs");
+  const root = document.getElementById("docroot");
+  const HTML = { fr: root.innerHTML, en: document.getElementById("doc-en").innerHTML };
+  let shownLang = "fr";
+  const visible = () => !view.hidden;
+
+  const STR = {
+    fr: { copy: "Copier", copied: "Copié", sel: "Ctrl+C", res: n => n ? `${n} résultat${n > 1 ? "s" : ""}` : "0 résultat",
+          syn: "Recherche élargie à : ", lb: "Capture agrandie", close: "Fermer" },
+    en: { copy: "Copy", copied: "Copied", sel: "Ctrl+C", res: n => `${n} result${n === 1 ? "" : "s"}`,
+          syn: "Also searching for: ", lb: "Enlarged screenshot", close: "Close" },
+  };
+  const SYN = {
+    fr: [
+      ["bug", "plantage", "plante", "crash", "erreur", "ne marche pas", "problème"],
+      ["mise à jour", "maj", "update", "nouvelle version", "upgrade"],
+      ["désinstaller", "supprimer", "uninstall", "enlever"],
+      ["lecteur", "player", "VLC", "mpv", "PotPlayer"],
+      ["raccourci", "clavier", "touche", "shortcut"],
+      ["connexion", "se connecter", "compte", "login", "jeton", "token", "mot de passe"],
+      ["emote", "emoji", "smiley", "émoticône"],
+      ["enregistrer", "record", "enregistrement"],
+      ["publicité", "pub", "ads"],
+      ["antivirus", "Defender", "virus", "quarantaine", "SmartScreen"],
+      ["mémoire", "RAM", "lent", "lag", "ralenti"],
+      ["latence", "retard", "délai", "décalage"],
+      ["vie privée", "données", "confidentialité", "tracking", "télémétrie"],
+    ],
+    en: [
+      ["bug", "crash", "error", "broken", "doesn't work", "problem"],
+      ["update", "upgrade", "new version"],
+      ["uninstall", "remove", "delete"],
+      ["player", "VLC", "mpv", "PotPlayer"],
+      ["shortcut", "keyboard", "key", "hotkey"],
+      ["log in", "login", "account", "token", "password", "sign in"],
+      ["emote", "emoji", "smiley", "emoticon"],
+      ["record", "recording", "save the video"],
+      ["ads", "advert", "commercial"],
+      ["antivirus", "Defender", "virus", "quarantine", "SmartScreen"],
+      ["memory", "RAM", "slow", "lag"],
+      ["latency", "delay", "lag behind"],
+      ["privacy", "data", "tracking", "telemetry"],
+    ],
+  };
+
+  let lang = "fr", toc, links = [], sections = [], blocks = [], q, count, empty, syn;
+  const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+
+  /* --- onglets */
+  function selectTab(group, name) {
+    root.querySelectorAll(`.d-tabs[data-group="${group}"] [data-tab]`).forEach(x => x.setAttribute("aria-selected", String(x.dataset.tab === name)));
+    root.querySelectorAll(`.pane[data-group="${group}"]`).forEach(p => p.classList.toggle("on", p.dataset.pane === name));
+  }
+
+  /* --- agrandir une capture (la boîte de dialogue est hors du contenu) */
+  const lb = document.getElementById("lb");
+  lb.addEventListener("click", e => { if (e.target === lb || e.target.tagName === "BUTTON") lb.close(); });
+
+  /* --- sommaire actif */
+  function current() {
+    let cur = sections[0];
+    for (const s of sections) if (!s.classList.contains("hidden-by-search") && s.getBoundingClientRect().top < 140) cur = s;
+    return cur;
+  }
+  function spy() {
+    if (!sections.length || !visible()) return;
+    const cur = current();
+    links.forEach(a => {
+      const on = a.getAttribute("href") === "#" + cur.id;
+      if (on && !a.classList.contains("on") && innerWidth <= 880) toc.scrollLeft = a.offsetLeft - toc.offsetLeft - (toc.clientWidth - a.offsetWidth) / 2;
+      a.classList.toggle("on", on);
+    });
+  }
+  addEventListener("scroll", spy, { passive: true });
+
+  /* --- recherche, avec synonymes */
+  function expand(term) {
+    if (term.length < 3) return { terms: [term], extra: [] };
+    const group = SYN[lang].find(g => g.some(w => { const n = norm(w); return n === term || (term.length >= 4 && n.startsWith(term)); }));
+    if (!group) return { terms: [term], extra: [] };
+    const extra = group.filter(w => norm(w) !== term);
+    return { terms: [term, ...extra.map(norm)], extra };
+  }
+  function clearMarks() { root.querySelectorAll("mark").forEach(m => m.replaceWith(...m.childNodes)); root.querySelectorAll("section.doc").forEach(s => s.normalize()); }
+  function markIn(el, terms) {
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    const hits = [];
+    while (walker.nextNode()) {
+      const n = walker.currentNode; if (n.parentElement.closest("button, mark")) continue;
+      const t = norm(n.data);
+      for (const term of terms) { const i = t.indexOf(term); if (i >= 0) { hits.push([n, i, term.length]); break; } }
+    }
+    hits.forEach(([n, i, len]) => { const r = document.createRange(); r.setStart(n, i); r.setEnd(n, i + len); const m = document.createElement("mark"); try { r.surroundContents(m); } catch {} });
+  }
+  function run() {
+    clearMarks();
+    const term = norm(q.value.trim());
+    const ex = term ? expand(term) : { terms: [], extra: [] }, terms = ex.terms;
+    let shown = 0;
+    blocks.forEach(b => {
+      const hit = !term || terms.some(t => b.dataset.text.includes(t));
+      b.classList.toggle("hidden-by-search", !hit);
+      if (hit && term) { shown++; markIn(b, terms); if (b.tagName === "DETAILS") b.open = true; }
+      if (!term && b.tagName === "DETAILS") b.open = false;
+    });
+    root.querySelectorAll("section.doc").forEach(s => {
+      const any = !term || blocks.some(b => s.contains(b) && !b.classList.contains("hidden-by-search"));
+      s.classList.toggle("hidden-by-search", !any);
+      const link = links.find(a => a.getAttribute("href") === "#" + s.id);
+      if (link) link.classList.toggle("dim", !any);
+    });
+    root.querySelectorAll(".pane").forEach(p => {
+      if (term) p.classList.toggle("on", !!p.querySelector(".blk:not(.hidden-by-search)") || (p.classList.contains("blk") && !p.classList.contains("hidden-by-search")));
+    });
+    if (!term) root.querySelectorAll(".d-tabs[data-group]").forEach(t => selectTab(t.dataset.group, t.querySelector('[aria-selected="true"]').dataset.tab));
+    root.querySelectorAll(".d-tabs[data-group]").forEach(t => t.closest(".blk").classList.toggle("hidden-by-search", !!term));
+    count.textContent = term ? STR[lang].res(shown) : "";
+    syn.textContent = ex.extra.length ? STR[lang].syn + ex.extra.join(", ") : "";
+    empty.hidden = !(term && !shown);
+    if (term && !shown) empty.closest("section.doc").classList.remove("hidden-by-search");
+    spy();
+  }
+
+  /* --- branche tout ce qui vit dans le contenu affiché */
+  function init() {
+    root.querySelectorAll(".d-tabs[data-group]").forEach(t => t.addEventListener("click", e => {
+      const b = e.target.closest("[data-tab]"); if (b) selectTab(t.dataset.group, b.dataset.tab);
+    }));
+    const ua = navigator.userAgent || "";
+    if (/Linux/.test(ua) && !/Android/.test(ua)) selectTab("os", "linux");
+
+    root.querySelectorAll("figure .zoom").forEach(z => z.addEventListener("click", () => {
+      const img = z.querySelector("img");
+      lb.querySelector("img").src = img.src; lb.querySelector("img").alt = img.alt;
+      lb.querySelector("p").textContent = z.closest("figure").querySelector("figcaption").textContent;
+      if (lb.showModal) lb.showModal();
+    }));
+
+    root.querySelectorAll(".d-term").forEach(t => {
+      const lines = [...t.childNodes].filter(n => !(n.classList && n.classList.contains("fn"))).map(n => n.textContent).join("").split("\n")
+        .filter(l => !l.trim().startsWith("# ")).map(l => l.replace(/^\s*[$>]\s/, "")).join("\n").trim();
+      const b = document.createElement("button");
+      b.type = "button"; b.textContent = STR[lang].copy;
+      b.addEventListener("click", () => {
+        const ok = () => { b.textContent = STR[lang].copied; setTimeout(() => { b.textContent = STR[lang].copy; }, 1500); };
+        const fb = () => { const r = document.createRange(); r.selectNodeContents(t); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = STR[lang].sel; };
+        try { navigator.clipboard.writeText(lines).then(ok, fb); } catch { fb(); }
+      });
+      t.appendChild(b);
+    });
+
+    toc = document.getElementById("toc");
+    links = [...toc.querySelectorAll("a")];
+    sections = links.map(a => document.querySelector(a.getAttribute("href")));
+    q = document.getElementById("dq"); count = document.getElementById("count"); empty = document.getElementById("empty"); syn = document.getElementById("syn");
+    blocks = [...root.querySelectorAll("section.doc .blk, section.doc .faq, section.doc > .note, section.doc > .tip, section.doc > .lead, section.doc .gl")]
+      .filter(b => !b.parentElement.closest(".blk, .faq"));
+    blocks.forEach(b => { b.dataset.text = norm(b.textContent); });
+    let timer;
+    q.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(run, 120); });
+    spy();
+  }
+
+  /* --- changer de langue : même partie de la page, recherche conservée */
+  function apply(l, keepPlace) {
+    keepPlace = keepPlace && visible();
+    const idx = keepPlace && sections.length && sections[0].getBoundingClientRect().top < 140 ? sections.indexOf(current()) : -1;
+    const query = q ? q.value : "";
+    lang = l;
+    if (l !== shownLang) { root.innerHTML = HTML[l]; shownLang = l; }
+    lb.setAttribute("aria-label", STR[l].lb); lb.querySelector("button").setAttribute("aria-label", STR[l].close);
+    init();
+    if (query) { q.value = query; run(); }
+    if (idx >= 0 && sections[idx]) {
+      sections[idx].scrollIntoView({ behavior: "instant" });
+      history.replaceState(null, "", "#" + sections[idx].id);
+    } else if (visible() && location.hash && location.hash !== "#docs") {
+      history.replaceState(null, "", "#docs");
+    }
+  }
+  /* langue d'une ancre de la doc (les ancres sont traduites) */
+  function langFor(id) {
+    if (!id) return null;
+    const fr = HTML.fr.includes(`id="${id}"`), en = HTML.en.includes(`id="${id}"`);
+    return fr && !en ? "fr" : en && !fr ? "en" : null;
+  }
+  return { setLang: apply, langFor, refresh: spy };
+})();
+</script>
