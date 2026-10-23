@@ -12,6 +12,8 @@
 
 A lightweight Windows and Linux launcher for [Streamlink](https://streamlink.github.io/): paste a link or type a channel name, press <kbd>Enter</kbd>, and the stream opens in your video player (VLC, mpv, PotPlayer…) instead of the browser.
 
+**Website and documentation:** [bulls64.github.io/Streamlink-Launcher/en](https://bulls64.github.io/Streamlink-Launcher/en) · [en français](https://bulls64.github.io/Streamlink-Launcher)
+
 > **New in 1.5.0: Linux AppImage.** One file, no installation, with its own Python: download `StreamlinkLauncher-<version>-x86_64.AppImage` from the [latest release](https://github.com/Bulls64/Streamlink-Launcher/releases/latest), `chmod +x` it and run it. See [Option 2](#option-2-linux-appimage).
 
 Pure Python + Tkinter, **no third-party dependency**. From source, it starts in about 0.25 s and uses around 30 MB of RAM (the single-file `.exe` takes a little longer to start, as it unpacks itself first).
@@ -237,6 +239,8 @@ License: [MIT](LICENSE)
 ## Français
 
 Un lanceur léger pour Windows et Linux pour [Streamlink](https://streamlink.github.io/) : colle un lien ou tape le nom d'une chaîne, appuie sur <kbd>Entrée</kbd>, et le stream s'ouvre dans ton lecteur vidéo (VLC, mpv, PotPlayer…) au lieu du navigateur.
+
+**Site et documentation :** [bulls64.github.io/Streamlink-Launcher](https://bulls64.github.io/Streamlink-Launcher) · [in English](https://bulls64.github.io/Streamlink-Launcher/en)
 
 > **Nouveau en 1.5.0 : AppImage pour Linux.** Un seul fichier, sans installation, avec son propre Python : télécharge `StreamlinkLauncher-<version>-x86_64.AppImage` depuis la [dernière release](https://github.com/Bulls64/Streamlink-Launcher/releases/latest), rends-la exécutable (`chmod +x`) et lance-la. Voir l'[option 2](#option-2--linux-appimage).
 
