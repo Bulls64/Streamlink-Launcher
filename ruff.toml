@@ -2,6 +2,8 @@
 # Lancer :  python -m ruff check .
 target-version = "py310"
 line-length = 120
+# Scripts de génération du site (website-src/) : volontairement compacts, hors de l'analyse de l'appli
+extend-exclude = ["website-src"]
 
 [lint]
 select = ["E", "F", "W", "I", "B", "S110", "RUF100"]
