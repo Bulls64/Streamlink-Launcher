@@ -27,6 +27,9 @@ def up(cur): return "../" * cur.count("/")                    # chemin relatif v
 def link(cur, kind, lang, frag=""): return (up(cur) + PATHS[(kind, lang)] or "./") + frag
 def absu(kind, lang): return BASE + PATHS[(kind, lang)]
 
+# Google Search Console, propriété « Préfixe de l'URL » (validation par balise HTML)
+GOOGLE_SITE_VERIFICATION = "CNNycSFV-w4cvtyv4_P8k8AITTl89dwfBTBh9jasFlM"
+
 LAUNCHER, CHAT = "1.5.0", "0.2.0"
 META = {
     ("home", "fr"): ("Streamlink Launcher & Chat : Twitch et Kick dans VLC ou mpv",
@@ -171,6 +174,7 @@ def head(cur, kind, lang, extra_css="", content=None):
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(desc)}">
 <meta name="author" content="Bulls64">
+<meta name="google-site-verification" content="{GOOGLE_SITE_VERIFICATION}">
 <link rel="canonical" href="{absu(kind, lang)}">
 <link rel="alternate" hreflang="fr" href="{absu(kind, 'fr')}">
 <link rel="alternate" hreflang="en" href="{absu(kind, 'en')}">
