@@ -65,16 +65,20 @@ window.SLDocs = (() => {
     for (const s of sections) if (!s.classList.contains("hidden-by-search") && s.getBoundingClientRect().top < 140) cur = s;
     return cur;
   }
+  let spyQueued = false, lastCur = null;
+  function spyLater() { if (!spyQueued) { spyQueued = true; requestAnimationFrame(() => { spyQueued = false; spy(); }); } }
   function spy() {
     if (!sections.length || !visible()) return;
     const cur = current();
+    if (cur === lastCur && links.some(a => a.classList.contains("on"))) return;
+    lastCur = cur;
     links.forEach(a => {
       const on = a.getAttribute("href") === "#" + cur.id;
       if (on && !a.classList.contains("on") && innerWidth <= 880) toc.scrollLeft = a.offsetLeft - toc.offsetLeft - (toc.clientWidth - a.offsetWidth) / 2;
       a.classList.toggle("on", on);
     });
   }
-  addEventListener("scroll", spy, { passive: true });
+  addEventListener("scroll", spyLater, { passive: true });
 
   /* --- recherche, avec synonymes */
   function expand(term) {
