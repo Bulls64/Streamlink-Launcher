@@ -1,0 +1,27 @@
+{
+ "name": "Streamlink Launcher & Chat",
+ "short_name": "Streamlink",
+ "start_url": "./",
+ "scope": "./",
+ "display": "browser",
+ "background_color": "#0F1116",
+ "theme_color": "#9146FF",
+ "lang": "fr",
+ "icons": [
+  {
+   "src": "assets/icons/icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "assets/icons/icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  },
+  {
+   "src": "assets/icons/icon.svg",
+   "sizes": "any",
+   "type": "image/svg+xml"
+  }
+ ]
+}
