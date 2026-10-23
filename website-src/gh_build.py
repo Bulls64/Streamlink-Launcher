@@ -57,7 +57,8 @@ BODY = read("site_body.html")
 SVG_DEFS = BODY[:BODY.index('<div class="boot"')].strip()
 HEADER = BODY[BODY.index('<header class="top">'):BODY.index("</header>") + 9]
 FOOTER = BODY[BODY.index("<footer>"):BODY.index("</footer>") + 9]
-MAIN = BODY[BODY.index('<div class="boot"'):BODY.index("<footer>")].replace("{{DOCS}}", "")
+BOOT = '<div class="boot" id="boot" aria-hidden="true"></div>\n\n'
+MAIN = BODY[BODY.index("</header>") + 9:BODY.index("<footer>")].replace("{{DOCS}}", "")   # sans l'en-tête, ajouté à part
 
 FONT_FACES = ([("Big Shoulders Display", "big-shoulders-display", w, "normal") for w in (600, 800, 900)]
               + [("Instrument Sans", "instrument-sans", w, "normal") for w in (400, 500, 600, 700)] + [("Instrument Sans", "instrument-sans", 400, "italic")]
@@ -267,7 +268,7 @@ def build_home(lang):
     js, imgs = home_script(cur, lang)
     main = re.sub(r"\{\{img:(\w+):(\w+)\}\}", lambda m: imgs[lang][m.group(2)], MAIN)
     main = main.replace('<figure><img data-img=', '<figure><img loading="lazy" decoding="async" data-img=')
-    body = SVG_DEFS + "\n\n" + header(cur, "home", lang) + "\n\n" + translate(main, lang) + "\n" + translate(FOOTER, lang) + "\n"
+    body = SVG_DEFS + "\n\n" + BOOT + header(cur, "home", lang) + "\n\n" + translate(main, lang) + "\n" + translate(FOOTER, lang) + "\n"
     return head(cur, "home", lang) + body + lang_switch_js(cur, "home") + js + "</body>\n</html>\n"
 
 def build_docs(lang):
