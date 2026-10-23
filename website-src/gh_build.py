@@ -7,14 +7,15 @@ mais une vraie page par langue et par rubrique, pré-rendue, pour que les moteur
     /docs/       documentation en français  /en/docs/     documentation en anglais
 
 Sortie : ../website/  (publié par .github/workflows/pages.yml)
-Usage :  python3 gh_build.py [URL_DU_SITE]
+Usage :  python3 gh_build.py [URL_DU_SITE] [--no-minify]
 """
 import json, re, shutil, subprocess, sys, datetime
 from pathlib import Path
 from bs4 import BeautifulSoup
 import docs_embed
 
-BASE = (sys.argv[1] if len(sys.argv) > 1 else "https://bulls64.github.io/Streamlink-Launcher/").rstrip("/") + "/"
+ARGS = [a for a in sys.argv[1:] if not a.startswith("--")]
+BASE = (ARGS[0] if ARGS else "https://bulls64.github.io/Streamlink-Launcher/").rstrip("/") + "/"
 BASE_PATH = "/" + BASE.split("://", 1)[1].split("/", 1)[1]           # ex. /Streamlink-Launcher/
 TODAY = datetime.date.today().isoformat()
 here = Path(__file__).parent
@@ -158,7 +159,7 @@ def jsonld(kind, lang, content=None):
             {"@type": "ListItem", "position": 2, "name": "Documentation", "item": absu(kind, lang)}]})
         faqs = faq_items(content)
         if faqs: graph.append({"@type": "FAQPage", "@id": absu(kind, lang) + "#faq-data", "inLanguage": lang, "mainEntity": faqs})
-    data = json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False, indent=1)
+    data = json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False, separators=(",", ":"))
     return '<script type="application/ld+json">\n' + data.replace("</", "<\\/") + "\n</script>"
 
 def head(cur, kind, lang, extra_css="", content=None):
@@ -243,15 +244,36 @@ def home_script(cur, lang):
     s = re.sub(r"  function startLang\(\) \{.*?\n  \}\n", "  function startLang() { return document.documentElement.lang; }\n", s, count=1, flags=re.S)
     sub("  route();\n", "")
     sub('if (reduce || view === "docs")', "if (reduce)")
+    # Page pré-rendue dans une seule langue : le dictionnaire anglais, la copie des textes français
+    # et leur réapplication au chargement ne servent plus (le HTML est déjà dans la bonne langue).
+    cut("  const EN = {", "  /* textes produits par le script */")
+    sub("    const d = DICT[l];\n", "")
+    s = re.sub(r"    document\.querySelectorAll\(\"\[data-i18n(?:-aria|-alt)?\]\"\)\.forEach\(el => \{ const v = d\[.*?\n", "", s)
+    assert "DICT" not in s and "const EN" not in s
+    s = keep_lang(s, "  const T = {", lang, "{")
+    sub('  let lang = "fr";', "  let lang = document.documentElement.lang;")
     imgs = {l: {k: f"{up(cur)}assets/img/site/{l}/{k}.webp" for k in ("l_main", "l_mini", "l_set", "l_light", "c_tw", "c_kick", "c_light")} for l in ("fr", "en")}
-    return s.replace("{{IMG_JSON}}", json.dumps(imgs)), imgs
+    return s.replace("{{IMG_JSON}}", json.dumps({lang: imgs[lang]})), imgs
+
+def keep_lang(s, start, lang, opener):
+    """Dans un objet { fr: …, en: … } du script, ne garde que la langue de la page."""
+    i = s.index(start)
+    fr, en = s.index(f"\n    fr: {opener}", i), s.index(f"\n    en: {opener}", i)
+    end = s.index("\n  };", en)
+    return s[:en] + s[end:] if lang == "fr" else s[:fr] + s[en:]
 
 def docs_script(lang):
     s = read("docs_script.html")
-    for a, b in [('en: document.getElementById("doc-en").innerHTML', "en: root.innerHTML"),
-                 ('let shownLang = "fr";', "let shownLang = document.documentElement.lang;"),
+    # une seule langue par page : pas de copie du contenu pour changer de langue sur place
+    for a, b in [('  const HTML = { fr: root.innerHTML, en: document.getElementById("doc-en").innerHTML };\n  let shownLang = "fr";\n', ""),
+                 ('    if (l !== shownLang) { root.innerHTML = HTML[l]; shownLang = l; }\n', ""),
+                 ('  return { setLang: apply, langFor, refresh: spy };', '  return { setLang: apply, refresh: spy };'),
                  ('} else if (visible() && location.hash && location.hash !== "#docs") {', '} else if (keepPlace && location.hash) {')]:
         assert a in s, a; s = s.replace(a, b)
+    s = re.sub(r"  /\* langue d'une ancre.*?\n  \}\n", "", s, count=1, flags=re.S)
+    assert "HTML" not in s and "langFor" not in s
+    s = keep_lang(s, "  const STR = {", lang, "{")
+    s = keep_lang(s, "  const SYN = {", lang, "[")
     theme = SCRIPT[SCRIPT.index("  /* ---------- thème clair / sombre"):SCRIPT.index("  /* ---------- onglet Docs")]
     return s + f"""<script>
 (() => {{
@@ -284,11 +306,23 @@ def build_docs(lang):
     body = SVG_DEFS + "\n\n" + header(cur, "docs", lang) + "\n\n" + view + "\n" + translate(FOOTER, lang) + "\n"
     return head(cur, "docs", lang, docs_embed.css(), content) + body + lang_switch_js(cur, "docs") + docs_script(lang) + "</body>\n</html>\n"
 
+MINIFY = "--no-minify" not in sys.argv
+ESBUILD = here / "node_modules" / ".bin" / "esbuild"
+
+def minify(html):
+    """Minifie chaque <script> de la page (pas les données structurées). Sources lisibles : website-src/."""
+    if not MINIFY: return html
+    def one(m):
+        r = subprocess.run([str(ESBUILD), "--minify", "--target=es2020", "--loader=js", "--log-level=warning"],
+                           input=m.group(1), capture_output=True, text=True, check=True)
+        return "<script>" + r.stdout.strip() + "</script>"
+    return re.sub(r"<script>(.*?)</script>", one, html, flags=re.S)
+
 def build():
     if OUT.exists(): shutil.rmtree(OUT)          # dossier généré : reconstruit à chaque fois
     for (kind, lang), path in PATHS.items():
         f = OUT / path / "index.html"; f.parent.mkdir(parents=True, exist_ok=True)
-        f.write_text(build_home(lang) if kind == "home" else build_docs(lang), encoding="utf-8")
+        f.write_text(minify(build_home(lang) if kind == "home" else build_docs(lang)), encoding="utf-8")
     # images
     shutil.copytree(here / "img" / "site", OUT / "assets/img/site")
     (OUT / "assets/img/docs/en").mkdir(parents=True)

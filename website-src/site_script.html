@@ -279,8 +279,17 @@
   /* ---------- raccourci du mode mini ---------- */
   const keys = [...document.querySelectorAll("#keys kbd")];
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  /* les animations et la démo du chat ne tournent que si on les voit (onglet affiché, élément à l'écran) */
+  const seen = new Set();
+  const visible = el => seen.has(el) && !document.hidden;
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(es => es.forEach(e => (e.isIntersecting ? seen.add(e.target) : seen.delete(e.target))), { rootMargin: "200px 0px" });
+    [document.getElementById("keys"), document.getElementById("chatbox")].forEach(el => el && io.observe(el));
+  } else { [document.getElementById("keys"), document.getElementById("chatbox")].forEach(el => el && seen.add(el)); }
+  const keysBox = document.getElementById("keys");
   if (!reduce) {
     setInterval(() => {
+      if (!visible(keysBox)) return;
       keys.forEach((k, i) => setTimeout(() => k.classList.add("press"), i * 140));
       setTimeout(() => keys.forEach(k => k.classList.remove("press")), 900);
     }, 4200);
@@ -333,7 +342,7 @@
   function atBottom() { return log.scrollHeight - log.scrollTop - log.clientHeight < 24; }
   function push(p, m, animate) {
     store[p].push(m); if (store[p].length > 80) store[p].shift();
-    if (p !== active) { unread[p]++; drawTabs(); return; }
+    if (p !== active) { unread[p]++; drawBadge(p); return; }
     const stick = follow && !hover;
     const n = node(m); if (animate) n.classList.add("new");
     log.appendChild(n);
@@ -344,12 +353,19 @@
     tabsEl.innerHTML = "";
     CHANNELS.forEach(c => {
       const b = document.createElement("button");
-      b.type = "button"; b.className = "tab"; b.setAttribute("role", "tab"); b.setAttribute("aria-selected", String(c.p === active));
+      b.type = "button"; b.className = "tab"; b.dataset.p = c.p; b.setAttribute("role", "tab"); b.setAttribute("aria-selected", String(c.p === active));
       b.style.setProperty("--tc", c.color); b.style.setProperty("--ton", c.on);
       b.innerHTML = `<i></i>${c.name}${unread[c.p] && c.p !== active ? `<span class="n">${Math.min(unread[c.p], 99)}</span>` : ""}`;
       b.addEventListener("click", () => openChannel(c.p));
       tabsEl.appendChild(b);
     });
+  }
+  function drawBadge(p) {
+    const b = tabsEl.querySelector(`[data-p="${p}"]`);
+    if (!b) return;
+    let n = b.querySelector(".n");
+    if (!n) { n = document.createElement("span"); n.className = "n"; b.appendChild(n); }
+    n.textContent = Math.min(unread[p], 99);
   }
   function openChannel(p) {
     active = p; unread[p] = 0;
@@ -373,7 +389,7 @@
 
   const RATE = { twitch: 1300, kick: 1700, steamtv: 3600 };
   Object.keys(RATE).forEach(p => {
-    const tick = () => { push(p, makeMsg(p), !reduce); setTimeout(tick, RATE[p] * (reduce ? 2.5 : (.5 + Math.random()))); };
+    const tick = () => { if (visible(chatbox)) push(p, makeMsg(p), !reduce); setTimeout(tick, RATE[p] * (reduce ? 2.5 : (.5 + Math.random()))); };
     setTimeout(tick, 900 + Math.random() * 900);
   });
   log.addEventListener("mouseenter", () => { hover = true; });
