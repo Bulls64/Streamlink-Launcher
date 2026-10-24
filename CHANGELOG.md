@@ -11,6 +11,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+- **`launcher/app.py` split into smaller modules** (2,276 → about 680 lines): favorites and live status, launching and log drawer, side panels, updates, desktop integration (tray, clipboard, drag and drop). The methods are moved unchanged into mixins of `App`; no change in behavior.
+
 ### Planned
 - Viewing statistics (time per channel, peak hours).
 
@@ -242,6 +245,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## Français
 
 ## [Non publié]
+
+### Modifié
+- **`launcher/app.py` découpé en modules plus petits** (2 276 → environ 680 lignes) : favoris et statut en direct, lancement et tiroir du journal, panneaux latéraux, mises à jour, intégration au bureau (zone de notification, presse-papiers, glisser-déposer). Les méthodes sont déplacées sans modification dans des mixins de `App` ; aucun changement de comportement.
 
 ### Prévu
 - Statistiques de visionnage (temps par chaîne, heures de pointe).
