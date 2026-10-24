@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 - **`launcher/app.py` split into smaller modules** (2,276 → about 680 lines): favorites and live status, launching and log drawer, side panels, updates, desktop integration (tray, clipboard, drag and drop). The methods are moved unchanged into mixins of `App`; no change in behavior.
+- **`launcher/core.py` and `launcher/widgets.py` split as well**: `core.py` (1,705 → about 760 lines) keeps paths, configuration, languages, platforms, history and launching; input validation and links go to `inputs.py`, backup to `backup.py`, updates to `updater.py`, live status to `live.py`. `widgets.py` now re-exports the components grouped in `widgets_base`, `widgets_controls`, `widgets_cards`, `widgets_field` and `widgets_layout`. Code moved unchanged; no change in behavior.
 
 ### Planned
 - Viewing statistics (time per channel, peak hours).
@@ -248,6 +249,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Modifié
 - **`launcher/app.py` découpé en modules plus petits** (2 276 → environ 680 lignes) : favoris et statut en direct, lancement et tiroir du journal, panneaux latéraux, mises à jour, intégration au bureau (zone de notification, presse-papiers, glisser-déposer). Les méthodes sont déplacées sans modification dans des mixins de `App` ; aucun changement de comportement.
+- **`launcher/core.py` et `launcher/widgets.py` découpés aussi** : `core.py` (1 705 → environ 760 lignes) garde les chemins, la configuration, les langues, les plateformes, l'historique et le lancement ; la validation des saisies et des liens passe dans `inputs.py`, la sauvegarde dans `backup.py`, les mises à jour dans `updater.py`, le statut en direct dans `live.py`. `widgets.py` réexporte maintenant les composants rangés dans `widgets_base`, `widgets_controls`, `widgets_cards`, `widgets_field` et `widgets_layout`. Code déplacé sans modification ; aucun changement de comportement.
 
 ### Prévu
 - Statistiques de visionnage (temps par chaîne, heures de pointe).
