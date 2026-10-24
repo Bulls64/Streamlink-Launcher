@@ -10,7 +10,7 @@ import threading
 import tkinter as tk
 from tkinter import messagebox
 
-from . import core, wintray
+from . import core, updater, wintray
 
 
 class UpdatesMixin:
@@ -65,7 +65,7 @@ class UpdatesMixin:
         self._update_busy = True
         if in_settings:
             self._update_sl_card(busy=True)
-        self.run_in_thread(lambda: core.check_streamlink_update(path_setting),
+        self.run_in_thread(lambda: updater.check_streamlink_update(path_setting),
                            lambda result: self._update_checked(result, manual))
 
     def _update_checked(self, result, manual):
@@ -133,7 +133,7 @@ class UpdatesMixin:
                            button=t("btn_retry"), level="warn")
         elif r and r.get("update"):
             asset = (r.get("release") or {}).get("asset")
-            direct = bool(asset) and core.can_self_update()
+            direct = bool(asset) and updater.can_self_update()
             detail = (t("app_update_detail", installed=__version__, size=t.format_size(asset["size"])) if direct
                       else t("app_update_manual", installed=__version__))
             card.set_state(False, t("app_update_title", latest=r["latest"]), detail,
@@ -141,7 +141,7 @@ class UpdatesMixin:
         elif r and r.get("update") is False:
             card.set_state(True, title, t("app_up_to_date"), button=t("btn_check"))
         else:
-            card.set_state(True, title, core.REPO_URL.split("//", 1)[1], button=t("btn_check"))
+            card.set_state(True, title, updater.REPO_URL.split("//", 1)[1], button=t("btn_check"))
 
     def _app_card_action(self):
         state, r = self._app_state, self.app_update
@@ -154,7 +154,7 @@ class UpdatesMixin:
 
     def _open_release_notes(self):
         rel = (self.app_update or {}).get("release")
-        self.open_url(rel["page"] if rel else core.REPO_URL + "/releases")
+        self.open_url(rel["page"] if rel else updater.REPO_URL + "/releases")
 
     def check_app_update(self, manual=False):
         """Cherche une release plus récente sur GitHub, hors de l'interface (thread).
@@ -164,7 +164,7 @@ class UpdatesMixin:
             return
         self._app_state, self._app_error = "checking", None
         self._update_app_card()
-        self.run_in_thread(core.check_app_update, lambda result: self._app_update_checked(result, manual))
+        self.run_in_thread(updater.check_app_update, lambda result: self._app_update_checked(result, manual))
 
     def _app_update_checked(self, result, manual):
         t = self.t
@@ -180,7 +180,7 @@ class UpdatesMixin:
         self._refresh_update_badge()
         # jamais de mise à jour surprise pendant un stream : la carte propose alors la mise à jour
         # never a surprise update during a stream: the card offers the update instead
-        if not manual and not self.streams.running() and core.should_auto_update(self.cfg, result, self._updated_from):
+        if not manual and not self.streams.running() and updater.should_auto_update(self.cfg, result, self._updated_from):
             self.log(t("log_app_auto_update", installed=result["current"], latest=result["latest"]), "warn")
             self.toast(t("toast_app_auto_update", latest=result["latest"]), "ok", duration=6000)
             self.install_app_update(auto=True)
@@ -202,7 +202,7 @@ class UpdatesMixin:
         rel = (self.app_update or {}).get("release")
         if not rel:
             return
-        if not (rel.get("asset") and core.can_self_update()):
+        if not (rel.get("asset") and updater.can_self_update()):
             self.open_url(rel["page"])
             self.toast(t("toast_update_page_opened"), "ok")
             return
@@ -221,15 +221,15 @@ class UpdatesMixin:
             self._app_dl = (done, total)
 
         def work():
-            path = core.download_update(rel, folder, progress, cancel)
+            path = updater.download_update(rel, folder, progress, cancel)
             self._app_state = "verifying"
-            key = core.check_signature(exe, path)
+            key = updater.check_signature(exe, path)
             if key:
                 try:
                     os.remove(path)
                 except OSError:
                     pass
-                raise core.UpdateError(key)
+                raise updater.UpdateError(key)
             return path
 
         self._update_app_card()
@@ -245,20 +245,20 @@ class UpdatesMixin:
         t = self.t
         from . import __version__
         if isinstance(result, Exception):
-            key = result.key if isinstance(result, core.UpdateError) else "app_err_download"
+            key = result.key if isinstance(result, updater.UpdateError) else "app_err_download"
             if key == "app_err_cancelled":
                 self._app_state = "idle"
             else:
                 self._app_state, self._app_error = "error", key
                 self.log(t("log_app_update_failed", error=t(key)), "err")
-                if not isinstance(result, core.UpdateError):
+                if not isinstance(result, updater.UpdateError):
                     core.log.error("Mise à jour : %r", result)
             self._update_app_card()
             return
-        final = core.target_exe(sys.executable, __version__, rel["version"])
+        final = updater.target_exe(sys.executable, __version__, rel["version"])
         try:
-            core.install_update(result, final=final)
-        except core.UpdateError as e:
+            updater.install_update(result, final=final)
+        except updater.UpdateError as e:
             try:
                 os.remove(result)
             except OSError:
@@ -271,7 +271,7 @@ class UpdatesMixin:
         if str(final) != sys.executable and self.cfg.get("autostart"):  # le démarrage avec Windows suit le nouveau nom
                                                                         # start-up with Windows follows the new name
             wintray.set_autostart(True, "", sys.executable, exe=str(final))
-        if core.relaunch(final, old_version=__version__, extra_args=("--tray",) if "--tray" in sys.argv else ()):
+        if updater.relaunch(final, old_version=__version__, extra_args=("--tray",) if "--tray" in sys.argv else ()):
             self._shutdown()
         else:  # nouvelle version en place, mais impossible de la démarrer : à relancer à la main
                # new version in place, but it cannot be started: to be restarted by hand
@@ -287,13 +287,13 @@ class UpdatesMixin:
         t = self.t
         r = self.sl_update or {}
         if r.get("kind") == "windows":
-            self.open_url(core.WINDOWS_BUILDS_URL)
+            self.open_url(updater.WINDOWS_BUILDS_URL)
             self.toast(t("toast_update_page_opened"), "ok")
         else:
             self.clipboard_clear()
-            self.clipboard_append(core.PIP_UPGRADE_CMD)
-            self.toast(t("toast_pip_copied", cmd=core.PIP_UPGRADE_CMD), "ok", duration=6000)
-            self.log(t("log_pip_command", cmd=core.PIP_UPGRADE_CMD))
+            self.clipboard_append(updater.PIP_UPGRADE_CMD)
+            self.toast(t("toast_pip_copied", cmd=updater.PIP_UPGRADE_CMD), "ok", duration=6000)
+            self.log(t("log_pip_command", cmd=updater.PIP_UPGRADE_CMD))
 
     def open_url(self, url):
         import webbrowser

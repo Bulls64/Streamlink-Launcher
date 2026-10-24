@@ -11,7 +11,7 @@ import sys
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
-from . import core, wintray
+from . import backup, core, updater, wintray
 from .widgets import (
     Button,
     Field,
@@ -235,7 +235,7 @@ class PanelsMixin:
             Button(links, self, text=t("link_release_notes"), kind="link", font=self.fonts.small, pad=0, height=32,
                    command=self._open_release_notes).pack(side="left", padx=(0, self.px(16)))
             Button(links, self, text=t("link_repo"), kind="link", font=self.fonts.small, pad=0, height=32,
-                   command=lambda: self.open_url(core.REPO_URL)).pack(side="left")
+                   command=lambda: self.open_url(updater.REPO_URL)).pack(side="left")
             self._switch_row(sec, t("label_auto_update"), t("hint_auto_update"), s["auto_update"],
                              lambda v: s.update(auto_update=v))
             self._hint(sec, t("about_data", path=core.DATA_ROOT))
@@ -305,10 +305,10 @@ class PanelsMixin:
                                             initialfile=name, filetypes=[(t("filetype_json"), "*.json")])
         if not path:
             return False
-        backup = core.make_backup(self.cfg, self.store.favorites, __version__)
+        data = backup.make_backup(self.cfg, self.store.favorites, __version__)
         try:
             with open(path, "w", encoding="utf-8") as f:
-                json.dump(backup, f, ensure_ascii=False, indent=2)
+                json.dump(data, f, ensure_ascii=False, indent=2)
         except OSError as e:
             core.log.error("Export impossible vers %s : %s", path, e)
             self.toast(t("toast_export_failed"), "error")
@@ -324,8 +324,8 @@ class PanelsMixin:
         if not path:
             return False
         try:
-            settings, favorites = core.read_backup(path, core.available_languages(), wintray.HOTKEYS)
-        except core.BackupError as e:
+            settings, favorites = backup.read_backup(path, core.available_languages(), wintray.HOTKEYS)
+        except backup.BackupError as e:
             self.toast(t(e.key), "error")
             return False
         n, m = len(settings), len(favorites)
@@ -350,7 +350,7 @@ class PanelsMixin:
             if replace:
                 self.store.favorites = favorites
             else:
-                self.store.favorites, m = core.merge_favorites(self.store.favorites, favorites)
+                self.store.favorites, m = backup.merge_favorites(self.store.favorites, favorites)
             self.store.save_favorites()
         self._settings_changed(old_lang, clear_live=True)  # favoris peut-être changés : statuts à revérifier
                                                            # favorites may have changed: statuses to check again

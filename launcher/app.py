@@ -13,7 +13,7 @@ import tkinter as tk
 from collections import deque
 from tkinter import messagebox, simpledialog
 
-from . import core, wintray
+from . import core, inputs, updater, wintray
 from .app_common import APP_COLOR, GEOMETRY_RE, ICON_FILE, LOG_LIMIT, RECENTS
 from .app_desktop import DesktopMixin
 from .app_favorites import FavoritesMixin
@@ -68,15 +68,15 @@ class App(FavoritesMixin, DesktopMixin, LaunchMixin, PanelsMixin, UpdatesMixin, 
         self.sl_update = None        # dernier résultat de vérification de mise à jour
                                      # latest update check result
         self._update_busy = False
-        self.app_update = None       # idem pour le lanceur lui-même (core.check_app_update)
-                                     # same for the launcher itself (core.check_app_update)
+        self.app_update = None       # idem pour le lanceur lui-même (updater.check_app_update)
+                                     # same for the launcher itself (updater.check_app_update)
         self._app_state = "idle"     # idle, checking, downloading, verifying, error, restart
         self._app_error = None       # clé de traduction du message d'erreur affiché
                                      # translation key of the error message shown
         self._app_dl = (0, 0)        # octets reçus, taille totale
                                      # bytes received, total size
         self._app_cancel = threading.Event()
-        self._updated_from = core.arg_value("--updated-from")  # version précédente, après une mise à jour
+        self._updated_from = updater.arg_value("--updated-from")  # version précédente, après une mise à jour
                                                                # previous version, after an update
         self.query = tk.StringVar()
         self.query.trace_add("write", self._on_query)
@@ -133,7 +133,7 @@ class App(FavoritesMixin, DesktopMixin, LaunchMixin, PanelsMixin, UpdatesMixin, 
         self.after(300, self._startup_checks)
         if core.FROZEN:  # restes d'une mise à jour précédente (ancien exécutable, téléchargement interrompu)
                          # leftovers of a previous update (old executable, interrupted download)
-            threading.Thread(target=core.cleanup_update_leftovers, daemon=True).start()
+            threading.Thread(target=updater.cleanup_update_leftovers, daemon=True).start()
         if self._updated_from:
             from . import __version__
             self.log(self.t("log_app_updated", old=self._updated_from, new=__version__))
@@ -440,7 +440,7 @@ class App(FavoritesMixin, DesktopMixin, LaunchMixin, PanelsMixin, UpdatesMixin, 
                 self.refresh_target()
                 return
             value = value.strip()
-            if not core.QUALITY_RE.match(value):
+            if not inputs.QUALITY_RE.match(value):
                 self.toast(self.t("err_quality"), "warn")
                 self.refresh_target()
                 return
@@ -499,7 +499,7 @@ class App(FavoritesMixin, DesktopMixin, LaunchMixin, PanelsMixin, UpdatesMixin, 
             return
         text = self.query.get()
         if self.target[0] == "platform" and text:
-            detected = core.detect_platform_in_text(self.platforms, text)
+            detected = inputs.detect_platform_in_text(self.platforms, text)
             if detected and detected != self.target[1]:
                 self.select_platform(detected)
         self.update_suggestions()
@@ -675,7 +675,7 @@ def main():
     from .theme import enable_dpi_awareness, set_app_id
     core.setup_logging()
     core.log.info("Démarrage de Streamlink Launcher %s (données : %s)", __version__, core.DATA_ROOT)
-    waited = core.arg_value("--wait-pid")  # relance après une mise à jour : on attend la fermeture de l'ancienne
+    waited = updater.arg_value("--wait-pid")  # relance après une mise à jour : on attend la fermeture de l'ancienne
                                            # restart after an update: wait for the old one to close
     if waited and waited.isdigit():
         wintray.wait_for_pid(int(waited), 20)

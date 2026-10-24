@@ -10,7 +10,7 @@ Esc or a click elsewhere closes it. It is recreated at each opening (always with
 import time
 import tkinter as tk
 
-from . import core
+from . import inputs
 from .theme import apply_window_chrome
 from .widgets import Button, Field, Pill, SuggestionList
 from .wintray import bring_to_front
@@ -216,7 +216,7 @@ class MiniBar:
         if self._suppress or self.win is None:
             return
         text = self.query.get()
-        detected = core.detect_platform_in_text(self.app.platforms, text) if text else None
+        detected = inputs.detect_platform_in_text(self.app.platforms, text) if text else None
         if detected and detected != self.pid:
             self.set_platform(detected)
         self.message = None

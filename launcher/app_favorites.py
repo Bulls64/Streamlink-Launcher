@@ -7,7 +7,7 @@ Mixin of App (see app.py): these methods use self as the main window."""
 import base64
 import tkinter as tk
 
-from . import core, thumb, winnotify
+from . import inputs, live, thumb, winnotify
 from .app_common import FAV_SLOTS
 from .widgets import (
     Card,
@@ -166,11 +166,11 @@ class FavoritesMixin:
         for fav in self.shown_favorites():
             key = self.live_key(fav)
             info = self.live.get(key) if key else None
-            url = core.preview_url((info or {}).get("preview")) if info and info.get("live") else None
+            url = live.preview_url((info or {}).get("preview")) if info and info.get("live") else None
             if url and not (only_missing and key in self.previews):
                 urls[key] = url
         if urls:
-            self.run_in_thread(lambda: core.fetch_previews(urls), self._previews_fetched)
+            self.run_in_thread(lambda: live.fetch_previews(urls), self._previews_fetched)
 
     def _previews_fetched(self, results):
         if isinstance(results, Exception):
@@ -221,8 +221,8 @@ class FavoritesMixin:
                 self.toast(t("info_no_channel", name=self.platform_name(p)), "warn")
                 return
             try:
-                _, channel = core.resolve_target(p, self.query.get())
-            except core.InputError as e:
+                _, channel = inputs.resolve_target(p, self.query.get())
+            except inputs.InputError as e:
                 self.toast(t("toast_fav_need_channel") if e.key == "err_empty" else
                            t(e.key, name=self.platform_name(p)), "warn")
                 self.field.focus()
@@ -267,7 +267,7 @@ class FavoritesMixin:
         target = self.entry_target(entry)
         if not target or target[0] != "platform" or not entry.get("channel"):
             return None
-        if core.live_method(target[1]) == "none":
+        if live.live_method(target[1]) == "none":
             return None
         return entry["channel"].lower(), target[1]["id"]
 
@@ -303,7 +303,7 @@ class FavoritesMixin:
             return
         self._live_busy = True
         platforms, streamlink_path = list(self.platforms), self.cfg["streamlink_path"]
-        self.run_in_thread(lambda: core.check_live(entries, platforms, streamlink_path), self._live_done)
+        self.run_in_thread(lambda: live.check_live(entries, platforms, streamlink_path), self._live_done)
 
     def _live_done(self, results):
         self._live_busy = False
