@@ -7,7 +7,7 @@ Mixin of App (see app.py): these methods use self as the main window."""
 import os
 import tkinter as tk
 
-from . import core, windrop, wintray
+from . import core, inputs, windrop, wintray
 from .app_common import ICON_FILE
 
 
@@ -193,7 +193,7 @@ class DesktopMixin:
         except tk.TclError:  # vide, ou contenu qui n'est pas du texte (image, fichiers…)
                              # empty, or content that is not text (image, files…)
             return None, ""
-        return (core.clipboard_sequence(), text), text
+        return (inputs.clipboard_sequence(), text), text
 
     def clipboard_offer(self):
         """Lien de stream copié et jamais proposé -> (id de plateforme, lien), sinon None.
@@ -212,7 +212,7 @@ class DesktopMixin:
         if key is None or key == self._clip_seen:
             return None
         self._clip_seen = key
-        hit = core.link_in_text(self.platforms, text)
+        hit = inputs.link_in_text(self.platforms, text)
         if not hit or hit[1] == self.query.get().strip():
             return None
         return hit
@@ -270,8 +270,8 @@ class DesktopMixin:
         self.hide_drop_overlay()
         if kind == "leave":
             return
-        hit = (core.link_in_text(self.platforms, event[1]) if kind == "text"
-               else core.links_from_paths(self.platforms, event[1]))
+        hit = (inputs.link_in_text(self.platforms, event[1]) if kind == "text"
+               else inputs.links_from_paths(self.platforms, event[1]))
         if not hit:
             self.toast(self.t("toast_drop_unknown"), "warn")
             return

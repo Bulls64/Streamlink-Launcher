@@ -8,7 +8,7 @@ import os
 import subprocess
 import tkinter as tk
 
-from . import core
+from . import core, inputs
 from .app_common import LOG_LIMIT
 from .widgets import (
     StreamRow,
@@ -51,14 +51,14 @@ class LaunchMixin:
             self.log(t("log_no_streamlink", url=core.STREAMLINK_INSTALL_URL), "err")
             return False
         try:
-            url, display = core.resolve_target(p, raw)
-        except core.InputError as e:
+            url, display = inputs.resolve_target(p, raw)
+        except inputs.InputError as e:
             report(t(e.key, name=self.platform_name(p)), "warn")
             if not quiet:
                 self.field.focus()
             return False
         quality = quality if quality and quality not in ("—", "__custom__") else self.quality_for(p)
-        if not core.QUALITY_RE.match(quality):
+        if not inputs.QUALITY_RE.match(quality):
             report(t("err_quality"), "warn")
             return False
         # Le lien lancé n'est pas à reproposer. Lu AVANT de démarrer le processus : sous X11, lire le presse-papiers
@@ -102,7 +102,7 @@ class LaunchMixin:
             report(t("err_script_not_found", path=script_name), "error")
             return False
         arg = (raw or "").strip()
-        if arg and not core.SCRIPT_ARG_RE.match(arg):
+        if arg and not inputs.SCRIPT_ARG_RE.match(arg):
             report(t("err_script_arg"), "warn")
             return False
         try:

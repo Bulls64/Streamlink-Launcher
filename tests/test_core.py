@@ -19,7 +19,7 @@ from unittest import mock
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from launcher import __version__, core  # noqa: E402
+from launcher import __version__, backup, core, inputs, live, updater  # noqa: E402
 
 
 class TempData(unittest.TestCase):
@@ -86,9 +86,9 @@ class TestVersion(unittest.TestCase):
         self.assertIn(f"## [{__version__}]", (ROOT / "CHANGELOG.md").read_text(encoding="utf-8"))
 
     def test_parse_version(self):
-        self.assertEqual(core.parse_version("streamlink 7.1.3"), (7, 1, 3))
-        self.assertEqual(core.parse_version("8.0"), (8, 0, 0))
-        self.assertIsNone(core.parse_version("pas de version"))
+        self.assertEqual(updater.parse_version("streamlink 7.1.3"), (7, 1, 3))
+        self.assertEqual(updater.parse_version("8.0"), (8, 0, 0))
+        self.assertIsNone(updater.parse_version("pas de version"))
 
 
 class TestTranslations(unittest.TestCase):
@@ -148,27 +148,27 @@ class TestInput(unittest.TestCase):
 
     def test_channel_and_links(self):
         tw = self.p["twitch"]
-        self.assertEqual(core.resolve_target(tw, "zerator"), ("https://www.twitch.tv/zerator", "zerator"))
-        self.assertEqual(core.resolve_target(tw, "https://www.twitch.tv/zerator")[1], "zerator")
-        self.assertEqual(core.resolve_target(tw, "twitch.tv/zerator")[1], "zerator")
+        self.assertEqual(inputs.resolve_target(tw, "zerator"), ("https://www.twitch.tv/zerator", "zerator"))
+        self.assertEqual(inputs.resolve_target(tw, "https://www.twitch.tv/zerator")[1], "zerator")
+        self.assertEqual(inputs.resolve_target(tw, "twitch.tv/zerator")[1], "zerator")
 
     def test_youtube_forms(self):
         yt = self.p["youtube"]
         for text in ("dQw4w9WgXcQ", "https://youtu.be/dQw4w9WgXcQ",
                      "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=1", "youtube.com/shorts/dQw4w9WgXcQ"):
-            self.assertEqual(core.resolve_target(yt, text)[1], "dQw4w9WgXcQ", text)
+            self.assertEqual(inputs.resolve_target(yt, text)[1], "dQw4w9WgXcQ", text)
 
     def test_rejects_bad_input(self):
         for platform, text in (("twitch", ""), ("twitch", "a b"), ("twitch", "x;rm -rf"),
                                ("url", "ftp://x.y"), ("url", 'https://a.b/"x')):
-            with self.assertRaises(core.InputError, msg=text):
-                core.resolve_target(self.p[platform], text)
+            with self.assertRaises(inputs.InputError, msg=text):
+                inputs.resolve_target(self.p[platform], text)
 
     def test_detect_platform(self):
         platforms = core.DEFAULT_PLATFORMS
-        self.assertEqual(core.detect_platform_in_text(platforms, "kick.com/xqc"), "kick")
-        self.assertEqual(core.detect_platform_in_text(platforms, "https://example.com/live"), "url")
-        self.assertIsNone(core.detect_platform_in_text(platforms, "zerator"))
+        self.assertEqual(inputs.detect_platform_in_text(platforms, "kick.com/xqc"), "kick")
+        self.assertEqual(inputs.detect_platform_in_text(platforms, "https://example.com/live"), "url")
+        self.assertIsNone(inputs.detect_platform_in_text(platforms, "zerator"))
 
 
 class TestSaveLoad(TempData):
@@ -232,7 +232,7 @@ class TestLinks(unittest.TestCase):
         self.tmp = Path(tempfile.mkdtemp())
 
     def test_link_in_text(self):
-        f = lambda t: core.link_in_text(self.platforms, t)
+        f = lambda t: inputs.link_in_text(self.platforms, t)
         self.assertEqual(f("https://kick.com/xqc"), ("kick", "https://kick.com/xqc"))
         self.assertEqual(f("twitch.tv/zerator"), ("twitch", "twitch.tv/zerator"))
         self.assertEqual(f("Regarde ça : https://www.twitch.tv/zerator, vite !"),
@@ -241,37 +241,37 @@ class TestLinks(unittest.TestCase):
 
     def test_known_platform_wins_over_generic_link(self):
         text = "https://example.com/a puis https://kick.com/xqc"
-        self.assertEqual(core.link_in_text(self.platforms, text)[0], "kick")
+        self.assertEqual(inputs.link_in_text(self.platforms, text)[0], "kick")
 
     def test_ignores_plain_text(self):
         for text in ("", "   ", "bonjour", "du texte avec des mots", "zerator", None):
-            self.assertIsNone(core.link_in_text(self.platforms, text), text)
+            self.assertIsNone(inputs.link_in_text(self.platforms, text), text)
 
     def test_ignores_huge_clipboard(self):
-        self.assertIsNone(core.link_in_text(self.platforms, "https://kick.com/xqc " + "x" * core.CLIPBOARD_MAX))
+        self.assertIsNone(inputs.link_in_text(self.platforms, "https://kick.com/xqc " + "x" * inputs.CLIPBOARD_MAX))
 
     def test_url_shortcut_file(self):
         f = self.tmp / "lien.url"
         f.write_text("[InternetShortcut]\r\nURL=https://www.twitch.tv/zerator\r\n", encoding="utf-8")
-        self.assertEqual(core.link_from_url_file(f), "https://www.twitch.tv/zerator")
-        self.assertEqual(core.links_from_paths(self.platforms, [f]), ("twitch", "https://www.twitch.tv/zerator"))
+        self.assertEqual(inputs.link_from_url_file(f), "https://www.twitch.tv/zerator")
+        self.assertEqual(inputs.links_from_paths(self.platforms, [f]), ("twitch", "https://www.twitch.tv/zerator"))
 
     def test_url_shortcut_utf16_and_garbage(self):
         f = self.tmp / "u16.url"
         f.write_text("[InternetShortcut]\nURL=https://kick.com/xqc\n", encoding="utf-16")
-        self.assertEqual(core.link_from_url_file(f), "https://kick.com/xqc")
+        self.assertEqual(inputs.link_from_url_file(f), "https://kick.com/xqc")
         bad = self.tmp / "bad.url"
         bad.write_text("URL=javascript:alert(1)", encoding="utf-8")
-        self.assertIsNone(core.link_from_url_file(bad))
-        self.assertIsNone(core.link_from_url_file(self.tmp / "absent.url"))
+        self.assertIsNone(inputs.link_from_url_file(bad))
+        self.assertIsNone(inputs.link_from_url_file(self.tmp / "absent.url"))
 
     def test_dropped_files_skip_unsupported_types(self):
         img = self.tmp / "a.png"
         img.write_bytes(b"\x89PNG")
         txt = self.tmp / "n.txt"
         txt.write_text("à voir : https://kick.com/xqc", encoding="utf-8")
-        self.assertIsNone(core.links_from_paths(self.platforms, [img]))
-        self.assertEqual(core.links_from_paths(self.platforms, [img, txt]), ("kick", "https://kick.com/xqc"))
+        self.assertIsNone(inputs.links_from_paths(self.platforms, [img]))
+        self.assertEqual(inputs.links_from_paths(self.platforms, [img, txt]), ("kick", "https://kick.com/xqc"))
 
     def test_drop_module_is_inert_outside_windows(self):
         from launcher import windrop
@@ -289,14 +289,14 @@ class TestBackup(TempData):
     KEYS = ("ctrl+alt+s", "alt+shift+s")
 
     def parse(self, data):
-        return core.parse_backup(data, self.LANGS, self.KEYS)
+        return backup.parse_backup(data, self.LANGS, self.KEYS)
 
     def test_roundtrip_keeps_settings_and_favorites(self):
         cfg = dict(core.DEFAULT_CONFIG, language="en", theme="dark", live_interval=10,
                    qualities={"twitch": "720p,best"}, hotkey_combo="alt+shift+s")
         favs = [{"channel": "zerator", "platform": "twitch", "added": "2026-01-01 10:00:00"}]
-        backup = core.make_backup(cfg, favs, "1.2.0")
-        settings, got = self.parse(json.loads(json.dumps(backup)))
+        data = backup.make_backup(cfg, favs, "1.2.0")
+        settings, got = self.parse(json.loads(json.dumps(data)))
         self.assertEqual((settings["language"], settings["theme"], settings["live_interval"]), ("en", "dark", 10))
         self.assertEqual(settings["qualities"], {"twitch": "720p,best"})
         self.assertEqual(settings["hotkey_combo"], "alt+shift+s")
@@ -305,8 +305,8 @@ class TestBackup(TempData):
     def test_machine_specific_paths_are_never_exported_or_imported(self):
         cfg = dict(core.DEFAULT_CONFIG, streamlink_path="C:/a.exe", player_path="C:/p.exe",
                    scripts_folder="C:/s", geometry="1x1+0+0")
-        exported = core.make_backup(cfg, [], "1")["settings"]
-        for key in core.MACHINE_KEYS:
+        exported = backup.make_backup(cfg, [], "1")["settings"]
+        for key in backup.MACHINE_KEYS:
             self.assertNotIn(key, exported)
         settings, _ = self.parse({"theme": "dark", "streamlink_path": "C:/evil.exe", "player_path": "x",
                                   "scripts_folder": "y", "geometry": "z"})
@@ -324,36 +324,36 @@ class TestBackup(TempData):
         self.assertEqual(favs, [{"channel": "a", "platform": "kick"}])
 
     def test_unrecognised_content_is_refused(self):
-        for data in ({}, [], "texte", {"foo": 1}, {"format": core.BACKUP_FORMAT}):
-            with self.assertRaises(core.BackupError) as cm:
+        for data in ({}, [], "texte", {"foo": 1}, {"format": backup.BACKUP_FORMAT}):
+            with self.assertRaises(backup.BackupError) as cm:
                 self.parse(data)
             self.assertEqual(cm.exception.key, "err_backup_invalid")
 
     def test_read_backup_errors(self):
         bad = self.tmp / "bad.json"
         bad.write_text("{pas du json", encoding="utf-8")
-        with self.assertRaises(core.BackupError) as cm:
-            core.read_backup(bad, self.LANGS, self.KEYS)
+        with self.assertRaises(backup.BackupError) as cm:
+            backup.read_backup(bad, self.LANGS, self.KEYS)
         self.assertEqual(cm.exception.key, "err_backup_read")
-        with self.assertRaises(core.BackupError):
-            core.read_backup(self.tmp / "absent.json", self.LANGS, self.KEYS)
+        with self.assertRaises(backup.BackupError):
+            backup.read_backup(self.tmp / "absent.json", self.LANGS, self.KEYS)
         huge = self.tmp / "huge.json"
-        huge.write_text('{"theme": "dark"}' + " " * core.BACKUP_MAX_BYTES, encoding="utf-8")
-        with self.assertRaises(core.BackupError):
-            core.read_backup(huge, self.LANGS, self.KEYS)
+        huge.write_text('{"theme": "dark"}' + " " * backup.BACKUP_MAX_BYTES, encoding="utf-8")
+        with self.assertRaises(backup.BackupError):
+            backup.read_backup(huge, self.LANGS, self.KEYS)
 
     def test_merge_favorites_skips_duplicates(self):
         current = [{"channel": "a", "platform": "twitch"}]
         incoming = [{"channel": "a", "platform": "twitch", "added": "x"}, {"channel": "a", "platform": "kick"},
                     {"channel": "b", "platform": "twitch"}]
-        merged, added = core.merge_favorites(current, incoming)
+        merged, added = backup.merge_favorites(current, incoming)
         self.assertEqual(added, 2)
         self.assertEqual([(f["channel"], f["platform"]) for f in merged],
                          [("a", "twitch"), ("a", "kick"), ("b", "twitch")])
 
     def test_favorites_are_capped(self):
-        many = [{"channel": f"c{i}", "platform": "twitch"} for i in range(core.FAVORITES_MAX + 50)]
-        self.assertEqual(len(core.sanitize_favorites(many)), core.FAVORITES_MAX)
+        many = [{"channel": f"c{i}", "platform": "twitch"} for i in range(backup.FAVORITES_MAX + 50)]
+        self.assertEqual(len(backup.sanitize_favorites(many)), backup.FAVORITES_MAX)
 
 
 SMALL_JPEG = (
@@ -385,35 +385,35 @@ class TestLivePreviews(unittest.TestCase):
                 {"login": "On", "stream": {"title": "T", "viewersCount": 42, "game": {"displayName": "G"},
                                            "previewImageURL": "https://static-cdn.jtvnw.net/p-640x360.jpg"}},
                 {"login": "off", "stream": None}]}}
-        with mock.patch.object(core, "_http_json", fake_http):
-            res = core.twitch_live(["On", "off", "absent"])
+        with mock.patch.object(live, "_http_json", fake_http):
+            res = live.twitch_live(["On", "off", "absent"])
         self.assertIn("previewImageURL(width:640,height:360)", sent["query"])
         self.assertEqual(res["on"], {"live": True, "title": "T", "game": "G", "viewers": 42,
                                      "preview": "https://static-cdn.jtvnw.net/p-640x360.jpg"})
-        self.assertEqual(res["off"], core._offline())
-        self.assertEqual(res["absent"], core._offline())
+        self.assertEqual(res["off"], live._offline())
+        self.assertEqual(res["absent"], live._offline())
 
     def test_preview_url_is_https_only_and_refreshed(self):
         base = "https://static-cdn.jtvnw.net/previews-ttv/live_user_x-640x360.jpg"
-        self.assertEqual(core.preview_url(base, now=600), base + "?t=2")
-        self.assertEqual(core.preview_url(base + "?a=1", now=0), base + "?a=1&t=0")
-        self.assertNotEqual(core.preview_url(base, now=0), core.preview_url(base, now=300))
+        self.assertEqual(live.preview_url(base, now=600), base + "?t=2")
+        self.assertEqual(live.preview_url(base + "?a=1", now=0), base + "?a=1&t=0")
+        self.assertNotEqual(live.preview_url(base, now=0), live.preview_url(base, now=300))
         for bad in (None, "", "http://example.com/x.jpg", "file:///c:/x.jpg", "https://" + "a" * 600):
-            self.assertIsNone(core.preview_url(bad))
+            self.assertIsNone(live.preview_url(bad))
 
     def test_fetch_previews_survives_errors(self):
         def fake(url, timeout=8):
             if "bad" in url:
                 raise OSError("boom")
             return b"\xff\xd8data"
-        with mock.patch.object(core, "fetch_image", fake):
-            self.assertEqual(core.fetch_previews({"a": "https://ok", "b": "https://bad"}),
+        with mock.patch.object(live, "fetch_image", fake):
+            self.assertEqual(live.fetch_previews({"a": "https://ok", "b": "https://bad"}),
                              {"a": b"\xff\xd8data", "b": None})
 
     def test_setting_is_on_by_default_and_importable(self):
         self.assertIs(core.DEFAULT_CONFIG["live_previews"], True)
-        self.assertEqual(core.sanitize_settings({"live_previews": False}), {"live_previews": False})
-        self.assertEqual(core.sanitize_settings({"live_previews": "yes"}), {})
+        self.assertEqual(backup.sanitize_settings({"live_previews": False}), {"live_previews": False})
+        self.assertEqual(backup.sanitize_settings({"live_previews": "yes"}), {})
 
 
 class TestThumb(unittest.TestCase):
@@ -513,59 +513,59 @@ class TestAppUpdate(unittest.TestCase):
         v = "9.9.9"
         data = {"tag_name": f"v{v}", "draft": False, "prerelease": False, "assets": [{
             "name": f"StreamlinkLauncher-{v}.exe", "size": self.SIZE, "digest": "sha256:" + "a" * 64,
-            "browser_download_url": f"{core.REPO_URL}/releases/download/v{v}/StreamlinkLauncher-{v}.exe"}]}
+            "browser_download_url": f"{updater.REPO_URL}/releases/download/v{v}/StreamlinkLauncher-{v}.exe"}]}
         data.update(over)
         return data
 
     def test_parse_release_ok(self):
-        r = core.parse_release(self.api())
+        r = updater.parse_release(self.api())
         self.assertEqual(r["version"], "9.9.9")
         self.assertEqual(r["asset"]["sha256"], "a" * 64)
         self.assertTrue(r["page"].endswith("/releases/tag/v9.9.9"))
 
     def test_parse_release_rejects(self):
-        self.assertIsNone(core.parse_release(None))
-        self.assertIsNone(core.parse_release(self.api(draft=True)))
-        self.assertIsNone(core.parse_release(self.api(prerelease=True)))
-        self.assertIsNone(core.parse_release(self.api(tag_name="v9.9")))
-        self.assertIsNone(core.parse_release(self.api(tag_name="release-9")))
+        self.assertIsNone(updater.parse_release(None))
+        self.assertIsNone(updater.parse_release(self.api(draft=True)))
+        self.assertIsNone(updater.parse_release(self.api(prerelease=True)))
+        self.assertIsNone(updater.parse_release(self.api(tag_name="v9.9")))
+        self.assertIsNone(updater.parse_release(self.api(tag_name="release-9")))
 
     def test_parse_release_asset_checks(self):
         def asset(**kw):
             d = self.api()
             d["assets"][0].update(kw)
-            return core.parse_release(d)["asset"]
+            return updater.parse_release(d)["asset"]
         self.assertIsNone(asset(browser_download_url="https://evil.example/StreamlinkLauncher-9.9.9.exe"))
         self.assertIsNone(asset(digest=None))
         self.assertIsNone(asset(digest="sha1:" + "a" * 40))
         self.assertIsNone(asset(size=10))
-        self.assertIsNone(asset(size=core.UPDATE_MAX_BYTES + 1))
+        self.assertIsNone(asset(size=updater.UPDATE_MAX_BYTES + 1))
         self.assertIsNone(asset(size=True))
         self.assertIsNone(asset(name="Other.exe"))
         self.assertIsNotNone(asset())
 
     def test_check_app_update(self):
-        with mock.patch.object(core, "_http_get_json", return_value=self.api()):
-            r = core.check_app_update("1.0.0")
+        with mock.patch.object(updater, "_http_get_json", return_value=self.api()):
+            r = updater.check_app_update("1.0.0")
             self.assertTrue(r["update"])
             self.assertEqual(r["latest"], "9.9.9")
-            self.assertFalse(core.check_app_update("9.9.9")["update"])
-            self.assertFalse(core.check_app_update("10.0.0")["update"])
+            self.assertFalse(updater.check_app_update("9.9.9")["update"])
+            self.assertFalse(updater.check_app_update("10.0.0")["update"])
 
     def test_check_app_update_errors(self):
         import urllib.error
         e404 = urllib.error.HTTPError("u", 404, "nf", {}, None)
-        with mock.patch.object(core, "_http_get_json", side_effect=e404):
-            self.assertEqual(core.check_app_update("1.0.0")["error"], "release")
-        with mock.patch.object(core, "_http_get_json", side_effect=OSError("down")):
-            r = core.check_app_update("1.0.0")
+        with mock.patch.object(updater, "_http_get_json", side_effect=e404):
+            self.assertEqual(updater.check_app_update("1.0.0")["error"], "release")
+        with mock.patch.object(updater, "_http_get_json", side_effect=OSError("down")):
+            r = updater.check_app_update("1.0.0")
             self.assertEqual((r["error"], r["update"]), ("network", None))
-        with mock.patch.object(core, "_http_get_json", return_value={"tag_name": "x"}):
-            self.assertEqual(core.check_app_update("1.0.0")["error"], "release")
+        with mock.patch.object(updater, "_http_get_json", return_value={"tag_name": "x"}):
+            self.assertEqual(updater.check_app_update("1.0.0")["error"], "release")
 
     def test_safe_redirects(self):
         import urllib.error
-        h = [x for x in core._safe_opener().handlers if x.__class__.__name__ == "Redirect"][0]
+        h = [x for x in updater._safe_opener().handlers if x.__class__.__name__ == "Redirect"][0]
         import urllib.request
         req = urllib.request.Request("https://github.com/x")
         for ok in ("https://objects.githubusercontent.com/a", "https://github.com/b", "https://api.github.com/c"):
@@ -605,8 +605,8 @@ class TestAppUpdate(unittest.TestCase):
         rel = release or self.release(payload)
         opener = kw.pop("opener", lambda url: self.Resp(payload))
         try:
-            return d, core.download_update(rel, d, opener=opener, **kw)
-        except core.UpdateError as e:
+            return d, updater.download_update(rel, d, opener=opener, **kw)
+        except updater.UpdateError as e:
             return d, e
 
     def test_download_ok(self):
@@ -624,7 +624,7 @@ class TestAppUpdate(unittest.TestCase):
         }
         for key, kw in cases.items():
             d, e = self.dl(good, **kw)
-            self.assertIsInstance(e, core.UpdateError)
+            self.assertIsInstance(e, updater.UpdateError)
             self.assertEqual(e.key, key)
             self.assertEqual(list(d.iterdir()), [])
         d, e = self.dl(good, release=self.release(good, size=10))             # plus gros que annoncé
@@ -649,19 +649,19 @@ class TestAppUpdate(unittest.TestCase):
         d, e = self.dl(b"MZ" + b"\0" * 100, cancel=ev)
         self.assertEqual(e.key, "app_err_cancelled")
         self.assertEqual(list(d.iterdir()), [])
-        with self.assertRaises(core.UpdateError):
-            core.download_update({"asset": None}, tempfile.mkdtemp())
+        with self.assertRaises(updater.UpdateError):
+            updater.download_update({"asset": None}, tempfile.mkdtemp())
 
     # -- signature
     def test_parse_authenticode(self):
-        self.assertEqual(core._parse_authenticode("Valid|CN=SignPath Foundation, O=SignPath\n"),
+        self.assertEqual(updater._parse_authenticode("Valid|CN=SignPath Foundation, O=SignPath\n"),
                          ("Valid", "CN=SignPath Foundation, O=SignPath"))
-        self.assertEqual(core._parse_authenticode("NotSigned|"), ("NotSigned", None))
-        self.assertEqual(core._parse_authenticode(""), ("error", None))
+        self.assertEqual(updater._parse_authenticode("NotSigned|"), ("NotSigned", None))
+        self.assertEqual(updater._parse_authenticode(""), ("error", None))
 
     def test_check_signature(self):
         def run(cur, new):
-            return core.check_signature("c", "n", probe=lambda f: cur if f == "c" else new)
+            return updater.check_signature("c", "n", probe=lambda f: cur if f == "c" else new)
         v = ("Valid", "CN=Me, O=X")
         self.assertIsNone(run(v, ("Valid", "CN=Me, O=Y")))
         self.assertEqual(run(v, ("Valid", "CN=Other")), "app_err_signature")
@@ -682,13 +682,13 @@ class TestAppUpdate(unittest.TestCase):
         exe.write_bytes(b"old")
         new.write_bytes(b"new")
         (d / "app.exe.old").write_bytes(b"stale")
-        old = core.install_update(new, exe)
+        old = updater.install_update(new, exe)
         self.assertEqual(exe.read_bytes(), b"new")
         self.assertEqual(old.read_bytes(), b"old")
         self.assertFalse(new.exists())
 
     def test_target_exe(self):
-        t = core.target_exe
+        t = updater.target_exe
         self.assertEqual(t("C:/x/StreamlinkLauncher-1.4.1.exe", "1.4.1", "1.4.2"), Path("C:/x/StreamlinkLauncher-1.4.2.exe"))
         self.assertEqual(t("C:/x/slink.exe", "1.4.1", "1.4.2"), Path("C:/x/slink.exe"))
         self.assertEqual(t("C:/x/App-11.4.1.exe", "1.4.1", "1.4.2"), Path("C:/x/App-11.4.1.exe"))
@@ -703,7 +703,7 @@ class TestAppUpdate(unittest.TestCase):
         exe, new, final = d / "app-1.exe", d / "app-1.exe.download", d / "app-2.exe"
         exe.write_bytes(b"old")
         new.write_bytes(b"new")
-        old = core.install_update(new, exe, final)
+        old = updater.install_update(new, exe, final)
         self.assertEqual(final.read_bytes(), b"new")
         self.assertFalse(exe.exists())
         self.assertEqual(old, d / "app-1.exe.old")
@@ -718,8 +718,8 @@ class TestAppUpdate(unittest.TestCase):
         d = Path(tempfile.mkdtemp())
         exe = d / "app.exe"
         exe.write_bytes(b"old")
-        with self.assertRaises(core.UpdateError) as cm:
-            core.install_update(d / "missing", exe)
+        with self.assertRaises(updater.UpdateError) as cm:
+            updater.install_update(d / "missing", exe)
         self.assertEqual(cm.exception.key, "app_err_install")
         self.assertEqual(exe.read_bytes(), b"old")
         self.assertFalse((d / "app.exe.old").exists())
@@ -731,25 +731,25 @@ class TestAppUpdate(unittest.TestCase):
         (d / (exe.name + ".old")).write_bytes(b"o")
         (d / "StreamlinkLauncher-2.exe.download").write_bytes(b"p")
         (d / "keep.txt").write_bytes(b"k")
-        core.cleanup_update_leftovers(exe)
+        updater.cleanup_update_leftovers(exe)
         self.assertEqual(sorted(p.name for p in d.iterdir()), ["StreamlinkLauncher-1.exe", "keep.txt"])
-        self.assertTrue(core.cleanup_old_executable(exe, tries=1))
+        self.assertTrue(updater.cleanup_old_executable(exe, tries=1))
 
     def test_relaunch(self):
         with mock.patch.object(core.subprocess, "Popen") as popen:
-            self.assertTrue(core.relaunch("/x/app.exe", "1.0.0"))
+            self.assertTrue(updater.relaunch("/x/app.exe", "1.0.0"))
         args, kw = popen.call_args
         self.assertEqual(args[0][0], "/x/app.exe")
         self.assertEqual(args[0][1:3], ["--wait-pid", str(os.getpid())])
         self.assertEqual(args[0][3:], ["--updated-from", "1.0.0"])
         self.assertEqual(kw["env"]["PYINSTALLER_RESET_ENVIRONMENT"], "1")
         with mock.patch.object(core.subprocess, "Popen", side_effect=OSError):
-            self.assertFalse(core.relaunch("/x/app.exe"))
+            self.assertFalse(updater.relaunch("/x/app.exe"))
 
     def test_should_auto_update(self):
         res = {"update": True, "release": {"asset": {"name": "a"}}}
         cfg = {"auto_update": True, "update_check": True}
-        ok = lambda c=cfg, r=res, u=None, can=True: core.should_auto_update(c, r, u, can)
+        ok = lambda c=cfg, r=res, u=None, can=True: updater.should_auto_update(c, r, u, can)
         self.assertTrue(ok())
         self.assertFalse(ok(c={**cfg, "auto_update": False}))
         self.assertFalse(ok(c={**cfg, "update_check": False}))
@@ -764,26 +764,26 @@ class TestAppUpdate(unittest.TestCase):
 
     def test_platform_colors_setting(self):
         self.assertTrue(core.DEFAULT_CONFIG["platform_colors"])
-        self.assertEqual(core.sanitize_settings({"platform_colors": False}).get("platform_colors"), False)
-        self.assertNotIn("platform_colors", core.sanitize_settings({"platform_colors": 1}))
+        self.assertEqual(backup.sanitize_settings({"platform_colors": False}).get("platform_colors"), False)
+        self.assertNotIn("platform_colors", backup.sanitize_settings({"platform_colors": 1}))
 
     def test_auto_update_setting_is_validated(self):
-        out = core.sanitize_settings({"auto_update": True})
+        out = backup.sanitize_settings({"auto_update": True})
         self.assertEqual(out.get("auto_update"), True)
-        self.assertNotIn("auto_update", core.sanitize_settings({"auto_update": "oui"}))
+        self.assertNotIn("auto_update", backup.sanitize_settings({"auto_update": "oui"}))
 
     def test_relaunch_keeps_tray_argument(self):
         with mock.patch.object(core.subprocess, "Popen") as popen:
-            core.relaunch("/x/app.exe", "1.0.0", extra_args=("--tray",))
+            updater.relaunch("/x/app.exe", "1.0.0", extra_args=("--tray",))
         self.assertIn("--tray", popen.call_args[0][0])
 
     def test_arg_value(self):
-        self.assertEqual(core.arg_value("--a", ["p", "--a", "1"]), "1")
-        self.assertIsNone(core.arg_value("--a", ["p", "--a"]))
-        self.assertIsNone(core.arg_value("--b", ["p", "--a", "1"]))
+        self.assertEqual(updater.arg_value("--a", ["p", "--a", "1"]), "1")
+        self.assertIsNone(updater.arg_value("--a", ["p", "--a"]))
+        self.assertIsNone(updater.arg_value("--b", ["p", "--a", "1"]))
 
     def test_self_update_needs_frozen_exe(self):
-        self.assertFalse(core.can_self_update())          # lancé depuis les sources
+        self.assertFalse(updater.can_self_update())          # lancé depuis les sources
                                                           # started from the sources
 
     def test_wait_for_pid_off_windows(self):

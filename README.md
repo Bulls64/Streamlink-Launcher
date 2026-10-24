@@ -172,8 +172,13 @@ launcher/
   app_updates.py       Streamlink version, launcher updates from GitHub
   app_desktop.py       Tray, global shortcut, smart clipboard, drag and drop
   app_common.py        Constants shared by these modules
-  core.py              Logic without UI: config, platforms, input validation, history, live and update checks
-  widgets.py           Lightweight canvas widgets (buttons, pills, cards, fields…)
+  core.py              Logic without UI: paths, config, languages, platforms, history, favorites, launching
+  inputs.py            Input validation, links pasted, copied or dropped
+  backup.py            Export / import of the settings and favorites
+  updater.py           Streamlink version, launcher updates from the GitHub releases
+  live.py              Live status and previews
+  widgets.py           Lightweight canvas widgets, re-exported from widgets_base, widgets_controls (buttons, pills,
+                       switches…), widgets_cards (cards, rows), widgets_field (field, menus, suggestions), widgets_layout
   theme.py, gfx.py     Colors, fonts, anti-aliased shapes, icons
   mini.py              Mini mode
   thumb.py             Live previews: JPEG decoding (GDI+, ctypes), rounded corners, PNG
@@ -370,8 +375,13 @@ launcher/
   app_updates.py       Version de Streamlink, mise à jour du lanceur depuis GitHub
   app_desktop.py       Zone de notification, raccourci global, presse-papiers intelligent, glisser-déposer
   app_common.py        Constantes partagées par ces modules
-  core.py              Logique sans interface : config, plateformes, validation, historique, lives, mises à jour
-  widgets.py           Composants légers dessinés (boutons, pastilles, cartes, champs…)
+  core.py              Logique sans interface : chemins, config, langues, plateformes, historique, favoris, lancement
+  inputs.py            Validation des saisies, liens collés, copiés ou glissés
+  backup.py            Export / import des réglages et des favoris
+  updater.py           Version de Streamlink, mise à jour du lanceur depuis les releases GitHub
+  live.py              Statut en direct et aperçus
+  widgets.py           Composants légers dessinés, réexportés depuis widgets_base, widgets_controls (boutons, pastilles,
+                       interrupteurs…), widgets_cards (cartes, lignes), widgets_field (champ, menus, suggestions), widgets_layout
   theme.py, gfx.py     Couleurs, polices, formes lissées, icônes
   mini.py              Mode mini
   thumb.py             Aperçus des lives : décodage JPEG (GDI+, ctypes), coins arrondis, PNG
