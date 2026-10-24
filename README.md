@@ -165,7 +165,13 @@ The tests use the standard library only. They run automatically on Windows and L
 ```
 slink_launcher.py      Entry point
 launcher/
-  app.py               Main window, panels, log drawer
+  app.py               Main window: build, input and suggestions, recents, start-up and closing
+  app_favorites.py     Favorites, live previews and live status
+  app_launch.py        Launching and monitoring streams, log drawer
+  app_panels.py        Side panels: settings, backup, history, favorites
+  app_updates.py       Streamlink version, launcher updates from GitHub
+  app_desktop.py       Tray, global shortcut, smart clipboard, drag and drop
+  app_common.py        Constants shared by these modules
   core.py              Logic without UI: config, platforms, input validation, history, live and update checks
   widgets.py           Lightweight canvas widgets (buttons, pills, cards, fields…)
   theme.py, gfx.py     Colors, fonts, anti-aliased shapes, icons
@@ -357,7 +363,13 @@ Les tests n'utilisent que la bibliothèque standard. Ils tournent automatiquemen
 ```
 slink_launcher.py      Point d'entrée
 launcher/
-  app.py               Fenêtre principale, panneaux, tiroir du journal
+  app.py               Fenêtre principale : construction, saisie et suggestions, récents, démarrage et fermeture
+  app_favorites.py     Favoris, aperçus des lives et statut en direct
+  app_launch.py        Lancement et suivi des streams, tiroir du journal
+  app_panels.py        Panneaux latéraux : paramètres, sauvegarde, historique, favoris
+  app_updates.py       Version de Streamlink, mise à jour du lanceur depuis GitHub
+  app_desktop.py       Zone de notification, raccourci global, presse-papiers intelligent, glisser-déposer
+  app_common.py        Constantes partagées par ces modules
   core.py              Logique sans interface : config, plateformes, validation, historique, lives, mises à jour
   widgets.py           Composants légers dessinés (boutons, pastilles, cartes, champs…)
   theme.py, gfx.py     Couleurs, polices, formes lissées, icônes
