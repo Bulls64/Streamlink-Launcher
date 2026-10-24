@@ -14,6 +14,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Planned
 - Viewing statistics (time per channel, peak hours).
 
+## [1.5.1] - 2026-10-24
+
+### Added
+- **Code of conduct** (`CODE_OF_CONDUCT.md`, English and French).
+- **Website and documentation**, in French and English, on GitHub Pages: https://bulls64.github.io/Streamlink-Launcher. The README links to it.
+
+### Changed
+- Every French comment and docstring now has its English translation. No change in behavior.
+
 ## [1.5.0] - 2026-10-16
 
 ### Added
@@ -237,6 +246,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Prévu
 - Statistiques de visionnage (temps par chaîne, heures de pointe).
 
+## [1.5.1] - 2026-10-24
+
+### Ajouté
+- **Code de conduite** (`CODE_OF_CONDUCT.md`, anglais et français).
+- **Site et documentation**, en français et en anglais, sur GitHub Pages : https://bulls64.github.io/Streamlink-Launcher. Le README y renvoie.
+
+### Modifié
+- Chaque commentaire et chaque docstring en français a maintenant sa traduction anglaise. Aucun changement de comportement.
+
 ## [1.5.0] - 2026-10-16
 
 ### Ajouté
@@ -451,10 +469,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 > Les versions 0.1.0 à 1.0.0 n'ont jamais été publiées sur GitHub ; la 1.0.1 est la première release. La date de la 0.1.0 est la plus ancienne date trouvée dans les données de l'application.
 
-[Unreleased]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.5.1...HEAD
+[1.5.1]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.5.0
 [1.4.3]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.3
-[Non publié]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.5.0...HEAD
+[Non publié]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.5.1...HEAD
 [1.4.2]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.2
 [1.4.1]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.1
 [1.4.0]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.0
