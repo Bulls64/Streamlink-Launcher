@@ -1,6 +1,6 @@
 <div class="wrap">
   <div class="intro">
-    <div class="tag"><span class="num">DOCS</span><span>Launcher v1.5.0 · Chat v0.2.0</span></div>
+    <div class="tag"><span class="num">DOCS</span><span>Launcher v1.5.1 · Chat v0.2.1</span></div>
     <h1>Documentation</h1>
     <p>Tout ce qu'il faut pour installer Streamlink, utiliser les deux applis et régler les problèmes courants. Les étiquettes <span class="app l">Launcher</span> et <span class="app c">Chat</span> indiquent à quelle appli s'applique un passage.</p>
     <label class="search" for="q">
@@ -550,9 +550,8 @@ player-args=--force-window=immediate</div>
           <div class="tbl"><table>
             <thead><tr><th>Appli</th><th>Dernière version</th><th>En bref</th></tr></thead>
             <tbody>
-              <tr><td><span class="app l">Launcher</span></td><td>1.5.0 (16 octobre 2026)</td><td>AppImage pour Linux.</td></tr>
-              <tr><td><span class="app c">Chat</span></td><td>0.2.0 (20 octobre 2026)</td><td>Couleurs par plateforme, mises à jour depuis GitHub.</td></tr>
-              <tr><td><span class="app c">Chat</span></td><td>Prochaine version</td><td>Pastilles de plateformes dans le champ d'ajout, mémoire bien plus basse avec les emotes animées, 500 messages gardés par défaut.</td></tr>
+              <tr><td><span class="app l">Launcher</span></td><td>1.5.1 (24 octobre 2026)</td><td>Code de conduite, commentaires anglais dans le code. Aucun changement de comportement.</td></tr>
+              <tr><td><span class="app c">Chat</span></td><td>0.2.1 (24 octobre 2026)</td><td>Pastilles des plateformes dans le champ d'ajout, mémoire bien plus basse avec les emotes animées, 500 messages gardés par défaut, fichier de réglages lisible par toi seul (Linux), message clair quand le port de connexion à Kick est occupé.</td></tr>
             </tbody>
           </table></div>
           <p>Le détail de chaque version est dans le journal des modifications, en anglais et en français : <a href="https://github.com/Bulls64/Streamlink-Launcher/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Chat</a>. Les fichiers à télécharger sont sur les pages des releases : <a href="https://github.com/Bulls64/Streamlink-Launcher/releases" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/releases" target="_blank" rel="noopener">Chat</a>.</p>
@@ -655,9 +654,9 @@ player-args=--force-window=immediate</div>
           <details class="faq"><summary>Windows affiche « Windows a protégé votre ordinateur » <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
             <p>Les exécutables ne sont pas encore signés, donc SmartScreen avertit au premier lancement. Ce n'est pas une détection.</p>
             <ol>
-              <li>Vérifie le fichier : dans PowerShell, <code>Get-FileHash .\StreamlinkLauncher-1.5.0.exe</code>, et compare avec <code>SHA256SUMS.txt</code> de la release.</li>
+              <li>Vérifie le fichier : dans PowerShell, <code>Get-FileHash .\StreamlinkLauncher-1.5.1.exe</code>, et compare avec <code>SHA256SUMS.txt</code> de la release.</li>
               <li>Clique sur <em>Informations complémentaires</em>, puis <em>Exécuter quand même</em>.</li>
-              <li>Si rien ne se passe au double-clic : clic droit › <em>Propriétés</em> › coche <em>Débloquer</em>, ou <code>Unblock-File .\StreamlinkLauncher-1.5.0.exe</code>.</li>
+              <li>Si rien ne se passe au double-clic : clic droit › <em>Propriétés</em> › coche <em>Débloquer</em>, ou <code>Unblock-File .\StreamlinkLauncher-1.5.1.exe</code>.</li>
             </ol></div></details>
           <details class="faq"><summary>Mon antivirus bloque ou supprime l'exe <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
             <p>Les programmes compilés avec PyInstaller sont parfois détectés à tort. Vérifie le SHA-256, restaure le fichier depuis la quarantaine, ajoute son dossier aux exclusions, et signale le faux positif (Microsoft Defender : <a href="https://www.microsoft.com/wdsi/filesubmission" target="_blank" rel="noopener">envoyer un fichier</a>, catégorie <em>Incorrectly detected as malware</em>). Tu peux aussi lancer l'appli depuis les sources.</p></div></details>
@@ -692,7 +691,7 @@ player-args=--force-window=immediate</div>
           <details class="faq"><summary>Certaines emotes s'affichent en texte <span class="app c">Chat</span></summary><div class="a">
             <p>Tk n'affiche que les PNG et les GIF. Une emote proposée seulement en WebP ou AVIF reste écrite en texte. Vérifie aussi que son fournisseur (BetterTTV, FrankerFaceZ, 7TV) est activé dans <em>Paramètres › Emotes</em>, et qu'il est disponible pour cette plateforme (voir <a href="#plateformes">Emotes et plateformes</a>).</p></div></details>
           <details class="faq"><summary>Le chat utilise beaucoup de mémoire <span class="app c">Chat</span></summary><div class="a">
-            <p>Les emotes animées sont les plus coûteuses. Depuis la version qui suit la 0.2.0, elles ne s'animent que dans le chat affiché et le cache est plafonné. Tu peux encore réduire la mémoire en désactivant <em>Emotes animées</em> ou en gardant 500 messages par chat (<em>Paramètres › Affichage</em>).</p></div></details>
+            <p>Les emotes animées sont les plus coûteuses. Depuis la 0.2.1, elles ne s'animent que dans le chat affiché et le cache est plafonné. Tu peux encore réduire la mémoire en désactivant <em>Emotes animées</em> ou en gardant 500 messages par chat (<em>Paramètres › Affichage</em>).</p></div></details>
           <details class="faq"><summary>La mise à jour intégrée échoue <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
             <p>L'appli doit pouvoir remplacer son propre fichier : place l'<code>.exe</code> dans un dossier à toi (par exemple <span class="path">Documents\Streamlink</span>), pas dans <span class="path">C:\Program Files</span>. En cas d'échec, l'ancienne version est remise en place ; tu peux toujours télécharger la nouvelle depuis la page des releases.</p></div></details>
           <details class="faq"><summary>Un fichier de réglages est endommagé <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">

@@ -1,6 +1,6 @@
 <div class="wrap">
   <div class="intro">
-    <div class="tag"><span class="num">DOCS</span><span>Launcher v1.5.0 · Chat v0.2.0</span></div>
+    <div class="tag"><span class="num">DOCS</span><span>Launcher v1.5.1 · Chat v0.2.1</span></div>
     <h1>Documentation</h1>
     <p>Everything you need to install Streamlink, use both apps and fix common problems. The <span class="app l">Launcher</span> and <span class="app c">Chat</span> labels show which app a passage applies to.</p>
     <label class="search" for="q">
@@ -550,9 +550,8 @@ player-args=--force-window=immediate</div>
           <div class="tbl"><table>
             <thead><tr><th>App</th><th>Latest version</th><th>In short</th></tr></thead>
             <tbody>
-              <tr><td><span class="app l">Launcher</span></td><td>1.5.0 (October 16, 2026)</td><td>AppImage for Linux.</td></tr>
-              <tr><td><span class="app c">Chat</span></td><td>0.2.0 (October 20, 2026)</td><td>Platform colors, updates from GitHub.</td></tr>
-              <tr><td><span class="app c">Chat</span></td><td>Next version</td><td>Platform pills in the add field, much lower memory with animated emotes, 500 messages kept by default.</td></tr>
+              <tr><td><span class="app l">Launcher</span></td><td>1.5.1 (October 24, 2026)</td><td>Code of conduct, English comments in the code. No change in behavior.</td></tr>
+              <tr><td><span class="app c">Chat</span></td><td>0.2.1 (October 24, 2026)</td><td>Platform pills in the add field, much lower memory with animated emotes, 500 messages kept by default, settings file readable by you only (Linux), clear message when the Kick sign-in port is busy.</td></tr>
             </tbody>
           </table></div>
           <p>The details of each version are in the changelog, in English and French: <a href="https://github.com/Bulls64/Streamlink-Launcher/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Chat</a>. Downloads are on the releases pages: <a href="https://github.com/Bulls64/Streamlink-Launcher/releases" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/releases" target="_blank" rel="noopener">Chat</a>.</p>
@@ -655,9 +654,9 @@ player-args=--force-window=immediate</div>
           <details class="faq"><summary>Windows shows “Windows protected your PC” <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
             <p>The executables aren't code-signed yet, so SmartScreen warns on first launch. This is not a detection.</p>
             <ol>
-              <li>Check the file: in PowerShell, <code>Get-FileHash .\StreamlinkLauncher-1.5.0.exe</code>, and compare with the release's <code>SHA256SUMS.txt</code>.</li>
+              <li>Check the file: in PowerShell, <code>Get-FileHash .\StreamlinkLauncher-1.5.1.exe</code>, and compare with the release's <code>SHA256SUMS.txt</code>.</li>
               <li>Click <em>More info</em>, then <em>Run anyway</em>.</li>
-              <li>If nothing happens on double-click: right-click › <em>Properties</em> › tick <em>Unblock</em>, or <code>Unblock-File .\StreamlinkLauncher-1.5.0.exe</code>.</li>
+              <li>If nothing happens on double-click: right-click › <em>Properties</em> › tick <em>Unblock</em>, or <code>Unblock-File .\StreamlinkLauncher-1.5.1.exe</code>.</li>
             </ol></div></details>
           <details class="faq"><summary>My antivirus blocks or deletes the exe <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
             <p>Programs built with PyInstaller are sometimes flagged by mistake. Check the SHA-256, restore the file from quarantine, add its folder to the exclusions, and report the false positive (Microsoft Defender: <a href="https://www.microsoft.com/wdsi/filesubmission" target="_blank" rel="noopener">submit a file</a>, category <em>Incorrectly detected as malware</em>). You can also run the app from source.</p></div></details>
@@ -692,7 +691,7 @@ player-args=--force-window=immediate</div>
           <details class="faq"><summary>Some emotes show as text <span class="app c">Chat</span></summary><div class="a">
             <p>Tk only displays PNG and GIF. An emote offered only as WebP or AVIF stays as text. Also check that its provider (BetterTTV, FrankerFaceZ, 7TV) is on in <em>Settings › Emotes</em>, and that it is available for this platform (see <a href="#platforms">Emotes and platforms</a>).</p></div></details>
           <details class="faq"><summary>The chat uses a lot of memory <span class="app c">Chat</span></summary><div class="a">
-            <p>Animated emotes are the most costly. Since the version after 0.2.0, they only animate in the displayed chat and the cache is capped. You can lower memory further by turning off <em>Animated emotes</em> or keeping 500 messages per chat (<em>Settings › Display</em>).</p></div></details>
+            <p>Animated emotes are the most costly. Since 0.2.1, they only animate in the displayed chat and the cache is capped. You can lower memory further by turning off <em>Animated emotes</em> or keeping 500 messages per chat (<em>Settings › Display</em>).</p></div></details>
           <details class="faq"><summary>The built-in update fails <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
             <p>The app must be able to replace its own file: put the <code>.exe</code> in a folder of your own (for example <span class="path">Documents\Streamlink</span>), not in <span class="path">C:\Program Files</span>. If it fails, the old version is put back; you can always download the new one from the releases page.</p></div></details>
           <details class="faq"><summary>A settings file is damaged <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
