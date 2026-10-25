@@ -251,7 +251,7 @@ def lang_switch_js(cur, kind):
         assert all(len(v) == len(ids["fr"]) for v in ids.values()), {l: len(v) for l, v in ids.items()}
         for i in range(len(ids["fr"])):
             same = {l: ids[l][i] for l in LANGS}
-            for a in set(same.values()):
+            for a in sorted(set(same.values())):
                 assert idmap.get(a, same) == same, f"ancre ambiguë : {a}"
                 idmap[a] = same
     return ("window.SL_PAGES = " + json.dumps({"alt": alt, "ids": idmap}, ensure_ascii=False) + ";\n"
