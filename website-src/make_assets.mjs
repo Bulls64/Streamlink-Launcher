@@ -5,7 +5,9 @@ const here = process.cwd();
 const F = 'node_modules/@fontsource';
 const b = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});
 const svg = fs.readFileSync('gh_assets/icons/icon.svg', 'utf8');
-for (const [name, size, pad] of [['icon-512', 512, 0], ['icon-192', 192, 0], ['apple-touch-icon', 180, 0], ['icon-32', 32, 0], ['icon-16', 16, 0]]) {
+// ONLY=home-es,docs-es… : ne refait que ces images de partage (les icônes sont gardées telles quelles)
+const ONLY = process.env.ONLY ? process.env.ONLY.split(',') : null;
+for (const [name, size, pad] of ONLY ? [] : [['icon-512', 512, 0], ['icon-192', 192, 0], ['apple-touch-icon', 180, 0], ['icon-32', 32, 0], ['icon-16', 16, 0]]) {
   const p = await b.newPage({ viewport: { width: size, height: size } });
   // l'icône Apple n'a pas de transparence : fond plein, coins arrondis par iOS
   const html = name === 'apple-touch-icon'
@@ -27,10 +29,18 @@ const T = {
   'home-en': { tag: 'Two free apps · Windows and Linux', h: 'Live, minus<br>the <em>browser.</em>', p: 'Twitch, Kick, YouTube and Steam TV in VLC, mpv or PotPlayer, with the chats in a separate window.' },
   'docs-fr': { tag: 'Docs · Launcher 1.5 · Chat 0.2', h: 'La doc<br><em>complète.</em>', p: 'Installer Streamlink, premier stream, chat Twitch et Kick, raccourcis, réglages, dépannage.' },
   'docs-en': { tag: 'Docs · Launcher 1.5 · Chat 0.2', h: 'The full<br><em>guide.</em>', p: 'Install Streamlink, first stream, Twitch and Kick chat, shortcuts, settings, troubleshooting.' },
+  'home-es': { tag: 'Dos aplicaciones libres · Windows y Linux', h: 'El directo,<br>fuera del <em>navegador.</em>', p: 'Twitch, Kick, YouTube y Steam TV en VLC, mpv o PotPlayer, con los chats en otra ventana.' },
+  'home-de': { tag: 'Zwei freie Apps · Windows und Linux', h: 'Live, aber<br>ohne <em>Browser.</em>', p: 'Twitch, Kick, YouTube und Steam TV in VLC, mpv oder PotPlayer, mit den Chats in einem eigenen Fenster.' },
+  'home-it': { tag: 'Due app libere · Windows e Linux', h: 'Il live esce<br>dal <em>browser.</em>', p: 'Twitch, Kick, YouTube e Steam TV in VLC, mpv o PotPlayer, con le chat in una finestra a parte.' },
+  'docs-es': { tag: 'Docs · Launcher 1.5 · Chat 0.2', h: 'La guía<br><em>completa.</em>', p: 'Instalar Streamlink, primer stream, chat de Twitch y Kick, atajos, ajustes, solución de problemas.' },
+  'docs-de': { tag: 'Docs · Launcher 1.5 · Chat 0.2', h: 'Das ganze<br><em>Handbuch.</em>', p: 'Streamlink installieren, erster Stream, Twitch- und Kick-Chat, Tastenkürzel, Einstellungen, Fehlerbehebung.' },
+  'docs-it': { tag: 'Docs · Launcher 1.5 · Chat 0.2', h: 'La guida<br><em>completa.</em>', p: 'Installare Streamlink, primo stream, chat di Twitch e Kick, scorciatoie, impostazioni, risoluzione dei problemi.' },
 };
 for (const [key, t] of Object.entries(T)) {
+  if (ONLY && !ONLY.includes(key)) continue;
   const lang = key.slice(-2);
-  const img = n => `file://${here}/img/site/${lang}/${n}.webp`;
+  const dir = lang === 'fr' ? 'fr' : 'en';   // es, de, it : mêmes captures que l'anglais
+  const img = n => `file://${here}/img/site/${dir}/${n}.webp`;
   const p = await b.newPage({ viewport: { width: 1200, height: 630 } });
   fs.writeFileSync('gh_assets/_og.html', `<!doctype html><html><head><style>${css}
     *{box-sizing:border-box} body{margin:0;width:1200px;height:630px;overflow:hidden;background:#0F1116;color:#ECEEF3;font-family:"Instrument Sans";position:relative}
@@ -58,6 +68,7 @@ for (const [key, t] of Object.entries(T)) {
 }
 fs.unlinkSync('gh_assets/_og.html');
 await b.close();
+if (ONLY) process.exit(0);
 // favicon.ico (16 et 32 px) à partir des PNG, sans dépendance supplémentaire : on l'assemble à la main
 const png = n => fs.readFileSync(`gh_assets/icons/${n}.png`);
 const imgs = [[16, png('icon-16')], [32, png('icon-32')]];

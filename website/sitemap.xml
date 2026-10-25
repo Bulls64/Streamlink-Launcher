@@ -2,30 +2,102 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://bulls64.github.io/Streamlink-Launcher/</loc>
-    <lastmod>2026-10-24</lastmod>
+    <lastmod>2026-10-25</lastmod>
     <xhtml:link rel="alternate" hreflang="fr" href="https://bulls64.github.io/Streamlink-Launcher/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://bulls64.github.io/Streamlink-Launcher/en/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bulls64.github.io/Streamlink-Launcher/es/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://bulls64.github.io/Streamlink-Launcher/de/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://bulls64.github.io/Streamlink-Launcher/it/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bulls64.github.io/Streamlink-Launcher/"/>
   </url>
   <url>
     <loc>https://bulls64.github.io/Streamlink-Launcher/en/</loc>
-    <lastmod>2026-10-24</lastmod>
+    <lastmod>2026-10-25</lastmod>
     <xhtml:link rel="alternate" hreflang="fr" href="https://bulls64.github.io/Streamlink-Launcher/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://bulls64.github.io/Streamlink-Launcher/en/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bulls64.github.io/Streamlink-Launcher/es/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://bulls64.github.io/Streamlink-Launcher/de/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://bulls64.github.io/Streamlink-Launcher/it/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bulls64.github.io/Streamlink-Launcher/"/>
+  </url>
+  <url>
+    <loc>https://bulls64.github.io/Streamlink-Launcher/es/</loc>
+    <lastmod>2026-10-25</lastmod>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bulls64.github.io/Streamlink-Launcher/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bulls64.github.io/Streamlink-Launcher/en/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bulls64.github.io/Streamlink-Launcher/es/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://bulls64.github.io/Streamlink-Launcher/de/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://bulls64.github.io/Streamlink-Launcher/it/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bulls64.github.io/Streamlink-Launcher/"/>
+  </url>
+  <url>
+    <loc>https://bulls64.github.io/Streamlink-Launcher/de/</loc>
+    <lastmod>2026-10-25</lastmod>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bulls64.github.io/Streamlink-Launcher/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bulls64.github.io/Streamlink-Launcher/en/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bulls64.github.io/Streamlink-Launcher/es/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://bulls64.github.io/Streamlink-Launcher/de/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://bulls64.github.io/Streamlink-Launcher/it/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bulls64.github.io/Streamlink-Launcher/"/>
+  </url>
+  <url>
+    <loc>https://bulls64.github.io/Streamlink-Launcher/it/</loc>
+    <lastmod>2026-10-25</lastmod>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bulls64.github.io/Streamlink-Launcher/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bulls64.github.io/Streamlink-Launcher/en/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bulls64.github.io/Streamlink-Launcher/es/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://bulls64.github.io/Streamlink-Launcher/de/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://bulls64.github.io/Streamlink-Launcher/it/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bulls64.github.io/Streamlink-Launcher/"/>
   </url>
   <url>
     <loc>https://bulls64.github.io/Streamlink-Launcher/docs/</loc>
-    <lastmod>2026-10-24</lastmod>
+    <lastmod>2026-10-25</lastmod>
     <xhtml:link rel="alternate" hreflang="fr" href="https://bulls64.github.io/Streamlink-Launcher/docs/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://bulls64.github.io/Streamlink-Launcher/en/docs/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bulls64.github.io/Streamlink-Launcher/es/docs/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://bulls64.github.io/Streamlink-Launcher/de/docs/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://bulls64.github.io/Streamlink-Launcher/it/docs/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bulls64.github.io/Streamlink-Launcher/docs/"/>
   </url>
   <url>
     <loc>https://bulls64.github.io/Streamlink-Launcher/en/docs/</loc>
-    <lastmod>2026-10-24</lastmod>
+    <lastmod>2026-10-25</lastmod>
     <xhtml:link rel="alternate" hreflang="fr" href="https://bulls64.github.io/Streamlink-Launcher/docs/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://bulls64.github.io/Streamlink-Launcher/en/docs/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bulls64.github.io/Streamlink-Launcher/es/docs/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://bulls64.github.io/Streamlink-Launcher/de/docs/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://bulls64.github.io/Streamlink-Launcher/it/docs/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bulls64.github.io/Streamlink-Launcher/docs/"/>
+  </url>
+  <url>
+    <loc>https://bulls64.github.io/Streamlink-Launcher/es/docs/</loc>
+    <lastmod>2026-10-25</lastmod>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bulls64.github.io/Streamlink-Launcher/docs/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bulls64.github.io/Streamlink-Launcher/en/docs/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bulls64.github.io/Streamlink-Launcher/es/docs/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://bulls64.github.io/Streamlink-Launcher/de/docs/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://bulls64.github.io/Streamlink-Launcher/it/docs/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bulls64.github.io/Streamlink-Launcher/docs/"/>
+  </url>
+  <url>
+    <loc>https://bulls64.github.io/Streamlink-Launcher/de/docs/</loc>
+    <lastmod>2026-10-25</lastmod>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bulls64.github.io/Streamlink-Launcher/docs/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bulls64.github.io/Streamlink-Launcher/en/docs/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bulls64.github.io/Streamlink-Launcher/es/docs/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://bulls64.github.io/Streamlink-Launcher/de/docs/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://bulls64.github.io/Streamlink-Launcher/it/docs/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bulls64.github.io/Streamlink-Launcher/docs/"/>
+  </url>
+  <url>
+    <loc>https://bulls64.github.io/Streamlink-Launcher/it/docs/</loc>
+    <lastmod>2026-10-25</lastmod>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://bulls64.github.io/Streamlink-Launcher/docs/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bulls64.github.io/Streamlink-Launcher/en/docs/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bulls64.github.io/Streamlink-Launcher/es/docs/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://bulls64.github.io/Streamlink-Launcher/de/docs/"/>
+    <xhtml:link rel="alternate" hreflang="it" href="https://bulls64.github.io/Streamlink-Launcher/it/docs/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://bulls64.github.io/Streamlink-Launcher/docs/"/>
   </url>
 </urlset>

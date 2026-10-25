@@ -77,6 +77,287 @@
   document.querySelectorAll("[data-i18n-alt]").forEach(el => { FR[el.dataset.i18nAlt] = el.getAttribute("alt"); });
   const DICT = { fr: FR, en: EN };
 
+  /* espagnol, allemand, italien : textes de la page d'accueil */
+  const HOME_TR = {
+    es: {
+      nav_dl: "Descargar",
+      lang_label: "Idioma",
+      onair: "Dos aplicaciones libres · Windows y Linux",
+      h1: '<span class="w">El</span> <span class="w">directo,</span> <span class="w">fuera</span> <span class="w">del</span> <span class="w"><em>navegador</em>.</span>',
+      lede: "<strong>Streamlink Launcher</strong> abre Twitch, Kick, YouTube, Dailymotion y Steam TV en VLC, mpv o PotPlayer. <strong>Streamlink Chat</strong> reúne los chats de Twitch, Kick y Steam TV en una ventana al lado. El mismo estilo, la misma ligereza, sin dependencias.",
+      demo_aria: "Demostración del campo del lanzador",
+      demo_label: "<b>Prueba el campo del lanzador</b><span>escribe el nombre de un canal o pega un enlace: la plataforma se reconoce sola</span>",
+      q_aria: "Nombre del canal o enlace",
+      enter: "Intro",
+      quality: "Calidad",
+      launch: "Iniciar",
+      platform: "Plataforma",
+      examples: "Ejemplos:",
+      l_h2: "Un campo, Intro, y el stream se abre en tu reproductor.",
+      l_p: "Una interfaz ligera para Streamlink, en Python y Tkinter. Recuerda tus favoritos, te dice quién está en directo e inicia el stream sin anuncios de Twitch, en el reproductor que elijas.",
+      views_aria: "Capturas del lanzador",
+      v_main: "Pantalla principal", v_mini: "Modo mini", v_set: "Ajustes", v_light: "Tema claro",
+      lf1: "<dt>Campo inteligente</dt><dd>Un nombre de canal o cualquier enlace. Las sugerencias vienen de tus favoritos y de tu historial.</dd>",
+      lf2: "<dt>Favoritos en directo</dt><dd>Vista previa del stream, título y espectadores. Una notificación de Windows cuando un favorito empieza un directo.</dd>",
+      lf3: "<dt>Calidad recordada</dt><dd>Por plataforma: <code>best</code>, <code>1080p60</code>, <code>audio_only</code>, o una lista de alternativas como <code>720p60,720p,best</code>.</dd>",
+      lf4: "<dt>Portapapeles</dt><dd>Un enlace copiado se te propone en cuanto vuelves a la ventana. También puedes arrastrar y soltar un enlace o un acceso directo <code>.url</code>.</dd>",
+      lf5: "<dt>Área de notificación</dt><dd>Al cerrar la ventana, el lanzador se queda junto al reloj, con tus streams y la vigilancia de directos.</dd>",
+      lf6: "<dt>Tus plataformas</dt><dd>Se describen en <code>platforms.json</code>: añade las tuyas, con su color.</dd>",
+      keys_aria: "Atajo del modo mini",
+      combo: "Modo mini: una barra flotante al estilo Spotlight, desde cualquier aplicación.",
+      s1: "<b>0</b><span>dependencias externas: Python y Tkinter</span>",
+      s2: "<b>≈ 0,25 s</b><span>de arranque desde el código fuente</span>",
+      s3: "<b>≈ 30 MB</b><span>de memoria</span>",
+      s4: "<b>5</b><span>idiomas: EN, FR, ES, DE, IT</span>",
+      c_h2: "Todos tus chats, una pestaña cada uno.",
+      c_p: "El compañero del lanzador, al estilo de Chatterino. Twitch, Kick y Steam TV en una sola ventana, cada uno con el color de su plataforma. Leer no requiere cuenta.",
+      demo_small: "demo · mensajes simulados",
+      tabs_aria: "Chats abiertos",
+      send: "Enviar",
+      paused: "Mensajes nuevos ↓",
+      chat_note: "Pasa el ratón por el chat o desplázate hacia arriba: el desplazamiento automático se pausa, igual que en la aplicación. En Twitch, escribe un mensaje; <kbd>Tab</kbd> completa los nombres.",
+      cf1: "<dt>Mensajes legibles</dt><dd>Insignias, colores de nombre ajustados al tema, emotes como imágenes, GIF animados incluidos (Twitch, BetterTTV, FrankerFaceZ, 7TV).</dd>",
+      cf2: "<dt>Menciones</dt><dd>Los mensajes que mencionan tu nombre, o las palabras que elijas, se resaltan.</dd>",
+      cf3: "<dt>Escribir</dt><dd>En Twitch y Kick, tras iniciar sesión. <kbd>Tab</kbd> completa nombres y emotes, <kbd>↑</kbd> recupera tus últimos mensajes.</dd>",
+      cf4: "<dt>Ver</dt><dd>El botón ▶ del chat inicia el stream con Streamlink.</dd>",
+      cf5: "<dt>Tokens protegidos</dt><dd>En Windows, tus inicios de sesión se cifran con DPAPI y solo tu sesión puede leerlos.</dd>",
+      pt_head: "<tr><th>Plataforma</th><th>Lectura</th><th>Escritura</th></tr>",
+      pt_body: '<tr><td><i style="background:#9146FF"></i>Twitch</td><td>Sin cuenta</td><td>Tras iniciar sesión</td></tr>'
+        + '<tr><td><i style="background:#53FC18"></i>Kick</td><td>Sin cuenta <span class="exp">experimental</span></td><td>Tras iniciar sesión</td></tr>'
+        + '<tr><td><i style="background:#2A475E"></i>Steam TV</td><td>Sin cuenta</td><td>Solo lectura</td></tr>',
+      alt_ctw: "Captura de Streamlink Chat: chat de Twitch en tono violeta",
+      alt_ckick: "Captura de Streamlink Chat: chat de Kick en tono verde",
+      alt_clight: "Captura de Streamlink Chat con el tema claro",
+      together: "Juntos",
+      t_h2: "El reproductor a la izquierda, el chat a la derecha.",
+      t1: "<h3>Un clic para ver</h3><p>En el chat, ▶ inicia el stream con el mismo Streamlink que el lanzador. En el lanzador, tus favoritos te dicen quién está en directo.</p>",
+      t2: "<h3>Un mismo aspecto</h3><p>Los mismos componentes dibujados, los mismos colores de plataforma, tema claro, oscuro o automático según Windows.</p>",
+      t3: "<h3>Se actualizan solas</h3><p>Cada aplicación busca su nueva versión en GitHub, comprueba su tamaño y su SHA-256, sustituye el ejecutable y se reinicia.</p>",
+      dl_tag: "Versiones en GitHub",
+      dl_p: 'Libres y con licencia MIT. Necesitas <a href="https://streamlink.github.io/install.html" target="_blank" rel="noopener">Streamlink</a> y un reproductor de vídeo como VLC o mpv.',
+      size_l_exe: "12,3 MB", size_c_exe: "12,9 MB", size_img: "31,8 MB",
+      step_chmod: "En Linux, haz ejecutable la AppImage y luego iníciala:",
+      step_l2: "En el primer inicio, el lanzador encuentra Streamlink por sí solo, o te explica cómo instalarlo.",
+      step_c2: "Escribe el nombre de un canal o pega un enlace de Twitch, Kick o Steam TV. Para escribir, conecta tu cuenta en <em>Ajustes › Cuentas</em>.",
+      src: "Código fuente", notes: "Notas de la versión",
+      trust: "Cada versión publica un archivo <code>SHA256SUMS.txt</code> para que compruebes lo que descargas. Los ejecutables de Windows todavía no tienen firma de código: si aparece SmartScreen, elige <em>Más información</em> y luego <em>Ejecutar de todas formas</em>.",
+      foot1: 'Streamlink Launcher y Streamlink Chat, por <a href="https://github.com/Bulls64" target="_blank" rel="noopener">Bulls64</a>. Licencia MIT.',
+      foot2: "Proyectos independientes, sin relación con Streamlink, Twitch, Kick, YouTube, Dailymotion ni Valve.",
+    },
+    de: {
+      nav_dl: "Download",
+      lang_label: "Sprache",
+      onair: "Zwei freie Apps · Windows und Linux",
+      h1: '<span class="w">Live,</span> <span class="w">aber</span> <span class="w">ohne</span> <span class="w"><em>Browser</em>.</span>',
+      lede: "<strong>Streamlink Launcher</strong> öffnet Twitch, Kick, YouTube, Dailymotion und Steam TV in VLC, mpv oder PotPlayer. <strong>Streamlink Chat</strong> hält die Chats von Twitch, Kick und Steam TV in einem Fenster daneben. Gleicher Stil, gleiche Leichtigkeit, keine Abhängigkeiten.",
+      demo_aria: "Demo des Eingabefelds des Launchers",
+      demo_label: "<b>Probier das Feld des Launchers aus</b><span>gib einen Kanalnamen ein oder füge einen Link ein: Die Plattform wird von selbst erkannt</span>",
+      q_aria: "Kanalname oder Link",
+      enter: "Enter",
+      quality: "Qualität",
+      launch: "Starten",
+      platform: "Plattform",
+      examples: "Beispiele:",
+      l_h2: "Ein Feld, Enter, und der Stream öffnet sich in deinem Player.",
+      l_p: "Eine schlanke Oberfläche für Streamlink, in Python und Tkinter. Sie merkt sich deine Favoriten, zeigt dir, wer live ist, und startet den Stream ohne Twitch-Werbung im Player deiner Wahl.",
+      views_aria: "Screenshots des Launchers",
+      v_main: "Hauptbildschirm", v_mini: "Mini-Modus", v_set: "Einstellungen", v_light: "Helles Design",
+      lf1: "<dt>Smartes Feld</dt><dd>Ein Kanalname oder ein beliebiger Link. Die Vorschläge kommen aus deinen Favoriten und deinem Verlauf.</dd>",
+      lf2: "<dt>Live-Favoriten</dt><dd>Stream-Vorschau, Titel und Zuschauer. Eine Windows-Benachrichtigung, wenn ein Favorit live geht.</dd>",
+      lf3: "<dt>Gemerkte Qualität</dt><dd>Pro Plattform: <code>best</code>, <code>1080p60</code>, <code>audio_only</code> oder eine Ausweichliste wie <code>720p60,720p,best</code>.</dd>",
+      lf4: "<dt>Zwischenablage</dt><dd>Ein kopierter Link wird dir angeboten, sobald du zum Fenster zurückkehrst. Du kannst auch einen Link oder eine <code>.url</code>-Verknüpfung per Drag-and-drop ablegen.</dd>",
+      lf5: "<dt>Infobereich</dt><dd>Beim Schließen des Fensters bleibt der Launcher neben der Uhr, mit deinen Streams und der Live-Überwachung.</dd>",
+      lf6: "<dt>Deine Plattformen</dt><dd>Sie sind in <code>platforms.json</code> beschrieben: Füge deine eigenen hinzu, mit ihrer Farbe.</dd>",
+      keys_aria: "Tastenkombination des Mini-Modus",
+      combo: "Mini-Modus: eine schwebende Leiste im Spotlight-Stil, aus jeder Anwendung.",
+      s1: "<b>0</b><span>externe Abhängigkeiten: Python und Tkinter</span>",
+      s2: "<b>≈ 0,25 s</b><span>Start aus dem Quellcode</span>",
+      s3: "<b>≈ 30 MB</b><span>Arbeitsspeicher</span>",
+      s4: "<b>5</b><span>Sprachen: EN, FR, ES, DE, IT</span>",
+      c_h2: "Alle deine Chats, jeder in seinem Tab.",
+      c_p: "Der Begleiter des Launchers, im Stil von Chatterino. Twitch, Kick und Steam TV in einem einzigen Fenster, jeder in der Farbe seiner Plattform. Zum Lesen brauchst du kein Konto.",
+      demo_small: "Demo · simulierte Nachrichten",
+      tabs_aria: "Geöffnete Chats",
+      send: "Senden",
+      paused: "Neue Nachrichten ↓",
+      chat_note: "Fahre mit der Maus über den Chat oder scrolle nach oben: Das automatische Scrollen pausiert, genau wie in der App. Schreib auf Twitch eine Nachricht; <kbd>Tab</kbd> vervollständigt Namen.",
+      cf1: "<dt>Lesbare Nachrichten</dt><dd>Abzeichen, an das Design angepasste Namensfarben, Emotes als Bilder, animierte GIFs inklusive (Twitch, BetterTTV, FrankerFaceZ, 7TV).</dd>",
+      cf2: "<dt>Erwähnungen</dt><dd>Nachrichten, die deinen Namen oder Wörter deiner Wahl enthalten, werden hervorgehoben.</dd>",
+      cf3: "<dt>Schreiben</dt><dd>Auf Twitch und Kick, nach der Anmeldung. <kbd>Tab</kbd> vervollständigt Namen und Emotes, <kbd>↑</kbd> holt deine letzten Nachrichten zurück.</dd>",
+      cf4: "<dt>Ansehen</dt><dd>Die Schaltfläche ▶ im Chat startet den Stream mit Streamlink.</dd>",
+      cf5: "<dt>Geschützte Tokens</dt><dd>Unter Windows sind deine Anmeldungen mit DPAPI verschlüsselt und nur von deiner Sitzung lesbar.</dd>",
+      pt_head: "<tr><th>Plattform</th><th>Lesen</th><th>Schreiben</th></tr>",
+      pt_body: '<tr><td><i style="background:#9146FF"></i>Twitch</td><td>Ohne Konto</td><td>Nach der Anmeldung</td></tr>'
+        + '<tr><td><i style="background:#53FC18"></i>Kick</td><td>Ohne Konto <span class="exp">experimentell</span></td><td>Nach der Anmeldung</td></tr>'
+        + '<tr><td><i style="background:#2A475E"></i>Steam TV</td><td>Ohne Konto</td><td>Nur lesen</td></tr>',
+      alt_ctw: "Screenshot von Streamlink Chat: Twitch-Chat in Violett",
+      alt_ckick: "Screenshot von Streamlink Chat: Kick-Chat in Grün",
+      alt_clight: "Screenshot von Streamlink Chat im hellen Design",
+      together: "Zusammen",
+      t_h2: "Links der Player, rechts der Chat.",
+      t1: "<h3>Ein Klick zum Ansehen</h3><p>Im Chat startet ▶ den Stream mit demselben Streamlink wie der Launcher. Im Launcher zeigen dir deine Favoriten, wer live ist.</p>",
+      t2: "<h3>Ein Look</h3><p>Dieselben gezeichneten Elemente, dieselben Plattformfarben, helles, dunkles oder automatisches Design nach Windows.</p>",
+      t3: "<h3>Aktualisieren sich selbst</h3><p>Jede App sucht ihre neue Version auf GitHub, prüft Größe und SHA-256, ersetzt die ausführbare Datei und startet neu.</p>",
+      dl_tag: "Releases auf GitHub",
+      dl_p: 'Frei und unter MIT-Lizenz. Du brauchst <a href="https://streamlink.github.io/install.html" target="_blank" rel="noopener">Streamlink</a> und einen Videoplayer wie VLC oder mpv.',
+      size_l_exe: "12,3 MB", size_c_exe: "12,9 MB", size_img: "31,8 MB",
+      step_chmod: "Unter Linux machst du das AppImage ausführbar und startest es dann:",
+      step_l2: "Beim ersten Start findet der Launcher Streamlink von selbst oder erklärt dir, wie du es installierst.",
+      step_c2: "Gib einen Kanalnamen ein oder füge einen Twitch-, Kick- oder Steam-TV-Link ein. Zum Schreiben verbindest du dein Konto unter <em>Einstellungen › Konten</em>.",
+      src: "Quellcode", notes: "Versionshinweise",
+      trust: "Jedes Release veröffentlicht eine Datei <code>SHA256SUMS.txt</code>, damit du prüfen kannst, was du herunterlädst. Die Windows-Programme sind noch nicht signiert: Wenn SmartScreen erscheint, wähle <em>Weitere Informationen</em> und dann <em>Trotzdem ausführen</em>.",
+      foot1: 'Streamlink Launcher und Streamlink Chat, von <a href="https://github.com/Bulls64" target="_blank" rel="noopener">Bulls64</a>. MIT-Lizenz.',
+      foot2: "Unabhängige Projekte, ohne Verbindung zu Streamlink, Twitch, Kick, YouTube, Dailymotion oder Valve.",
+    },
+    it: {
+      nav_dl: "Scarica",
+      lang_label: "Lingua",
+      onair: "Due app libere · Windows e Linux",
+      h1: '<span class="w">La</span> <span class="w">diretta</span> <span class="w">esce</span> <span class="w">dal</span> <span class="w"><em>browser</em>.</span>',
+      lede: "<strong>Streamlink Launcher</strong> apre Twitch, Kick, YouTube, Dailymotion e Steam TV in VLC, mpv o PotPlayer. <strong>Streamlink Chat</strong> tiene le chat di Twitch, Kick e Steam TV in una finestra accanto. Stesso stile, stessa leggerezza, nessuna dipendenza.",
+      demo_aria: "Demo del campo del launcher",
+      demo_label: "<b>Prova il campo del launcher</b><span>scrivi il nome di un canale o incolla un link: la piattaforma viene riconosciuta da sola</span>",
+      q_aria: "Nome del canale o link",
+      enter: "Invio",
+      quality: "Qualità",
+      launch: "Avvia",
+      platform: "Piattaforma",
+      examples: "Esempi:",
+      l_h2: "Un campo, Invio, e lo stream si apre nel tuo lettore.",
+      l_p: "Un'interfaccia leggera per Streamlink, in Python e Tkinter. Ricorda i tuoi preferiti, ti dice chi è in diretta e avvia lo stream senza pubblicità di Twitch, nel lettore che preferisci.",
+      views_aria: "Screenshot del launcher",
+      v_main: "Schermata principale", v_mini: "Modalità mini", v_set: "Impostazioni", v_light: "Tema chiaro",
+      lf1: "<dt>Campo intelligente</dt><dd>Un nome di canale o qualsiasi link. I suggerimenti vengono dai tuoi preferiti e dalla cronologia.</dd>",
+      lf2: "<dt>Preferiti in diretta</dt><dd>Anteprima dello stream, titolo e spettatori. Una notifica di Windows quando un preferito va in diretta.</dd>",
+      lf3: "<dt>Qualità ricordata</dt><dd>Per piattaforma: <code>best</code>, <code>1080p60</code>, <code>audio_only</code>, o un elenco di riserva come <code>720p60,720p,best</code>.</dd>",
+      lf4: "<dt>Appunti</dt><dd>Un link copiato ti viene proposto appena torni alla finestra. Puoi anche trascinare un link o un collegamento <code>.url</code>.</dd>",
+      lf5: "<dt>Area di notifica</dt><dd>Chiudendo la finestra, il launcher resta accanto all'orologio, con i tuoi stream e il controllo delle dirette.</dd>",
+      lf6: "<dt>Le tue piattaforme</dt><dd>Sono descritte in <code>platforms.json</code>: aggiungi le tue, con il loro colore.</dd>",
+      keys_aria: "Scorciatoia della modalità mini",
+      combo: "Modalità mini: una barra mobile in stile Spotlight, da qualsiasi applicazione.",
+      s1: "<b>0</b><span>dipendenze esterne: Python e Tkinter</span>",
+      s2: "<b>≈ 0,25 s</b><span>di avvio dal codice sorgente</span>",
+      s3: "<b>≈ 30 MB</b><span>di memoria</span>",
+      s4: "<b>5</b><span>lingue: EN, FR, ES, DE, IT</span>",
+      c_h2: "Tutte le tue chat, una scheda ciascuna.",
+      c_p: "Il compagno del launcher, nello spirito di Chatterino. Twitch, Kick e Steam TV in un'unica finestra, ognuna con il colore della sua piattaforma. Per leggere non serve un account.",
+      demo_small: "demo · messaggi simulati",
+      tabs_aria: "Chat aperte",
+      send: "Invia",
+      paused: "Nuovi messaggi ↓",
+      chat_note: "Passa il mouse sulla chat o scorri verso l'alto: lo scorrimento automatico si mette in pausa, proprio come nell'app. Su Twitch, scrivi un messaggio; <kbd>Tab</kbd> completa i nomi.",
+      cf1: "<dt>Messaggi leggibili</dt><dd>Badge, colori dei nomi adattati al tema, emote come immagini, GIF animate comprese (Twitch, BetterTTV, FrankerFaceZ, 7TV).</dd>",
+      cf2: "<dt>Menzioni</dt><dd>I messaggi che citano il tuo nome, o parole a tua scelta, vengono evidenziati.</dd>",
+      cf3: "<dt>Scrivere</dt><dd>Su Twitch e Kick, dopo l'accesso. <kbd>Tab</kbd> completa nomi ed emote, <kbd>↑</kbd> richiama i tuoi ultimi messaggi.</dd>",
+      cf4: "<dt>Guardare</dt><dd>Il pulsante ▶ della chat avvia lo stream con Streamlink.</dd>",
+      cf5: "<dt>Token protetti</dt><dd>Su Windows, i tuoi accessi sono cifrati con DPAPI e leggibili solo dalla tua sessione.</dd>",
+      pt_head: "<tr><th>Piattaforma</th><th>Lettura</th><th>Scrittura</th></tr>",
+      pt_body: '<tr><td><i style="background:#9146FF"></i>Twitch</td><td>Senza account</td><td>Dopo l\'accesso</td></tr>'
+        + '<tr><td><i style="background:#53FC18"></i>Kick</td><td>Senza account <span class="exp">sperimentale</span></td><td>Dopo l\'accesso</td></tr>'
+        + '<tr><td><i style="background:#2A475E"></i>Steam TV</td><td>Senza account</td><td>Sola lettura</td></tr>',
+      alt_ctw: "Screenshot di Streamlink Chat: chat di Twitch in viola",
+      alt_ckick: "Screenshot di Streamlink Chat: chat di Kick in verde",
+      alt_clight: "Screenshot di Streamlink Chat con il tema chiaro",
+      together: "Insieme",
+      t_h2: "Il lettore a sinistra, la chat a destra.",
+      t1: "<h3>Un clic per guardare</h3><p>Nella chat, ▶ avvia lo stream con lo stesso Streamlink del launcher. Nel launcher, i tuoi preferiti ti dicono chi è in diretta.</p>",
+      t2: "<h3>Un unico stile</h3><p>Gli stessi componenti disegnati, gli stessi colori delle piattaforme, tema chiaro, scuro o automatico che segue Windows.</p>",
+      t3: "<h3>Si aggiornano da sole</h3><p>Ogni app cerca la nuova versione su GitHub, ne verifica dimensione e SHA-256, sostituisce l'eseguibile e si riavvia.</p>",
+      dl_tag: "Release su GitHub",
+      dl_p: 'Libere e con licenza MIT. Ti servono <a href="https://streamlink.github.io/install.html" target="_blank" rel="noopener">Streamlink</a> e un lettore video come VLC o mpv.',
+      size_l_exe: "12,3 MB", size_c_exe: "12,9 MB", size_img: "31,8 MB",
+      step_chmod: "Su Linux, rendi eseguibile l'AppImage, poi avviala:",
+      step_l2: "Al primo avvio, il launcher trova Streamlink da solo, o ti spiega come installarlo.",
+      step_c2: "Scrivi il nome di un canale o incolla un link di Twitch, Kick o Steam TV. Per scrivere, collega il tuo account in <em>Impostazioni › Account</em>.",
+      src: "Codice sorgente", notes: "Note di rilascio",
+      trust: "Ogni release pubblica un file <code>SHA256SUMS.txt</code> per verificare ciò che scarichi. Gli eseguibili di Windows non hanno ancora una firma del codice: se compare SmartScreen, scegli <em>Ulteriori informazioni</em>, poi <em>Esegui comunque</em>.",
+      foot1: 'Streamlink Launcher e Streamlink Chat, di <a href="https://github.com/Bulls64" target="_blank" rel="noopener">Bulls64</a>. Licenza MIT.',
+      foot2: "Progetti indipendenti, senza legami con Streamlink, Twitch, Kick, YouTube, Dailymotion o Valve.",
+    },
+  };
+  /* espagnol, allemand, italien : textes produits par le script de la page d'accueil */
+  const T_TR = {
+    es: {
+      ph: { twitch: "Nombre del canal de Twitch o enlace…", kick: "Nombre del canal de Kick o enlace…", youtube: "ID o enlace del vídeo de YouTube…",
+            dailymotion: "ID o enlace del vídeo de Dailymotion…", steamtv: "Enlace de steam.tv (opcional)…", url: "Cualquier enlace compatible con Streamlink…" },
+      direct: "Enlace directo",
+      e_empty: "Escribe el nombre de un canal o pega un enlace.", e_chan: "Nombre de canal no válido: solo letras, cifras y _.",
+      e_yt: "Un ID de YouTube tiene 11 caracteres, o pega el enlace del vídeo.", e_vid: "ID de vídeo no válido, o pega el enlace del vídeo.",
+      e_url: "Pega un enlace completo, que empiece por https://", e_noch: "A este enlace le falta el nombre del canal.",
+      cmd: p => `# ${p} reconocido · comando enviado a Streamlink`,
+      idle: "Ningún stream en curso",
+      run: n => `${n} stream${n > 1 ? "s" : ""} en curso`, demo: "(demo: en realidad no se abre nada)",
+      alt: { l_main: "Pantalla principal de Streamlink Launcher con el tema oscuro: campo de búsqueda, plataformas, favoritos en directo con vistas previas y número de espectadores, recientes.",
+             l_mini: "El modo mini de Streamlink Launcher: barra flotante con la lista de favoritos y su número de espectadores.",
+             l_set: "El panel de ajustes de Streamlink Launcher.", l_light: "Pantalla principal de Streamlink Launcher con el tema claro." },
+      copy: "Copiar", copied: "Copiado",
+      lines: {
+        twitch: ["gg wp, menuda ronda [e]", "ese flick [e] [e]", "ha fallado el clutch", "@chris ¿ves la final esta noche?", "smoke perfecta en B",
+          "El torneo se reanuda en 5 minutos: https://eslgaming.com/cs", "TIMEOUT [e2]", "¿prórroga o no?", "menudo retake [e]", "repetición porfa",
+          "los dos equipos están on fire", "1v3 increíble [e] [e]", "queremos el mapa 3", "@chris ¿has visto esa jugada?"],
+        kick: ["W stream", "es demasiado bueno", "clipéalo", "[e2] [e2]", "hoy el sonido va mejor", "chat, con respeto", "¿cuántos somos ya?", "W", "lo va a conseguir", "@chris ¡hola!"],
+        steamtv: ["[e] el nuevo parche", "qué ganas de probarlo", "¿ya está la demo?", "gg", "¿cuándo sale?", "el estilo artístico es una locura", "en la lista de deseos [e]"],
+      },
+      ev: { twitch: (n, m) => `¡${n} se ha suscrito con el nivel 1 durante ${m} meses!`, kick: n => `¡${n} acaba de suscribirse!` },
+      spam: "compra seguidores en mi web",
+      ch: { twitch: ["Twitch · Conectado", "Escribe en el chat de eslcs"], kick: ["Kick · Solo lectura", "Solo lectura: inicia sesión en Kick para escribir"],
+            steamtv: ["Steam TV · Solo lectura", "Chat de Steam TV de solo lectura"] },
+    },
+    de: {
+      ph: { twitch: "Twitch-Kanalname oder Link…", kick: "Kick-Kanalname oder Link…", youtube: "YouTube-Video-ID oder Link…",
+            dailymotion: "Dailymotion-Video-ID oder Link…", steamtv: "steam.tv-Link (optional)…", url: "Jeder von Streamlink unterstützte Link…" },
+      direct: "Direktlink",
+      e_empty: "Gib einen Kanalnamen ein oder füge einen Link ein.", e_chan: "Ungültiger Kanalname: nur Buchstaben, Ziffern und _.",
+      e_yt: "Eine YouTube-ID hat 11 Zeichen, oder füge den Link des Videos ein.", e_vid: "Ungültige Video-ID, oder füge den Link des Videos ein.",
+      e_url: "Füge einen vollständigen Link ein, der mit https:// beginnt", e_noch: "In diesem Link fehlt der Kanalname.",
+      cmd: p => `# ${p} erkannt · Befehl an Streamlink gesendet`,
+      idle: "Kein Stream aktiv",
+      run: n => `${n} Stream${n > 1 ? "s" : ""} aktiv`, demo: "(Demo: Es öffnet sich nichts wirklich)",
+      alt: { l_main: "Hauptbildschirm von Streamlink Launcher im dunklen Design: Suchfeld, Plattformen, Live-Favoriten mit Vorschau und Zuschauerzahl, zuletzt gesehen.",
+             l_mini: "Der Mini-Modus von Streamlink Launcher: schwebende Leiste mit der Liste der Favoriten und ihrer Zuschauerzahl.",
+             l_set: "Die Einstellungen von Streamlink Launcher.", l_light: "Hauptbildschirm von Streamlink Launcher im hellen Design." },
+      copy: "Kopieren", copied: "Kopiert",
+      lines: {
+        twitch: ["gg wp, was für eine Runde [e]", "dieser Flick [e] [e]", "er hat den Clutch verpasst", "@chris schaust du heute Abend das Finale?", "perfekte Smoke auf B",
+          "Das Turnier geht in 5 Minuten weiter: https://eslgaming.com/cs", "TIMEOUT [e2]", "Overtime oder nicht?", "was für ein Retake [e]", "Replay bitte",
+          "beide Teams sind heiß", "unglaubliches 1v3 [e] [e]", "wir wollen Map 3", "@chris hast du den Move gesehen"],
+        kick: ["W Stream", "er ist einfach zu gut", "clippt das", "[e2] [e2]", "der Ton ist heute besser", "Chat, bleibt freundlich", "wie viele sind wir gerade?", "W", "er schafft das", "@chris hi!"],
+        steamtv: ["[e] der neue Patch", "kann es kaum erwarten, das zu testen", "ist die Demo schon draußen?", "gg", "wann erscheint es?", "der Artstyle ist krass", "auf der Wunschliste [e]"],
+      },
+      ev: { twitch: (n, m) => `${n} hat seit ${m} Monaten Stufe 1 abonniert!`, kick: n => `${n} hat gerade abonniert!` },
+      spam: "kauft Follower auf meiner Seite",
+      ch: { twitch: ["Twitch · Verbunden", "In den Chat von eslcs schreiben"], kick: ["Kick · Nur lesen", "Nur lesen — bei Kick anmelden, um zu schreiben"],
+            steamtv: ["Steam TV · Nur lesen", "Steam-TV-Chat nur lesbar"] },
+    },
+    it: {
+      ph: { twitch: "Nome del canale Twitch o link…", kick: "Nome del canale Kick o link…", youtube: "ID o link del video YouTube…",
+            dailymotion: "ID o link del video Dailymotion…", steamtv: "Link steam.tv (facoltativo)…", url: "Qualsiasi link supportato da Streamlink…" },
+      direct: "Link diretto",
+      e_empty: "Scrivi il nome di un canale o incolla un link.", e_chan: "Nome del canale non valido: solo lettere, cifre e _.",
+      e_yt: "Un ID di YouTube è lungo 11 caratteri, oppure incolla il link del video.", e_vid: "ID del video non valido, oppure incolla il link del video.",
+      e_url: "Incolla un link completo, che inizi con https://", e_noch: "In questo link manca il nome del canale.",
+      cmd: p => `# ${p} riconosciuto · comando inviato a Streamlink`,
+      idle: "Nessuno stream in corso",
+      run: n => `${n} stream in corso`, demo: "(demo: in realtà non si apre nulla)",
+      alt: { l_main: "Schermata principale di Streamlink Launcher con il tema scuro: campo di ricerca, piattaforme, preferiti in diretta con anteprime e numero di spettatori, recenti.",
+             l_mini: "La modalità mini di Streamlink Launcher: barra mobile con l'elenco dei preferiti e il loro numero di spettatori.",
+             l_set: "Il pannello delle impostazioni di Streamlink Launcher.", l_light: "Schermata principale di Streamlink Launcher con il tema chiaro." },
+      copy: "Copia", copied: "Copiato",
+      lines: {
+        twitch: ["gg wp, che round [e]", "quel flick [e] [e]", "ha sbagliato il clutch", "@chris guardi la finale stasera?", "smoke perfetta su B",
+          "Il torneo riprende tra 5 minuti: https://eslgaming.com/cs", "TIMEOUT [e2]", "overtime o no?", "che retake [e]", "replay pls",
+          "entrambe le squadre sono in forma", "1v3 pazzesco [e] [e]", "vogliamo la mappa 3", "@chris hai visto quella giocata"],
+        kick: ["W stream", "è troppo forte", "clippate", "[e2] [e2]", "oggi l'audio è migliore", "chat, restiamo civili", "quanti siamo adesso?", "W", "ce la fa", "@chris ciao!"],
+        steamtv: ["[e] la nuova patch", "non vedo l'ora di provarlo", "la demo è uscita?", "gg", "quando esce?", "lo stile artistico è pazzesco", "in lista desideri [e]"],
+      },
+      ev: { twitch: (n, m) => `${n} si è abbonato al livello 1 da ${m} mesi!`, kick: n => `${n} si è appena abbonato!` },
+      spam: "comprate follower sul mio sito",
+      ch: { twitch: ["Twitch · Connesso", "Scrivi nella chat di eslcs"], kick: ["Kick · Sola lettura", "Sola lettura — accedi a Kick per scrivere"],
+            steamtv: ["Steam TV · Sola lettura", "Chat di Steam TV in sola lettura"] },
+    },
+  };
+  for (const l in HOME_TR) DICT[l] = Object.assign({}, EN, HOME_TR[l]);
+
   /* textes produits par le script */
   const T = {
     fr: {
@@ -132,6 +413,7 @@
             steamtv: ["Steam TV · Read-only", "Steam TV chat is read-only"] },
     },
   };
+  for (const l in T_TR) { T[l] = Object.assign({}, T.en, T_TR[l]); IMG[l] = IMG.en; }
   let lang = "fr";
   const t = () => T[lang];
 
@@ -430,7 +712,9 @@
   /* ---------- thème clair / sombre ---------- */
   const THEME_KEY = "slSiteTheme";
   const themeBtn = document.getElementById("theme"), themeLabel = document.getElementById("themeLabel");
-  const THEME_TXT = { fr: { light: "Mode clair", dark: "Mode sombre" }, en: { light: "Light mode", dark: "Dark mode" } };
+  const THEME_TXT = { fr: { light: "Mode clair", dark: "Mode sombre" }, en: { light: "Light mode", dark: "Dark mode" },
+    es: { light: "Modo claro", dark: "Modo oscuro" }, de: { light: "Heller Modus", dark: "Dunkler Modus" },
+    it: { light: "Modalità chiara", dark: "Modalità scura" } };
   const darkMQ = matchMedia("(prefers-color-scheme: dark)");
   function isDark() { return root.dataset.theme ? root.dataset.theme === "dark" : darkMQ.matches; }
   function drawTheme() {
@@ -449,7 +733,7 @@
 
   /* ---------- onglet Docs : deux vues dans la même page, choisies par l'ancre ---------- */
   const homeView = document.getElementById("top"), docsView = document.getElementById("docs"), navDocs = document.getElementById("nav-docs");
-  const TITLES = { home: "Streamlink Launcher & Chat", docs: { fr: "Docs · Streamlink Launcher & Chat", en: "Docs · Streamlink Launcher & Chat" } };
+  const TITLES = { home: "Streamlink Launcher & Chat", docs: { fr: "Docs · Streamlink Launcher & Chat", en: "Docs · Streamlink Launcher & Chat", es: "Documentación · Streamlink Launcher & Chat", de: "Dokumentation · Streamlink Launcher & Chat", it: "Documentazione · Streamlink Launcher & Chat" } };
   let view = null;
   const hashId = () => { try { return decodeURIComponent(location.hash.slice(1)); } catch { return ""; } };
   function viewFor(id) {
@@ -492,11 +776,12 @@
   });
   function startLang() {
     const p = new URLSearchParams(location.search).get("lang");
-    if (p === "fr" || p === "en") return p;
+    if (p in DICT) return p;
     const byAnchor = SLDocs.langFor(hashId()); if (byAnchor) return byAnchor;
-    try { const s = localStorage.getItem(KEY); if (s === "fr" || s === "en") return s; } catch {}
+    try { const s = localStorage.getItem(KEY); if (s in DICT) return s; } catch {}
     const nav = (navigator.languages && navigator.languages[0]) || navigator.language || "fr";
-    return /^fr/i.test(nav) ? "fr" : "en";
+    const code = nav.slice(0, 2).toLowerCase();
+    return code in DICT ? code : "en";
   }
   apply(startLang(), false);
   route();

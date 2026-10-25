@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Streamlink Launcher &amp; Chat: Twitch und Kick in VLC oder mpv</title>
+<meta name="description" content="Freie Apps für Windows und Linux: Twitch, Kick, YouTube und Steam TV in VLC, mpv oder PotPlayer ansehen, mit den Chats in einem eigenen Fenster.">
+<meta name="author" content="Bulls64">
+<meta name="google-site-verification" content="CNNycSFV-w4cvtyv4_P8k8AITTl89dwfBTBh9jasFlM">
+<link rel="canonical" href="https://bulls64.github.io/Streamlink-Launcher/de/">
+<link rel="alternate" hreflang="fr" href="https://bulls64.github.io/Streamlink-Launcher/">
+<link rel="alternate" hreflang="en" href="https://bulls64.github.io/Streamlink-Launcher/en/">
+<link rel="alternate" hreflang="es" href="https://bulls64.github.io/Streamlink-Launcher/es/">
+<link rel="alternate" hreflang="de" href="https://bulls64.github.io/Streamlink-Launcher/de/">
+<link rel="alternate" hreflang="it" href="https://bulls64.github.io/Streamlink-Launcher/it/">
+<link rel="alternate" hreflang="x-default" href="https://bulls64.github.io/Streamlink-Launcher/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Streamlink Launcher &amp; Chat">
+<meta property="og:title" content="Streamlink Launcher &amp; Chat: Twitch und Kick in VLC oder mpv">
+<meta property="og:description" content="Freie Apps für Windows und Linux: Twitch, Kick, YouTube und Steam TV in VLC, mpv oder PotPlayer ansehen, mit den Chats in einem eigenen Fenster.">
+<meta property="og:url" content="https://bulls64.github.io/Streamlink-Launcher/de/">
+<meta property="og:locale" content="de_DE">
+<meta property="og:locale:alternate" content="fr_FR">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="es_ES">
+<meta property="og:locale:alternate" content="it_IT">
+<meta property="og:image" content="https://bulls64.github.io/Streamlink-Launcher/assets/og/home-de.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Streamlink Launcher und Streamlink Chat: Live, aber ohne Browser.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Streamlink Launcher &amp; Chat: Twitch und Kick in VLC oder mpv">
+<meta name="twitter:description" content="Freie Apps für Windows und Linux: Twitch, Kick, YouTube und Steam TV in VLC, mpv oder PotPlayer ansehen, mit den Chats in einem eigenen Fenster.">
+<meta name="twitter:image" content="https://bulls64.github.io/Streamlink-Launcher/assets/og/home-de.jpg">
+<meta name="theme-color" content="#E9ECF1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1116" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../favicon.ico" sizes="32x32">
+<link rel="icon" href="../assets/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+<link rel="preload" href="../assets/fonts/instrument-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/big-shoulders-display-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://bulls64.github.io/Streamlink-Launcher/#website","url":"https://bulls64.github.io/Streamlink-Launcher/","name":"Streamlink Launcher & Chat","inLanguage":["fr","en","es","de","it"],"publisher":{"@id":"https://bulls64.github.io/Streamlink-Launcher/#author"}},{"@type":"Person","@id":"https://bulls64.github.io/Streamlink-Launcher/#author","name":"Bulls64","url":"https://github.com/Bulls64"},{"@type":"WebPage","@id":"https://bulls64.github.io/Streamlink-Launcher/de/#page","url":"https://bulls64.github.io/Streamlink-Launcher/de/","name":"Streamlink Launcher & Chat: Twitch und Kick in VLC oder mpv","description":"Freie Apps für Windows und Linux: Twitch, Kick, YouTube und Steam TV in VLC, mpv oder PotPlayer ansehen, mit den Chats in einem eigenen Fenster.","inLanguage":"de","isPartOf":{"@id":"https://bulls64.github.io/Streamlink-Launcher/#website"},"dateModified":"2026-10-25","image":"https://bulls64.github.io/Streamlink-Launcher/assets/og/home-de.jpg","author":{"@id":"https://bulls64.github.io/Streamlink-Launcher/#author"}},{"@type":"SoftwareApplication","name":"Streamlink Launcher","softwareVersion":"1.5.1","applicationCategory":"MultimediaApplication","operatingSystem":"Windows 10, Windows 11, Linux","description":"Schlanke Oberfläche für Streamlink: öffnet Twitch, Kick, YouTube, Dailymotion und Steam TV in VLC, mpv oder PotPlayer, mit Live-Favoriten und Mini-Modus.","url":"https://bulls64.github.io/Streamlink-Launcher/de/#launcher","downloadUrl":"https://github.com/Bulls64/Streamlink-Launcher/releases/latest","screenshot":"https://bulls64.github.io/Streamlink-Launcher/assets/img/site/en/l_main.webp","license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"author":{"@id":"https://bulls64.github.io/Streamlink-Launcher/#author"},"sameAs":"https://github.com/Bulls64/Streamlink-Launcher","inLanguage":["fr","en","es","de","it"]},{"@type":"SoftwareApplication","name":"Streamlink Chat","softwareVersion":"0.2.1","applicationCategory":"MultimediaApplication","operatingSystem":"Windows 10, Windows 11, Linux","description":"Die Chats von Twitch, Kick und Steam TV in einem Fenster, ein Tab pro Kanal; Lesen ohne Konto, Schreiben nach der Anmeldung.","url":"https://bulls64.github.io/Streamlink-Launcher/de/#chat","downloadUrl":"https://github.com/Bulls64/Streamlink-Chat/releases/latest","screenshot":"https://bulls64.github.io/Streamlink-Launcher/assets/img/site/en/c_tw.webp","license":"https://opensource.org/licenses/MIT","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"author":{"@id":"https://bulls64.github.io/Streamlink-Launcher/#author"},"sameAs":"https://github.com/Bulls64/Streamlink-Chat","inLanguage":["fr","en","es","de","it"]}]}
+</script>
+<style>
+@font-face { font-family: "Big Shoulders Display"; font-style: normal; font-weight: 600; font-display: swap; src: url("../assets/fonts/big-shoulders-display-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Big Shoulders Display"; font-style: normal; font-weight: 800; font-display: swap; src: url("../assets/fonts/big-shoulders-display-latin-800-normal.woff2") format("woff2"); }
+@font-face { font-family: "Big Shoulders Display"; font-style: normal; font-weight: 900; font-display: swap; src: url("../assets/fonts/big-shoulders-display-latin-900-normal.woff2") format("woff2"); }
+@font-face { font-family: "Instrument Sans"; font-style: normal; font-weight: 400; font-display: swap; src: url("../assets/fonts/instrument-sans-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Instrument Sans"; font-style: normal; font-weight: 500; font-display: swap; src: url("../assets/fonts/instrument-sans-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Instrument Sans"; font-style: normal; font-weight: 600; font-display: swap; src: url("../assets/fonts/instrument-sans-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Instrument Sans"; font-style: normal; font-weight: 700; font-display: swap; src: url("../assets/fonts/instrument-sans-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Instrument Sans"; font-style: italic; font-weight: 400; font-display: swap; src: url("../assets/fonts/instrument-sans-latin-400-italic.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("../assets/fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 500; font-display: swap; src: url("../assets/fonts/ibm-plex-mono-latin-500-normal.woff2") format("woff2"); }
+
+/* Mise en page : une régie de diffusion. Deux « canaux » (CH1 lanceur, CH2 chat) présentés comme des moniteurs ;
+   l'accent de toute la page suit la plateforme détectée dans la démo, comme les applis elles-mêmes. */
+@property --p { syntax: '<color>'; inherits: true; initial-value: #9146FF; }
+@property --p-ink-l { syntax: '<color>'; inherits: true; initial-value: #6E2BD9; }
+@property --p-ink-d { syntax: '<color>'; inherits: true; initial-value: #B794FF; }
+:root {
+  --bg: #E9ECF1;
+  --surface: #F7F8FA;
+  --raised: #FFFFFF;
+  --ink: #13151B;
+  --muted: #586071;
+  --line: #CDD2DB;
+  --term: #171A21;
+  --term-ink: #DCE0E8;
+  --term-dim: #7D8597;
+  --live: #E5232F;
+  --ok: #1E9E5A;
+  --p: #9146FF; --p-on: #FFFFFF; --p-ink-l: #6E2BD9; --p-ink-d: #B794FF;
+  --accent-ink: var(--p-ink-l);
+  --font-display: "Big Shoulders Display", "Arial Narrow", "Roboto Condensed", Impact, sans-serif;
+  --font-body: "Instrument Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", "Cascadia Mono", Consolas, "Courier New", monospace;
+  --step--1: 0.8125rem; --step-0: 1rem; --step-1: 1.25rem; --step-2: 1.75rem; --step-3: clamp(2.4rem, 5vw, 3.6rem); --step-4: clamp(3.4rem, 9.5vw, 7.4rem);
+  transition: --p .45s ease, --p-ink-l .45s ease, --p-ink-d .45s ease;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1116; --surface: #161920; --raised: #1C2029; --ink: #ECEEF3; --muted: #959CAD; --line: #2A2F3A;
+    --term: #0A0C10; --term-ink: #DCE0E8; --term-dim: #6F7789; --ok: #3CCB7F;
+    --accent-ink: var(--p-ink-d); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1116; --surface: #161920; --raised: #1C2029; --ink: #ECEEF3; --muted: #959CAD; --line: #2A2F3A;
+  --term: #0A0C10; --term-ink: #DCE0E8; --term-dim: #6F7789; --ok: #3CCB7F;
+  --accent-ink: var(--p-ink-d); color-scheme: dark;
+}
+:root[data-platform="twitch"] { --p: #9146FF; --p-on: #FFFFFF; --p-ink-l: #6E2BD9; --p-ink-d: #B794FF; }
+:root[data-platform="kick"] { --p: #53FC18; --p-on: #0B0D0A; --p-ink-l: #2B8A05; --p-ink-d: #6BFF3A; }
+:root[data-platform="youtube"] { --p: #D91A1A; --p-on: #FFFFFF; --p-ink-l: #BE1515; --p-ink-d: #FF6464; }
+:root[data-platform="dailymotion"] { --p: #0A6CFF; --p-on: #FFFFFF; --p-ink-l: #0A5AD4; --p-ink-d: #64A2FF; }
+:root[data-platform="steamtv"] { --p: #66C0F4; --p-on: #0B1A26; --p-ink-l: #1C6896; --p-ink-d: #7FCBF5; }
+:root[data-platform="url"] { --p: #6B7180; --p-on: #FFFFFF; --p-ink-l: #4B5060; --p-ink-d: #AEB3C0; }
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: var(--step-0); line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent-ink); text-underline-offset: 3px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 3px; border-radius: 4px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+p { margin: 0; }
+kbd {
+  font-family: var(--font-mono); font-size: .82em; padding: .1em .45em; border-radius: 5px;
+  border: 1px solid var(--line); border-bottom-width: 2px; background: var(--raised); color: var(--ink); white-space: nowrap;
+}
+code { font-family: var(--font-mono); font-size: .9em; }
+
+.wrap {
+  max-width: 1180px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.band { padding-block: clamp(56px, 9vw, 112px); }
+.band + .band { border-top: 1px solid var(--line); }
+
+/* --- en-tête */
+.top { padding-block: 18px; }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--ink); text-decoration: none; letter-spacing: -.01em; }
+.brand svg { width: 30px; height: 30px; flex: none; }
+.nav { display: flex; gap: 6px 20px; flex-wrap: wrap; font-size: var(--step--1); font-weight: 500; }
+.nav a { color: var(--muted); text-decoration: none; }
+.nav a:hover { color: var(--ink); }
+
+/* --- hero */
+.hero { padding-block: clamp(28px, 6vw, 72px) clamp(32px, 4vw, 48px); }
+.onair {
+  display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: var(--step--1);
+  text-transform: uppercase; letter-spacing: .08em; color: var(--muted);
+}
+.onair i { width: 9px; height: 9px; border-radius: 50%; background: var(--live); box-shadow: 0 0 0 4px color-mix(in srgb, var(--live) 22%, transparent); animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 50% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--live) 0%, transparent); } }
+.hero h1 {
+  font-family: var(--font-display); font-weight: 900; font-size: var(--step-4); line-height: .9;
+  text-transform: uppercase; letter-spacing: -.005em; margin-top: 18px; max-width: 12ch;
+}
+.hero h1 em { font-style: normal; color: var(--accent-ink); }
+.lede { margin-top: 22px; max-width: 60ch; font-size: var(--step-1); line-height: 1.5; color: var(--muted); }
+.lede strong { color: var(--ink); font-weight: 600; }
+
+/* --- démo du champ du lanceur */
+.demo { margin-top: clamp(32px, 5vw, 52px); display: grid; gap: 14px; }
+.demo-label { font-family: var(--font-mono); font-size: var(--step--1); color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+.demo-label b { color: var(--ink); font-weight: 500; text-transform: uppercase; letter-spacing: .08em; }
+.console {
+  background: var(--raised); border: 1px solid var(--line); border-radius: 18px; padding: clamp(14px, 2.4vw, 22px);
+  display: grid; gap: 14px;
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 4%, transparent), 0 24px 60px -36px color-mix(in srgb, var(--p) 55%, transparent);
+}
+.fieldrow { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; }
+.field {
+  display: flex; align-items: center; gap: 10px; min-width: 0;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 0 12px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.field:focus-within { border-color: var(--p); box-shadow: 0 0 0 4px color-mix(in srgb, var(--p) 26%, transparent); }
+.field svg { width: 18px; height: 18px; flex: none; color: var(--muted); }
+.field input {
+  flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 1.05rem;
+  padding-block: 14px; outline: none;
+}
+.field input::placeholder { color: var(--muted); }
+.field .hint { font-size: 12px; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 1px 7px; white-space: nowrap; }
+.select {
+  appearance: none; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 12px;
+  font: inherit; padding: 0 38px 0 14px; min-height: 50px; cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 20px) 52%, calc(100% - 15px) 52%; background-size: 5px 5px; background-repeat: no-repeat;
+}
+.go {
+  display: inline-flex; align-items: center; gap: 10px; border: 0; border-radius: 12px; padding: 0 22px; min-height: 50px;
+  background: var(--p); color: var(--p-on); font: inherit; font-weight: 700; cursor: pointer; white-space: nowrap;
+  transition: transform .12s ease, filter .2s;
+}
+.go:hover { filter: brightness(1.06); }
+.go:active { transform: translateY(1px); }
+.go svg { width: 14px; height: 14px; }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill {
+  display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: transparent; color: var(--ink);
+  border-radius: 999px; padding: 7px 14px; font: inherit; font-size: .92rem; font-weight: 500; cursor: pointer;
+  transition: background .2s, color .2s, border-color .2s;
+}
+.pill i { width: 8px; height: 8px; border-radius: 50%; background: var(--dot); }
+.pill[aria-pressed="true"] { background: var(--p); border-color: var(--p); color: var(--p-on); }
+.pill[aria-pressed="true"] i { background: var(--p-on); }
+.term {
+  background: var(--term); color: var(--term-ink); border-radius: 12px; padding: 14px 16px;
+  font-family: var(--font-mono); font-size: .9rem; line-height: 1.55; overflow-x: auto; white-space: pre;
+}
+.term .pr { color: var(--term-dim); user-select: none; }
+.term .opt { color: #F5C26B; }
+.term .url { color: #8FD3FF; }
+.term .q { color: #9EF0A8; }
+.term .err { color: #FF8B8B; }
+.term .cm { color: var(--term-dim); }
+.status {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: .92rem; color: var(--muted);
+  border-top: 1px dashed var(--line); padding-top: 12px;
+}
+.status .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--line); flex: none; }
+.status.running .dot { background: var(--ok); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ok) 20%, transparent); }
+.status.running strong { color: var(--ink); }
+.examples { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: var(--step--1); color: var(--muted); align-items: baseline; }
+.examples button {
+  border: 0; background: none; padding: 0; font: inherit; font-family: var(--font-mono); color: var(--accent-ink); cursor: pointer;
+  text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px;
+}
+
+/* --- canaux */
+.ch-head { display: grid; gap: 14px; max-width: 760px; }
+.ch-tag { font-family: var(--font-mono); font-size: var(--step--1); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.ch-tag .num { border: 1px solid var(--ink); color: var(--ink); padding: 1px 8px; border-radius: 4px; font-weight: 500; }
+.ch-tag .ver { color: var(--accent-ink); }
+.ch-head h2 { font-family: var(--font-display); font-weight: 800; font-size: var(--step-3); line-height: .95; text-transform: uppercase; }
+.ch-head p { color: var(--muted); font-size: 1.1rem; max-width: 62ch; }
+.ch-grid { margin-top: clamp(30px, 4vw, 48px); display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); align-items: start; }
+.ch-grid.flip { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); }
+
+/* moniteur : fenêtre Windows */
+.monitor { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #121318; box-shadow: 0 30px 70px -40px rgba(10, 12, 20, .55); }
+.titlebar { display: flex; align-items: center; gap: 10px; background: #0D0E12; color: #C9CDD6; font-size: 12px; padding: 0 0 0 12px; height: 32px; }
+.titlebar svg { width: 15px; height: 15px; }
+.titlebar span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.titlebar .ctl { display: flex; height: 100%; }
+.titlebar .ctl b { width: 42px; display: grid; place-items: center; font-weight: 400; color: #9AA0AC; }
+.monitor img { display: block; width: 100%; height: auto; aspect-ratio: 900 / 660; }
+.views { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.views button {
+  border: 1px solid var(--line); background: transparent; color: var(--muted); font: inherit; font-size: var(--step--1);
+  padding: 6px 12px; border-radius: 8px; cursor: pointer;
+}
+.views button[aria-pressed="true"] { color: var(--ink); border-color: var(--ink); }
+
+.feats { display: grid; gap: 0; }
+.feat { display: grid; grid-template-columns: 9.5rem minmax(0, 1fr); gap: 16px; padding-block: 15px; border-top: 1px solid var(--line); }
+.feat:last-child { border-bottom: 1px solid var(--line); }
+.feat dt { font-weight: 700; font-size: .95rem; }
+.feat dd { margin: 0; color: var(--muted); font-size: .95rem; }
+.feat dd code { color: var(--ink); }
+
+/* raccourci du mode mini */
+.combo { margin-top: 28px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.combo .keys { display: flex; gap: 8px; align-items: center; }
+.combo .keys kbd { font-size: 1.05rem; padding: .45em .8em; border-radius: 9px; border-bottom-width: 4px; }
+.combo .keys kbd.press { transform: translateY(2px); border-bottom-width: 2px; border-color: var(--p); }
+.combo p { color: var(--muted); max-width: 34ch; font-size: .95rem; }
+
+/* specs */
+.specs { margin-top: clamp(36px, 5vw, 56px); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.spec { padding: 18px 20px; display: grid; gap: 4px; }
+.spec + .spec { border-left: 1px solid var(--line); }
+.spec b { font-family: var(--font-display); font-weight: 800; font-size: 2.6rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.spec span { color: var(--muted); font-size: var(--step--1); }
+
+/* --- démo du chat */
+.chat {
+  --c: #9146FF; --c-on: #FFFFFF; --c-tint: color-mix(in srgb, #181A21 92%, var(--c));
+  background: #121318; color: #E7E9EE; border-radius: 14px; border: 1px solid var(--line); overflow: hidden;
+  font-size: 14px; line-height: 1.45; box-shadow: 0 30px 70px -40px rgba(10, 12, 20, .55);
+  display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; height: 560px; position: relative;
+}
+.chat[data-p="kick"] { --c: #53FC18; --c-on: #0B0D0A; }
+.chat[data-p="steamtv"] { --c: #2A475E; --c-on: #C7D5E0; --c-tint: color-mix(in srgb, #181A21 86%, #4E7DA3); }
+.chat-top { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 6px; }
+.chat-top b { font-size: 18px; }
+.chat-top small { color: #8C92A0; font-family: var(--font-mono); font-size: 11px; }
+.tabs { display: flex; gap: 6px; padding: 8px 14px; overflow-x: auto; }
+.tab {
+  display: inline-flex; align-items: center; gap: 7px; border-radius: 999px; padding: 5px 12px; cursor: pointer; flex: none;
+  border: 1px solid color-mix(in srgb, #2C303A 55%, var(--tc)); background: transparent; color: #E7E9EE; font: inherit; font-size: 13px; font-weight: 600;
+}
+.tab i { width: 7px; height: 7px; border-radius: 50%; background: var(--tc); }
+.tab .n { background: #2E323C; border-radius: 999px; padding: 0 6px; font-size: 11px; font-weight: 600; }
+.tab[aria-selected="true"] { background: var(--tc); color: var(--ton); border-color: var(--tc); }
+.tab[aria-selected="true"] i { background: var(--ton); }
+.card {
+  margin: 4px 14px 0; border: 1px solid color-mix(in srgb, #2C303A 40%, var(--c)); border-radius: 12px; background: var(--c-tint);
+  display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; transition: background .35s, border-color .35s;
+}
+.card-head { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid color-mix(in srgb, #2C303A 40%, var(--c)); }
+.card-head .pd { width: 8px; height: 8px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 1px #ffffff22; }
+.card-head b { font-size: 15px; }
+.card-head .st { color: #3CCB7F; font-size: 12px; display: inline-flex; align-items: center; gap: 5px; }
+.card-head .st::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.log { overflow-y: auto; padding: 8px 12px 10px; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #3A3F4B transparent; }
+.msg { padding: 2px 4px; border-radius: 4px; overflow-wrap: anywhere; }
+.msg.new { animation: slidein .28s ease-out; }
+@keyframes slidein { from { opacity: 0; transform: translateY(6px); } }
+.msg time { color: #7E8494; font-size: 12px; font-variant-numeric: tabular-nums; margin-right: 6px; }
+.msg .u { font-weight: 700; }
+.msg.mention { background: #4A3A1C; }
+.msg.first { background: #1D3A30; }
+.msg.event { background: color-mix(in srgb, #181A21 70%, var(--c)); }
+.msg.deleted { color: #7E8494; text-decoration: line-through; }
+.msg.deleted .u { color: #7E8494 !important; }
+.bd { display: inline-grid; place-items: center; width: 16px; height: 16px; border-radius: 4px; color: #fff; font-size: 10px; font-weight: 800; vertical-align: -3px; margin-right: 3px; }
+.emo { display: inline-block; width: 22px; height: 22px; vertical-align: -6px; margin: 0 2px; }
+.paused {
+  position: absolute; left: 50%; bottom: 74px; transform: translateX(-50%); border: 0; cursor: pointer;
+  background: var(--c); color: var(--c-on); font: inherit; font-size: 13px; font-weight: 700; padding: 7px 14px; border-radius: 999px;
+  box-shadow: 0 8px 22px -8px rgba(0, 0, 0, .6);
+}
+.compose { display: flex; gap: 8px; padding: 12px 14px 14px; }
+.compose input {
+  flex: 1; min-width: 0; border: 1px solid #2C303A; background: #181A21; color: #E7E9EE; border-radius: 10px; padding: 11px 13px; font: inherit; font-size: 14px; outline: none;
+}
+.compose input:focus { border-color: var(--c); }
+.compose input:disabled { opacity: .75; }
+.compose button { border: 0; width: 44px; border-radius: 10px; background: var(--c); color: var(--c-on); cursor: pointer; display: grid; place-items: center; }
+.compose button:disabled { opacity: .45; cursor: default; }
+.compose svg { width: 17px; height: 17px; }
+.chat-note { margin-top: 12px; color: var(--muted); font-size: var(--step--1); }
+
+.ptable { width: 100%; border-collapse: collapse; font-size: .93rem; }
+.ptable th, .ptable td { text-align: left; padding: 11px 10px 11px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+.ptable th { font-family: var(--font-mono); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.ptable td:first-child { font-weight: 700; white-space: nowrap; }
+.ptable td:first-child i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 8px; }
+.ptable .exp { font-family: var(--font-mono); font-size: 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; margin-left: 4px; white-space: nowrap; }
+.tbl { overflow-x: auto; }
+.shots { margin-top: 26px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.shots figure { margin: 0; display: grid; gap: 6px; }
+.shots img { border-radius: 8px; border: 1px solid var(--line); aspect-ratio: 560 / 780; width: 100%; height: auto; display: block; }
+.shots figcaption { font-size: 12px; color: var(--muted); font-family: var(--font-mono); }
+
+/* --- ensemble */
+.pair { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(20px, 3vw, 36px); margin-top: clamp(30px, 4vw, 44px); }
+.pair div { display: grid; gap: 8px; align-content: start; }
+.pair h3 { font-size: 1.1rem; }
+.pair p { color: var(--muted); font-size: .95rem; }
+
+/* --- téléchargement */
+.dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: clamp(30px, 4vw, 44px); }
+.app { border: 1px solid var(--line); background: var(--surface); border-radius: 18px; padding: clamp(18px, 3vw, 28px); display: grid; gap: 18px; align-content: start; }
+.app header { display: flex; align-items: center; gap: 14px; }
+.app header svg { width: 46px; height: 46px; flex: none; }
+.app h3 { font-family: var(--font-display); font-weight: 800; font-size: 1.9rem; line-height: 1; text-transform: uppercase; }
+.app header small { display: block; color: var(--muted); font-family: var(--font-mono); font-size: 12px; margin-top: 4px; }
+.files { display: grid; gap: 8px; }
+.file {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center;
+  border: 1px solid var(--line); background: var(--raised); border-radius: 12px; padding: 12px 14px; color: var(--ink); text-decoration: none;
+  transition: border-color .2s, transform .15s;
+}
+.file:hover { border-color: var(--p); transform: translateY(-1px); }
+.file .os { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); width: 4.2rem; }
+.file b { font-weight: 600; overflow-wrap: anywhere; font-size: .95rem; }
+.file span { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.steps { display: grid; gap: 10px; counter-reset: s; }
+.steps li { list-style: none; display: grid; grid-template-columns: 1.6rem minmax(0, 1fr); gap: 8px; font-size: .92rem; color: var(--muted); }
+.steps li::before { counter-increment: s; content: counter(s); font-family: var(--font-mono); font-size: 12px; color: var(--ink); border: 1px solid var(--line); border-radius: 50%; width: 1.4rem; height: 1.4rem; display: grid; place-items: center; }
+.steps { padding: 0; margin: 0; }
+.cmd { display: flex; align-items: center; gap: 8px; background: var(--term); color: var(--term-ink); border-radius: 8px; padding: 6px 6px 6px 12px; margin-top: 6px; }
+.cmd code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; font-size: .82rem; }
+.cmd button { border: 1px solid #3A3F4B; background: transparent; color: var(--term-ink); border-radius: 6px; font: inherit; font-size: 12px; padding: 4px 9px; cursor: pointer; }
+.app .links { display: flex; gap: 8px 18px; flex-wrap: wrap; font-size: .9rem; }
+.trust { margin-top: 22px; color: var(--muted); font-size: .92rem; max-width: 80ch; }
+
+footer { padding-block: 34px 48px; border-top: 1px solid var(--line); color: var(--muted); font-size: var(--step--1); }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 10px 28px; justify-content: space-between; }
+
+
+/* --- animation de chargement : mise sous tension façon écran de régie, puis « zapping » des plateformes */
+.boot { position: fixed; inset: 0; z-index: 100; background: var(--bg); pointer-events: none;
+  animation: boot-open .55s cubic-bezier(.7, 0, .3, 1) .5s forwards; }
+.boot::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 2px; margin-top: -1px;
+  background: var(--p); box-shadow: 0 0 18px 2px var(--p), 0 0 60px 6px color-mix(in srgb, var(--p) 45%, transparent);
+  transform: scaleX(0); animation: boot-line .5s cubic-bezier(.2, .8, .2, 1) forwards; }
+.boot::after { content: "CH 1 · SIGNAL"; position: absolute; left: 50%; top: calc(50% + 16px); transform: translateX(-50%);
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .2em; color: var(--muted); animation: boot-fade .5s ease forwards; }
+@keyframes boot-line { 0% { transform: scaleX(0); opacity: 1; } 100% { transform: scaleX(1); opacity: 1; } }
+@keyframes boot-open { 0% { clip-path: inset(0 0 0 0); } 99% { clip-path: inset(50% 0 50% 0); opacity: 1; } 100% { clip-path: inset(50% 0 50% 0); opacity: 0; visibility: hidden; } }
+@keyframes boot-fade { 0%, 60% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes rise { from { opacity: 0; transform: translateY(26px); } }
+@keyframes word { from { opacity: 0; transform: translateY(.45em) skewY(4deg); filter: blur(6px); } }
+@keyframes drop { from { opacity: 0; transform: translateY(-12px); } }
+@keyframes type { from { clip-path: inset(0 100% 0 0); } }
+.top { animation: drop .6s ease-out .95s backwards; }
+.onair { animation: rise .6s ease-out 1s backwards; }
+.hero h1 .w { display: inline-block; animation: word .7s cubic-bezier(.2, .8, .2, 1) backwards; }
+.hero h1 .w:nth-child(1) { animation-delay: 1.05s; } .hero h1 .w:nth-child(2) { animation-delay: 1.13s; }
+.hero h1 .w:nth-child(3) { animation-delay: 1.21s; } .hero h1 .w:nth-child(4) { animation-delay: 1.29s; }
+.hero h1 .w:nth-child(5) { animation-delay: 1.37s; }
+.lede { animation: rise .7s ease-out 1.45s backwards; }
+.demo { animation: rise .8s cubic-bezier(.2, .8, .2, 1) 1.6s backwards; }
+.term.typing .l2 { display: inline-block; animation: type 1s steps(46) 2.3s backwards; }
+:root.surfing { transition: --p .12s linear, --p-ink-l .12s linear, --p-ink-d .12s linear; }
+
+@media (max-width: 900px) {
+  .ch-grid, .ch-grid.flip, .dl { grid-template-columns: minmax(0, 1fr); }
+  .pair { grid-template-columns: minmax(0, 1fr); }
+  .specs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .spec:nth-child(3) { border-left: 0; }
+  .spec:nth-child(n+3) { border-top: 1px solid var(--line); }
+}
+@media (max-width: 620px) {
+  .fieldrow { grid-template-columns: minmax(0, 1fr) auto; }
+  .fieldrow .field { grid-column: 1 / -1; }
+  .go { justify-content: center; }
+  .feat { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .shots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .shots figure:last-child { display: none; }
+  .chat { height: 500px; }
+  .field .hint { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .boot { display: none; }
+}
+/* --- menu de langue */
+.top-right { display: flex; align-items: center; gap: 12px 20px; flex-wrap: wrap; }
+.langsel { position: relative; display: inline-flex; align-items: center; }
+.langsel svg { position: absolute; left: 10px; width: 16px; height: 16px; color: var(--muted); pointer-events: none; }
+.langsel::after { content: ""; position: absolute; right: 12px; top: 50%; width: 6px; height: 6px; border-right: 1.6px solid var(--muted); border-bottom: 1.6px solid var(--muted); transform: translateY(-70%) rotate(45deg); pointer-events: none; }
+.langsel select { appearance: none; -webkit-appearance: none; font: inherit; font-size: var(--step--1); font-weight: 600; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 6px 32px; cursor: pointer; }
+.langsel select:hover { border-color: var(--p); }
+.themebtn { display: inline-flex; align-items: center; gap: 8px; font: inherit; font-size: var(--step--1); font-weight: 600; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px 6px 11px; cursor: pointer; }
+.themebtn svg { width: 16px; height: 16px; color: var(--muted); flex: none; }
+.themebtn:hover { border-color: var(--p); }
+.themebtn:hover svg { color: var(--accent-ink); }
+@media (max-width: 620px) { .themebtn { padding: 6px 9px; } .themebtn span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+:root.static .hero h1 .w { animation: none; }
+/* --- vue Docs (onglet du header) */
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+.nav a[aria-current="page"] { color: var(--ink); text-decoration: underline; text-decoration-color: var(--p); text-decoration-thickness: 2px; text-underline-offset: 6px; }
+:root.nointro .top { animation: none; }
+#docs { border-top: 1px solid var(--line); }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="logo" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="var(--p)"/><path d="M12.5 9.6v12.8c0 .8.9 1.3 1.6.8l9.6-6.4c.6-.4.6-1.2 0-1.6l-9.6-6.4c-.7-.5-1.6 0-1.6.8z" fill="var(--p-on)"/></symbol>
+    <symbol id="logo-chat" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="var(--p)"/><path d="M9 10.5c0-1.4 1.1-2.5 2.5-2.5h9c1.4 0 2.5 1.1 2.5 2.5v7c0 1.4-1.1 2.5-2.5 2.5h-5.2L12 23.4V20h-.5C10.1 20 9 18.9 9 17.5z" fill="var(--p-on)"/></symbol>
+    <symbol id="i-search" viewBox="0 0 20 20"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12.6 12.6 17 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 20 20"><circle cx="10" cy="10" r="3.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.3 4.3l1.4 1.4M14.3 14.3l1.4 1.4M4.3 15.7l1.4-1.4M14.3 5.7l1.4-1.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 20 20"><path d="M16.5 11.6A6.8 6.8 0 0 1 8.4 3.5a6.8 6.8 0 1 0 8.1 8.1z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 10h15M10 2.5c2.2 2.3 3.2 4.8 3.2 7.5s-1 5.2-3.2 7.5c-2.2-2.3-3.2-4.8-3.2-7.5s1-5.2 3.2-7.5z" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+    <symbol id="i-play" viewBox="0 0 14 14"><path d="M3 1.8v10.4c0 .6.7 1 1.2.6l8-5.2c.5-.3.5-1 0-1.3l-8-5.1C3.7.8 3 1.2 3 1.8z" fill="currentColor"/></symbol>
+    <symbol id="i-send" viewBox="0 0 20 20"><path d="M3 3.5 17 10 3 16.5l2.2-6.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M5.2 10H11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="emo" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#F2C94C"/><circle cx="8.3" cy="9.6" r="1.6" fill="#3B2A0A"/><circle cx="15.7" cy="9.6" r="1.6" fill="#3B2A0A"/><path d="M7 14c1.3 2.4 3 3.4 5 3.4s3.7-1 5-3.4" fill="none" stroke="#3B2A0A" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="emo2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#A6E36B"/><path d="M6.5 9.5h4M13.5 9.5h4" stroke="#1E3309" stroke-width="2" stroke-linecap="round"/><ellipse cx="12" cy="16" rx="3.4" ry="2.4" fill="#1E3309"/></symbol>
+  </defs>
+</svg>
+
+<div class="boot" id="boot" aria-hidden="true"></div>
+
+<header class="top">
+<div class="wrap">
+<a class="brand" href="#top"><svg aria-hidden="true"><use href="#logo"></use></svg>Streamlink Launcher <span style="color:var(--muted);font-weight:500">&amp; Chat</span></a>
+<div class="top-right">
+<nav aria-label="Sections" class="nav">
+<a href="#launcher">Launcher</a>
+<a href="#chat">Chat</a>
+<a data-i18n="nav_dl" href="#download">Download</a>
+<a href="https://github.com/Bulls64" rel="noopener" target="_blank">GitHub</a>
+<a href="../de/docs/" id="nav-docs">Docs</a>
+</nav>
+<button class="themebtn" id="theme" type="button"><svg aria-hidden="true"><use href="#i-moon"></use></svg><span id="themeLabel">Mode sombre</span></button>
+<label class="langsel"><span class="sr" data-i18n="lang_label">Sprache</span><svg aria-hidden="true"><use href="#i-globe"></use></svg>
+<select id="lang"><option lang="fr" value="fr">Français</option><option lang="en" value="en">English</option><option lang="es" value="es">Español</option><option lang="de" selected="" value="de">Deutsch</option><option lang="it" value="it">Italiano</option></select>
+</label>
+</div>
+</div>
+</header>
+
+
+<main id="top">
+<section class="hero">
+<div class="wrap">
+<span class="onair"><i></i><span data-i18n="onair">Zwei freie Apps · Windows und Linux</span></span>
+<h1 data-i18n="h1"><span class="w">Live,</span> <span class="w">aber</span> <span class="w">ohne</span> <span class="w"><em>Browser</em>.</span></h1>
+<p class="lede" data-i18n="lede"><strong>Streamlink Launcher</strong> öffnet Twitch, Kick, YouTube, Dailymotion und Steam TV in VLC, mpv oder PotPlayer. <strong>Streamlink Chat</strong> hält die Chats von Twitch, Kick und Steam TV in einem Fenster daneben. Gleicher Stil, gleiche Leichtigkeit, keine Abhängigkeiten.</p>
+<div aria-label="Demo des Eingabefelds des Launchers" class="demo" data-i18n-aria="demo_aria">
+<div class="demo-label" data-i18n="demo_label"><b>Probier das Feld des Launchers aus</b><span>gib einen Kanalnamen ein oder füge einen Link ein: Die Plattform wird von selbst erkannt</span></div>
+<div class="console">
+<div class="fieldrow">
+<label class="field" for="q">
+<svg aria-hidden="true"><use href="#i-search"></use></svg>
+<input aria-label="Kanalname oder Link" autocomplete="off" data-i18n-aria="q_aria" id="q" placeholder="Twitch-Kanalname oder Link…" spellcheck="false" type="text" value="twitch.tv/eslcs"/>
+<span class="hint" data-i18n="enter">Enter</span>
+</label>
+<select aria-label="Qualität" class="select" data-i18n-aria="quality" id="quality"></select>
+<button class="go" id="go" type="button"><svg aria-hidden="true"><use href="#i-play"></use></svg><span data-i18n="launch">Starten</span></button>
+</div>
+<div aria-label="Plattform" class="pills" data-i18n-aria="platform" id="pills" role="group"></div>
+<div aria-live="polite" class="term" id="term"></div>
+<div class="status" id="status"><span class="dot"></span><span id="status-text">Aucun stream en cours</span></div>
+</div>
+<div class="examples"><span data-i18n="examples">Beispiele:</span>
+<button data-ex="kick.com/xqc" type="button">kick.com/xqc</button>
+<button data-ex="https://youtu.be/jfKfPfyJRdk" type="button">youtu.be/jfKfPfyJRdk</button>
+<button data-ex="https://steam.tv/dota2" type="button">steam.tv/dota2</button>
+<button data-ex="https://www.dailymotion.com/video/x8j2k4l" type="button">dailymotion.com/video/…</button>
+<button data-ex="gotaga" type="button">gotaga</button>
+</div>
+</div>
+</div>
+</section>
+<section class="band" id="launcher">
+<div class="wrap">
+<div class="ch-head">
+<div class="ch-tag"><span class="num">CH 1</span><span>Streamlink Launcher</span><span class="ver">v1.5.1</span></div>
+<h2 data-i18n="l_h2">Ein Feld, Enter, und der Stream öffnet sich in deinem Player.</h2>
+<p data-i18n="l_p">Eine schlanke Oberfläche für Streamlink, in Python und Tkinter. Sie merkt sich deine Favoriten, zeigt dir, wer live ist, und startet den Stream ohne Twitch-Werbung im Player deiner Wahl.</p>
+</div>
+<div class="ch-grid">
+<div>
+<div class="monitor">
+<div class="titlebar"><svg aria-hidden="true"><use href="#logo"></use></svg><span>Streamlink Launcher</span><div class="ctl"><b>–</b><b>□</b><b>✕</b></div></div>
+<img alt="Hauptbildschirm von Streamlink Launcher im dunklen Design: Suchfeld, Plattformen, Live-Favoriten mit Vorschau und Zuschauerzahl, zuletzt gesehen." height="660" id="shot" src="../assets/img/site/en/l_main.webp" width="900"/>
+</div>
+<div aria-label="Screenshots des Launchers" class="views" data-i18n-aria="views_aria" role="group">
+<button aria-pressed="true" data-i18n="v_main" data-shot="l_main" type="button">Hauptbildschirm</button>
+<button aria-pressed="false" data-i18n="v_mini" data-shot="l_mini" type="button">Mini-Modus</button>
+<button aria-pressed="false" data-i18n="v_set" data-shot="l_set" type="button">Einstellungen</button>
+<button aria-pressed="false" data-i18n="v_light" data-shot="l_light" type="button">Helles Design</button>
+</div>
+</div>
+<div>
+<dl class="feats">
+<div class="feat" data-i18n="lf1"><dt>Smartes Feld</dt><dd>Ein Kanalname oder ein beliebiger Link. Die Vorschläge kommen aus deinen Favoriten und deinem Verlauf.</dd></div>
+<div class="feat" data-i18n="lf2"><dt>Live-Favoriten</dt><dd>Stream-Vorschau, Titel und Zuschauer. Eine Windows-Benachrichtigung, wenn ein Favorit live geht.</dd></div>
+<div class="feat" data-i18n="lf3"><dt>Gemerkte Qualität</dt><dd>Pro Plattform: <code>best</code>, <code>1080p60</code>, <code>audio_only</code> oder eine Ausweichliste wie <code>720p60,720p,best</code>.</dd></div>
+<div class="feat" data-i18n="lf4"><dt>Zwischenablage</dt><dd>Ein kopierter Link wird dir angeboten, sobald du zum Fenster zurückkehrst. Du kannst auch einen Link oder eine <code>.url</code>-Verknüpfung per Drag-and-drop ablegen.</dd></div>
+<div class="feat" data-i18n="lf5"><dt>Infobereich</dt><dd>Beim Schließen des Fensters bleibt der Launcher neben der Uhr, mit deinen Streams und der Live-Überwachung.</dd></div>
+<div class="feat" data-i18n="lf6"><dt>Deine Plattformen</dt><dd>Sie sind in <code>platforms.json</code> beschrieben: Füge deine eigenen hinzu, mit ihrer Farbe.</dd></div>
+</dl>
+<div class="combo">
+<div aria-label="Tastenkombination des Mini-Modus" class="keys" data-i18n-aria="keys_aria" id="keys"><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>S</kbd></div>
+<p data-i18n="combo">Mini-Modus: eine schwebende Leiste im Spotlight-Stil, aus jeder Anwendung.</p>
+</div>
+</div>
+</div>
+<div class="specs">
+<div class="spec" data-i18n="s1"><b>0</b><span>externe Abhängigkeiten: Python und Tkinter</span></div>
+<div class="spec" data-i18n="s2"><b>≈ 0,25 s</b><span>Start aus dem Quellcode</span></div>
+<div class="spec" data-i18n="s3"><b>≈ 30 MB</b><span>Arbeitsspeicher</span></div>
+<div class="spec" data-i18n="s4"><b>5</b><span>Sprachen: EN, FR, ES, DE, IT</span></div>
+</div>
+</div>
+</section>
+<section class="band" id="chat">
+<div class="wrap">
+<div class="ch-head">
+<div class="ch-tag"><span class="num">CH 2</span><span>Streamlink Chat</span><span class="ver">v0.2.1</span></div>
+<h2 data-i18n="c_h2">Alle deine Chats, jeder in seinem Tab.</h2>
+<p data-i18n="c_p">Der Begleiter des Launchers, im Stil von Chatterino. Twitch, Kick und Steam TV in einem einzigen Fenster, jeder in der Farbe seiner Plattform. Zum Lesen brauchst du kein Konto.</p>
+</div>
+<div class="ch-grid flip">
+<div>
+<div class="chat" data-p="twitch" id="chatbox">
+<div class="chat-top"><b>Chats</b><small data-i18n="demo_small">Demo · simulierte Nachrichten</small></div>
+<div aria-label="Geöffnete Chats" class="tabs" data-i18n-aria="tabs_aria" id="tabs" role="tablist"></div>
+<div class="card">
+<div class="card-head"><span class="pd"></span><b id="cname">eslcs</b><span class="st" id="cstate">Twitch · Connecté</span></div>
+<div aria-live="off" class="log" id="log"></div>
+</div>
+<div class="compose">
+<input aria-label="Message" autocomplete="off" id="say" placeholder="In den Chat von eslcs schreiben" type="text"/>
+<button aria-label="Senden" data-i18n-aria="send" id="send" type="button"><svg aria-hidden="true"><use href="#i-send"></use></svg></button>
+</div>
+<button class="paused" data-i18n="paused" hidden="" id="paused" type="button">Neue Nachrichten ↓</button>
+</div>
+<p class="chat-note" data-i18n="chat_note">Fahre mit der Maus über den Chat oder scrolle nach oben: Das automatische Scrollen pausiert, genau wie in der App. Schreib auf Twitch eine Nachricht; <kbd>Tab</kbd> vervollständigt Namen.</p>
+</div>
+<div>
+<dl class="feats">
+<div class="feat" data-i18n="cf1"><dt>Lesbare Nachrichten</dt><dd>Abzeichen, an das Design angepasste Namensfarben, Emotes als Bilder, animierte GIFs inklusive (Twitch, BetterTTV, FrankerFaceZ, 7TV).</dd></div>
+<div class="feat" data-i18n="cf2"><dt>Erwähnungen</dt><dd>Nachrichten, die deinen Namen oder Wörter deiner Wahl enthalten, werden hervorgehoben.</dd></div>
+<div class="feat" data-i18n="cf3"><dt>Schreiben</dt><dd>Auf Twitch und Kick, nach der Anmeldung. <kbd>Tab</kbd> vervollständigt Namen und Emotes, <kbd>↑</kbd> holt deine letzten Nachrichten zurück.</dd></div>
+<div class="feat" data-i18n="cf4"><dt>Ansehen</dt><dd>Die Schaltfläche ▶ im Chat startet den Stream mit Streamlink.</dd></div>
+<div class="feat" data-i18n="cf5"><dt>Geschützte Tokens</dt><dd>Unter Windows sind deine Anmeldungen mit DPAPI verschlüsselt und nur von deiner Sitzung lesbar.</dd></div>
+</dl>
+<div class="tbl" style="margin-top:24px">
+<table class="ptable">
+<thead data-i18n="pt_head"><tr><th>Plattform</th><th>Lesen</th><th>Schreiben</th></tr></thead>
+<tbody data-i18n="pt_body"><tr><td><i style="background:#9146FF"></i>Twitch</td><td>Ohne Konto</td><td>Nach der Anmeldung</td></tr><tr><td><i style="background:#53FC18"></i>Kick</td><td>Ohne Konto <span class="exp">experimentell</span></td><td>Nach der Anmeldung</td></tr><tr><td><i style="background:#2A475E"></i>Steam TV</td><td>Ohne Konto</td><td>Nur lesen</td></tr></tbody>
+</table>
+</div>
+<div class="shots">
+<figure><img alt="Screenshot von Streamlink Chat: Twitch-Chat in Violett" data-i18n-alt="alt_ctw" data-img="c_tw" decoding="async" height="780" loading="lazy" src="../assets/img/site/en/c_tw.webp" width="560"/><figcaption>Twitch</figcaption></figure>
+<figure><img alt="Screenshot von Streamlink Chat: Kick-Chat in Grün" data-i18n-alt="alt_ckick" data-img="c_kick" decoding="async" height="780" loading="lazy" src="../assets/img/site/en/c_kick.webp" width="560"/><figcaption>Kick</figcaption></figure>
+<figure><img alt="Screenshot von Streamlink Chat im hellen Design" data-i18n-alt="alt_clight" data-img="c_light" decoding="async" height="780" loading="lazy" src="../assets/img/site/en/c_light.webp" width="560"/><figcaption data-i18n="v_light">Helles Design</figcaption></figure>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="band">
+<div class="wrap">
+<div class="ch-head">
+<div class="ch-tag"><span class="num">CH 1 + 2</span><span data-i18n="together">Zusammen</span></div>
+<h2 data-i18n="t_h2">Links der Player, rechts der Chat.</h2>
+</div>
+<div class="pair">
+<div data-i18n="t1"><h3>Ein Klick zum Ansehen</h3><p>Im Chat startet ▶ den Stream mit demselben Streamlink wie der Launcher. Im Launcher zeigen dir deine Favoriten, wer live ist.</p></div>
+<div data-i18n="t2"><h3>Ein Look</h3><p>Dieselben gezeichneten Elemente, dieselben Plattformfarben, helles, dunkles oder automatisches Design nach Windows.</p></div>
+<div data-i18n="t3"><h3>Aktualisieren sich selbst</h3><p>Jede App sucht ihre neue Version auf GitHub, prüft Größe und SHA-256, ersetzt die ausführbare Datei und startet neu.</p></div>
+</div>
+</div>
+</section>
+<section class="band" id="download">
+<div class="wrap">
+<div class="ch-head">
+<div class="ch-tag"><span class="num">DL</span><span data-i18n="dl_tag">Releases auf GitHub</span></div>
+<h2 data-i18n="nav_dl">Download</h2>
+<p data-i18n="dl_p">Frei und unter MIT-Lizenz. Du brauchst <a href="https://streamlink.github.io/install.html" rel="noopener" target="_blank">Streamlink</a> und einen Videoplayer wie VLC oder mpv.</p>
+</div>
+<div class="dl">
+<article class="app">
+<header><svg aria-hidden="true"><use href="#logo"></use></svg><div><h3>Launcher</h3><small>v1.5.1 · Windows 10/11 · Linux x86_64</small></div></header>
+<div class="files">
+<a class="file" href="https://github.com/Bulls64/Streamlink-Launcher/releases/download/v1.5.1/StreamlinkLauncher-1.5.1.exe" rel="noopener" target="_blank"><span class="os">Windows</span><b>StreamlinkLauncher-1.5.1.exe</b><span data-i18n="size_l_exe">12,3 MB</span></a>
+<a class="file" href="https://github.com/Bulls64/Streamlink-Launcher/releases/download/v1.5.1/StreamlinkLauncher-1.5.1-x86_64.AppImage" rel="noopener" target="_blank"><span class="os">Linux</span><b>StreamlinkLauncher-1.5.1-x86_64.AppImage</b><span data-i18n="size_img">31,8 MB</span></a>
+</div>
+<ol class="steps">
+<li><span><span data-i18n="step_chmod">Unter Linux machst du das AppImage ausführbar und startest es dann:</span><span class="cmd"><code>chmod +x StreamlinkLauncher-1.5.1-x86_64.AppImage</code><button data-copy="chmod +x StreamlinkLauncher-1.5.1-x86_64.AppImage" type="button">Copier</button></span></span></li>
+<li><span data-i18n="step_l2">Beim ersten Start findet der Launcher Streamlink von selbst oder erklärt dir, wie du es installierst.</span></li>
+</ol>
+<div class="links"><a data-i18n="src" href="https://github.com/Bulls64/Streamlink-Launcher" rel="noopener" target="_blank">Quellcode</a><a data-i18n="notes" href="https://github.com/Bulls64/Streamlink-Launcher/releases/latest" rel="noopener" target="_blank">Versionshinweise</a></div>
+</article>
+<article class="app">
+<header><svg aria-hidden="true"><use href="#logo-chat"></use></svg><div><h3>Chat</h3><small>v0.2.1 · Windows 10/11 · Linux x86_64</small></div></header>
+<div class="files">
+<a class="file" href="https://github.com/Bulls64/Streamlink-Chat/releases/download/v0.2.1/StreamlinkChat-0.2.1.exe" rel="noopener" target="_blank"><span class="os">Windows</span><b>StreamlinkChat-0.2.1.exe</b><span data-i18n="size_c_exe">12,9 MB</span></a>
+<a class="file" href="https://github.com/Bulls64/Streamlink-Chat/releases/download/v0.2.1/StreamlinkChat-0.2.1-x86_64.AppImage" rel="noopener" target="_blank"><span class="os">Linux</span><b>StreamlinkChat-0.2.1-x86_64.AppImage</b><span data-i18n="size_img">31,8 MB</span></a>
+</div>
+<ol class="steps">
+<li><span><span data-i18n="step_chmod">Unter Linux machst du das AppImage ausführbar und startest es dann:</span><span class="cmd"><code>chmod +x StreamlinkChat-0.2.1-x86_64.AppImage</code><button data-copy="chmod +x StreamlinkChat-0.2.1-x86_64.AppImage" type="button">Copier</button></span></span></li>
+<li><span data-i18n="step_c2">Gib einen Kanalnamen ein oder füge einen Twitch-, Kick- oder Steam-TV-Link ein. Zum Schreiben verbindest du dein Konto unter <em>Einstellungen › Konten</em>.</span></li>
+</ol>
+<div class="links"><a data-i18n="src" href="https://github.com/Bulls64/Streamlink-Chat" rel="noopener" target="_blank">Quellcode</a><a data-i18n="notes" href="https://github.com/Bulls64/Streamlink-Chat/releases/latest" rel="noopener" target="_blank">Versionshinweise</a></div>
+</article>
+</div>
+<p class="trust" data-i18n="trust">Jedes Release veröffentlicht eine Datei <code>SHA256SUMS.txt</code>, damit du prüfen kannst, was du herunterlädst. Die Windows-Programme sind noch nicht signiert: Wenn SmartScreen erscheint, wähle <em>Weitere Informationen</em> und dann <em>Trotzdem ausführen</em>.</p>
+</div>
+</section>
+</main>
+
+<footer>
+<div class="wrap">
+<span data-i18n="foot1">Streamlink Launcher und Streamlink Chat, von <a href="https://github.com/Bulls64" rel="noopener" target="_blank">Bulls64</a>. MIT-Lizenz.</span>
+<span data-i18n="foot2">Unabhängige Projekte, ohne Verbindung zu Streamlink, Twitch, Kick, YouTube, Dailymotion oder Valve.</span>
+</div>
+</footer>
+<script>window.SL_PAGES={alt:{fr:"../",en:"../en/",es:"../es/",de:"../de/",it:"../it/"},ids:{}};function slGoLang(e){try{localStorage.setItem("slSiteLang",e)}catch{}let t="";try{t=decodeURIComponent(location.hash.slice(1))}catch{}const n=SL_PAGES.ids[t]&&SL_PAGES.ids[t][e]||(t&&document.getElementById(t)&&!Object.keys(SL_PAGES.ids).length?t:"");location.href=SL_PAGES.alt[e]+(n?"#"+n:"")}</script>
+
+<script>(()=>{const c=document.documentElement,W={de:{l_main:"../assets/img/site/en/l_main.webp",l_mini:"../assets/img/site/en/l_mini.webp",l_set:"../assets/img/site/en/l_set.webp",l_light:"../assets/img/site/en/l_light.webp",c_tw:"../assets/img/site/en/c_tw.webp",c_kick:"../assets/img/site/en/c_kick.webp",c_light:"../assets/img/site/en/c_light.webp"}},Be="slSiteLang",I={en:{ph:{twitch:"Twitch channel name or link\u2026",kick:"Kick channel name or link\u2026",youtube:"YouTube video ID or link\u2026",dailymotion:"Dailymotion video ID or link\u2026",steamtv:"steam.tv link (optional)\u2026",url:"Any link Streamlink supports\u2026"},direct:"Direct link",e_empty:"Type a channel name or paste a link.",e_chan:"Invalid channel name: letters, digits and _ only.",e_yt:"A YouTube ID is 11 characters long, or paste the video's link.",e_vid:"Invalid video ID, or paste the video's link.",e_url:"Paste a full link, starting with https://",e_noch:"This link is missing the channel name.",cmd:e=>`# ${e} recognized \xB7 command sent to Streamlink`,idle:"No stream running",run:e=>`${e} stream${e>1?"s":""} running`,demo:"(demo: nothing actually opens)",alt:{l_main:"Streamlink Launcher main screen, dark theme: search field, platforms, live favorites with previews and viewer counts, recent launches.",l_mini:"Streamlink Launcher mini mode: floating bar listing favorites and their viewer counts.",l_set:"Streamlink Launcher settings panel.",l_light:"Streamlink Launcher main screen, light theme."},copy:"Copy",copied:"Copied",lines:{twitch:["gg wp, what a round [e]","that flick [e] [e]","he missed the clutch","@chris are you watching the final tonight?","perfect smoke on B","The tournament resumes in 5 minutes: https://eslgaming.com/cs","TIMEOUT [e2]","overtime or not?","what a retake [e]","replay pls","both teams are on fire","insane 1v3 [e] [e]","we want map 3","@chris did you see that move"],kick:["W stream","he's way too good","clip it","[e2] [e2]","audio is better today","chat stay civil","how many of us are here?","W","he's gonna do it","@chris hi!"],steamtv:["[e] the new patch","can't wait to try it","is the demo out?","gg","when does it release?","the art style is insane","wishlisted [e]"]},ev:{twitch:(e,t)=>`${e} subscribed at Tier 1 for ${t} months!`,kick:e=>`${e} just subscribed!`},spam:"buy followers on my site",ch:{twitch:["Twitch \xB7 Connected","Write in eslcs's chat"],kick:["Kick \xB7 Read-only","Read-only \u2014 log in to Kick to write"],steamtv:["Steam TV \xB7 Read-only","Steam TV chat is read-only"]}}};I.de=Object.assign({},I.en,{ph:{twitch:"Twitch-Kanalname oder Link\u2026",kick:"Kick-Kanalname oder Link\u2026",youtube:"YouTube-Video-ID oder Link\u2026",dailymotion:"Dailymotion-Video-ID oder Link\u2026",steamtv:"steam.tv-Link (optional)\u2026",url:"Jeder von Streamlink unterst\xFCtzte Link\u2026"},direct:"Direktlink",e_empty:"Gib einen Kanalnamen ein oder f\xFCge einen Link ein.",e_chan:"Ung\xFCltiger Kanalname: nur Buchstaben, Ziffern und _.",e_yt:"Eine YouTube-ID hat 11 Zeichen, oder f\xFCge den Link des Videos ein.",e_vid:"Ung\xFCltige Video-ID, oder f\xFCge den Link des Videos ein.",e_url:"F\xFCge einen vollst\xE4ndigen Link ein, der mit https:// beginnt",e_noch:"In diesem Link fehlt der Kanalname.",cmd:e=>`# ${e} erkannt \xB7 Befehl an Streamlink gesendet`,idle:"Kein Stream aktiv",run:e=>`${e} Stream${e>1?"s":""} aktiv`,demo:"(Demo: Es \xF6ffnet sich nichts wirklich)",alt:{l_main:"Hauptbildschirm von Streamlink Launcher im dunklen Design: Suchfeld, Plattformen, Live-Favoriten mit Vorschau und Zuschauerzahl, zuletzt gesehen.",l_mini:"Der Mini-Modus von Streamlink Launcher: schwebende Leiste mit der Liste der Favoriten und ihrer Zuschauerzahl.",l_set:"Die Einstellungen von Streamlink Launcher.",l_light:"Hauptbildschirm von Streamlink Launcher im hellen Design."},copy:"Kopieren",copied:"Kopiert",lines:{twitch:["gg wp, was f\xFCr eine Runde [e]","dieser Flick [e] [e]","er hat den Clutch verpasst","@chris schaust du heute Abend das Finale?","perfekte Smoke auf B","Das Turnier geht in 5 Minuten weiter: https://eslgaming.com/cs","TIMEOUT [e2]","Overtime oder nicht?","was f\xFCr ein Retake [e]","Replay bitte","beide Teams sind hei\xDF","unglaubliches 1v3 [e] [e]","wir wollen Map 3","@chris hast du den Move gesehen"],kick:["W Stream","er ist einfach zu gut","clippt das","[e2] [e2]","der Ton ist heute besser","Chat, bleibt freundlich","wie viele sind wir gerade?","W","er schafft das","@chris hi!"],steamtv:["[e] der neue Patch","kann es kaum erwarten, das zu testen","ist die Demo schon drau\xDFen?","gg","wann erscheint es?","der Artstyle ist krass","auf der Wunschliste [e]"]},ev:{twitch:(e,t)=>`${e} hat seit ${t} Monaten Stufe 1 abonniert!`,kick:e=>`${e} hat gerade abonniert!`},spam:"kauft Follower auf meiner Seite",ch:{twitch:["Twitch \xB7 Verbunden","In den Chat von eslcs schreiben"],kick:["Kick \xB7 Nur lesen","Nur lesen \u2014 bei Kick anmelden, um zu schreiben"],steamtv:["Steam TV \xB7 Nur lesen","Steam-TV-Chat nur lesbar"]}});let y=document.documentElement.lang;const s=()=>I[y],P=[{id:"twitch",name:"Twitch",dot:"#9146FF",input:"channel",url:e=>`https://www.twitch.tv/${e}`,args:["--twitch-disable-ads"],q:["best","1080p60","720p60","720p","480p","360p","160p","audio_only","worst"]},{id:"kick",name:"Kick",dot:"#53FC18",input:"channel",url:e=>`https://kick.com/${e}`,args:[],q:["best","1080p60","720p60","480p30","360p30","160p30","worst"]},{id:"youtube",name:"YouTube",dot:"#D91A1A",input:"youtube",url:e=>`https://www.youtube.com/watch?v=${e}`,args:[],q:["best","1080p","720p","480p","360p","worst"]},{id:"dailymotion",name:"Dailymotion",dot:"#0A6CFF",input:"video",url:e=>`https://www.dailymotion.com/video/${e}`,args:[],q:["best","1080p","720p","480p","worst"]},{id:"steamtv",name:"Steam TV",dot:"#66C0F4",input:"none",url:()=>"https://steam.tv",args:[],q:["best","worst"]},{id:"url",name:null,dot:"#6B7180",input:"url",url:e=>e,args:[],q:["best","1080p","720p","480p","worst"]}],j=e=>e.name||s().direct,w=Object.fromEntries(P.map(e=>[e.id,e])),ge=[["twitch",["twitch.tv"]],["kick",["kick.com"]],["youtube",["youtube.com","youtu.be"]],["dailymotion",["dailymotion.com","dai.ly"]],["steamtv",["steam.tv","steamcommunity.com"]]],h=document.getElementById("q"),_=document.getElementById("quality"),S=document.getElementById("term"),A=document.getElementById("pills"),U=document.getElementById("status"),Y=document.getElementById("status-text");let r="twitch";const $={},u=e=>e.replace(/[&<>"]/g,t=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[t]);function fe(){A.innerHTML="",P.forEach(e=>{const t=document.createElement("button");t.type="button",t.className="pill",t.dataset.id=e.id,t.style.setProperty("--dot",e.dot),t.setAttribute("aria-pressed",String(e.id===r)),t.innerHTML=`<i></i>${u(j(e))}`,t.addEventListener("click",()=>{M(e.id,!0),k(),h.focus()}),A.appendChild(t)})}function M(e,t){r=e,c.dataset.platform=e,A.querySelectorAll(".pill").forEach(i=>i.setAttribute("aria-pressed",String(i.dataset.id===e)));const n=w[e];h.placeholder=s().ph[e],_.innerHTML=n.q.map(i=>`<option${i===($[e]||n.q[0])?" selected":""}>${i}</option>`).join(""),t&&($[e]=$[e]||n.q[0])}function ke(e){let t=e.trim();if(!t)return null;!/^[a-z]+:\/\//i.test(t)&&/^[\w-]+(\.[\w-]+)+(\/|$)/.test(t)&&(t="https://"+t);let n;try{n=new URL(t)}catch{return null}if(!/^https?:$/.test(n.protocol))return null;const i=n.hostname.replace(/^(www|m)\./,"");for(const[o,R]of ge)if(R.some(m=>i===m||i.endsWith("."+m))){if(o==="steamtv"&&i.endsWith("steamcommunity.com")&&!n.pathname.startsWith("/broadcast/watch/"))return{id:"url",url:n.href};if(o==="twitch"||o==="kick"){const m=n.pathname.split("/").filter(Boolean),O=m[0]==="popout"?m[1]:m[0];return O?{id:o,url:w[o].url(O.toLowerCase()),name:O.toLowerCase()}:{id:o,url:null}}return{id:o,url:n.href}}return{id:"url",url:n.href}}function ye(){const e=h.value.trim(),t=ke(e);if(t)return t;const n=w[r];return e?n.input==="channel"?/^[A-Za-z0-9_]{2,25}$/.test(e)?{id:r,url:n.url(e.toLowerCase()),name:e.toLowerCase()}:{id:r,error:s().e_chan}:n.input==="youtube"?/^[\w-]{11}$/.test(e)?{id:r,url:n.url(e)}:{id:r,error:s().e_yt}:n.input==="video"?/^[\w]{5,12}$/.test(e)?{id:r,url:n.url(e)}:{id:r,error:s().e_vid}:n.input==="none"?{id:r,url:n.url("")}:{id:r,error:s().e_url}:n.input==="none"?{id:r,url:n.url("")}:{id:r,error:s().e_empty}}function k(){const e=ye();e.id!==r&&M(e.id,!1);const t=w[r],n=_.value||t.q[0];if(e.error||!e.url)return S.innerHTML=`<span class="pr">$ </span><span class="err">${u(e.error||s().e_noch)}</span>`,null;const i=t.args.map(o=>` <span class="opt">${o}</span>`).join("");return S.innerHTML=`<span class="cm">${u(s().cmd(j(t)))}</span>
+<span class="l2"><span class="pr">$ </span>streamlink${i} <span class="url">${u(e.url)}</span> <span class="q">${u(n)}</span></span>`,{...e,quality:n}}let v=[];function G(){if(!v.length){U.classList.remove("running"),Y.textContent=s().idle;return}U.classList.add("running"),Y.innerHTML=`<strong>${s().run(v.length)}</strong> \xB7 ${v.map(u).join(", ")} <span style="opacity:.7">${s().demo}</span>`}function Z(){const e=k();if(!e){h.focus();return}const t=e.name||(w[e.id].input==="none"?"Steam TV":e.url.replace(/^https?:\/\/(www\.)?/,"").slice(0,42));v=[t,...v.filter(n=>n!==t)].slice(0,3),G()}h.addEventListener("input",k),h.addEventListener("keydown",e=>{e.key==="Enter"&&(e.preventDefault(),Z())}),_.addEventListener("change",()=>{$[r]=_.value,k()}),document.getElementById("go").addEventListener("click",Z),document.querySelectorAll("[data-ex]").forEach(e=>e.addEventListener("click",()=>{h.value=e.dataset.ex,k(),h.focus()}));const Q=document.getElementById("shot");let D="l_main";function J(){Q.src=W[y][D],Q.alt=s().alt[D],document.querySelectorAll("[data-img]").forEach(e=>{e.src=W[y][e.dataset.img]})}document.querySelectorAll("[data-shot]").forEach(e=>e.addEventListener("click",()=>{D=e.dataset.shot,J(),document.querySelectorAll("[data-shot]").forEach(t=>t.setAttribute("aria-pressed",String(t===e)))}));const X=[...document.querySelectorAll("#keys kbd")],b=matchMedia("(prefers-reduced-motion: reduce)").matches,B=new Set,ee=e=>B.has(e)&&!document.hidden;if("IntersectionObserver"in window){const e=new IntersectionObserver(t=>t.forEach(n=>n.isIntersecting?B.add(n.target):B.delete(n.target)),{rootMargin:"200px 0px"});[document.getElementById("keys"),document.getElementById("chatbox")].forEach(t=>t&&e.observe(t))}else[document.getElementById("keys"),document.getElementById("chatbox")].forEach(e=>e&&B.add(e));const we=document.getElementById("keys");b||setInterval(()=>{ee(we)&&(X.forEach((e,t)=>setTimeout(()=>e.classList.add("press"),t*140)),setTimeout(()=>X.forEach(e=>e.classList.remove("press")),900))},4200);const te={mod:["#00AD03","\u2713"],vip:["#E005B9","\u25C6"],sub:["#8205B4","\u2605"],broad:["#E91916","\u25CF"],og:["#53FC18","\u2666"]},ne={twitch:[["Okayeg","#FF7F50",["mod","sub"]],["Marie_Lune","#2ECC71",[]],["zywoo_fan","#DAA520",["sub"]],["dark_knight","#8A7BFF",["vip"]],["NightBot","#7B68EE",["mod"]],["kraken_92","#1E90FF",[]],["poulpe_rose","#FF69B4",["sub"]],["Tonio","#00CED1",[]],["lea_gg","#9ACD32",["sub"]]],kick:[["KickUser42","#53FC18",["og"]],["salty_sam","#F7A440",[]],["mr_clip","#FF6B6B",["sub"]],["nova","#4FC3F7",[]],["zedd_23","#C792EA",["vip"]],["lucky7","#FFD54F",[]]],steamtv:[["Gabe_N_Friends","#8FB8DE",[]],["hat_collector","#C7D5E0",[]],["pudge_main","#A3CF6E",[]],["roshan","#E0A458",[]],["lina_inverse","#F08A8A",[]]]},x=[{p:"twitch",name:"eslcs",color:"#9146FF",on:"#FFFFFF",write:!0},{p:"kick",name:"xqc",color:"#53FC18",on:"#0B0D0A",write:!1},{p:"steamtv",name:"steamtv",color:"#2A475E",on:"#C7D5E0",write:!1}],ie=document.getElementById("chatbox"),a=document.getElementById("log"),q=document.getElementById("tabs"),l=document.getElementById("say"),se=document.getElementById("send"),g=document.getElementById("paused");let d={twitch:[],kick:[],steamtv:[]};const E={twitch:0,kick:6,steamtv:0};let L="twitch",H=!1,f=!0,C=1241;const K=e=>e[Math.floor(Math.random()*e.length)];function N(){return C=(C+(Math.random()<.35?1:0))%1440,`${String(Math.floor(C/60)).padStart(2,"0")}:${String(C%60).padStart(2,"0")}`}function ve(e){return u(e).replace(/https?:\/\/\S+/g,t=>`<a href="${t}" target="_blank" rel="noopener" style="color:#8FB8FF">${t}</a>`).replace(/@(\w+)/g,"<b>@$1</b>").replace(/\[e\]/g,'<svg class="emo" aria-label="emote"><use href="#emo"/></svg>').replace(/\[e2\]/g,'<svg class="emo" aria-label="emote"><use href="#emo2"/></svg>')}function ae(e){const t=Math.random(),n=s().ev[e];if(n&&t<.07)return{kind:"event",text:n(K(ne[e])[0],2+Math.floor(Math.random()*30))};const[i,o,R]=K(ne[e]),m=K(s().lines[e]);return{name:i,color:o,badges:R,text:m,mention:/@chris/.test(m),first:t>.93,t:N()}}function re(e){const t=document.createElement("div");if(t.className="msg"+(e.kind==="event"?" event":"")+(e.mention?" mention":"")+(e.first?" first":"")+(e.deleted?" deleted":""),e.kind==="event")return t.innerHTML=`<time>${e.t||N()}</time>${u(e.text)}`,t;const n=e.badges.map(i=>`<span class="bd" style="background:${te[i][0]}">${te[i][1]}</span>`).join("");return t.innerHTML=`<time>${e.t}</time>${n}<span class="u" style="color:${e.color}">${u(e.name)}</span>: ${ve(e.text)}`,t}function be(){return a.scrollHeight-a.scrollTop-a.clientHeight<24}function oe(e,t,n){if(d[e].push(t),d[e].length>80&&d[e].shift(),e!==L){E[e]++,Le(e);return}const i=f&&!H,o=re(t);for(n&&o.classList.add("new"),a.appendChild(o);a.children.length>80;)a.firstChild.remove();i?a.scrollTop=a.scrollHeight:g.hidden=!1}function Ee(){q.innerHTML="",x.forEach(e=>{const t=document.createElement("button");t.type="button",t.className="tab",t.dataset.p=e.p,t.setAttribute("role","tab"),t.setAttribute("aria-selected",String(e.p===L)),t.style.setProperty("--tc",e.color),t.style.setProperty("--ton",e.on),t.innerHTML=`<i></i>${e.name}${E[e.p]&&e.p!==L?`<span class="n">${Math.min(E[e.p],99)}</span>`:""}`,t.addEventListener("click",()=>le(e.p)),q.appendChild(t)})}function Le(e){const t=q.querySelector(`[data-p="${e}"]`);if(!t)return;let n=t.querySelector(".n");n||(n=document.createElement("span"),n.className="n",t.appendChild(n)),n.textContent=Math.min(E[e],99)}function le(e){L=e,E[e]=0;const t=x.find(n=>n.p===e);ie.dataset.p=e,document.getElementById("cname").textContent=t.name,document.getElementById("cstate").textContent=s().ch[e][0],l.disabled=se.disabled=!t.write,l.value="",l.placeholder=s().ch[e][1],a.innerHTML="",d[e].forEach(n=>a.appendChild(re(n))),a.scrollTop=a.scrollHeight,g.hidden=!0,f=!0,Ee()}function Te(){const e=d.twitch.filter(t=>t.own);d={twitch:[],kick:[],steamtv:[]},x.forEach(t=>{for(let n=0;n<16;n++)d[t.p].push(ae(t.p))}),d.twitch.splice(9,0,{name:"spammer",color:"#888",badges:[],text:s().spam,t:"20:44",deleted:!0}),d.twitch.push(...e)}const ce={twitch:1300,kick:1700,steamtv:3600};Object.keys(ce).forEach(e=>{const t=()=>{ee(ie)&&oe(e,ae(e),!b),setTimeout(t,ce[e]*(b?2.5:.5+Math.random()))};setTimeout(t,900+Math.random()*900)}),a.addEventListener("mouseenter",()=>{H=!0}),a.addEventListener("mouseleave",()=>{H=!1,f&&(a.scrollTop=a.scrollHeight,g.hidden=!0)}),a.addEventListener("scroll",()=>{f=be(),f&&(g.hidden=!0)}),g.addEventListener("click",()=>{f=!0,a.scrollTop=a.scrollHeight,g.hidden=!0});const T=[];let p=-1;function de(){const e=l.value.trim();!e||l.disabled||(oe("twitch",{name:"chris",color:"#5DADE2",badges:["sub"],text:e,t:N(),own:!0},!b),T.unshift(e),p=-1,l.value="",f=!0,a.scrollTop=a.scrollHeight,g.hidden=!0)}se.addEventListener("click",de),l.addEventListener("keydown",e=>{if(e.key==="Enter")e.preventDefault(),de();else if(e.key==="ArrowUp"&&T.length)e.preventDefault(),p=Math.min(p+1,T.length-1),l.value=T[p];else if(e.key==="ArrowDown"&&p>=0)e.preventDefault(),p--,l.value=p>=0?T[p]:"";else if(e.key==="Tab"){const t=l.value.match(/(@?)(\w+)$/);if(!t)return;const n=[...new Set(d.twitch.map(i=>i.name).filter(Boolean))].find(i=>i.toLowerCase().startsWith(t[2].toLowerCase()));if(!n)return;e.preventDefault(),l.value=l.value.slice(0,t.index)+t[1]+n+" "}}),document.querySelectorAll("[data-copy]").forEach(e=>e.addEventListener("click",()=>{const t=()=>{e.textContent=s().copied,setTimeout(()=>{e.textContent=s().copy},1600)},n=()=>{const i=document.createRange();i.selectNodeContents(e.previousElementSibling);const o=getSelection();o.removeAllRanges(),o.addRange(i),e.textContent="Ctrl+C"};try{navigator.clipboard.writeText(e.dataset.copy).then(t,n)}catch{n()}}));const ue="slSiteTheme",F=document.getElementById("theme"),_e=document.getElementById("themeLabel"),Se={fr:{light:"Mode clair",dark:"Mode sombre"},en:{light:"Light mode",dark:"Dark mode"},es:{light:"Modo claro",dark:"Modo oscuro"},de:{light:"Heller Modus",dark:"Dunkler Modus"},it:{light:"Modalit\xE0 chiara",dark:"Modalit\xE0 scura"}},me=matchMedia("(prefers-color-scheme: dark)");function he(){return c.dataset.theme?c.dataset.theme==="dark":me.matches}function z(){const e=he()?"light":"dark",t=Se[y][e];_e.textContent=t,F.setAttribute("aria-label",t),F.title=t,F.querySelector("use").setAttribute("href",e==="dark"?"#i-moon":"#i-sun")}try{const e=localStorage.getItem(ue);(e==="light"||e==="dark")&&(c.dataset.theme=e)}catch{}F.addEventListener("click",()=>{const e=he()?"light":"dark";c.dataset.theme=e;try{localStorage.setItem(ue,e)}catch{}z()}),me.addEventListener("change",z);const V=document.getElementById("lang");function $e(e,t){y=e,t&&c.classList.add("static"),c.lang=e,V.value=e,document.querySelectorAll("[data-copy]").forEach(n=>{n.textContent=s().copy}),fe(),M(r,!1),k(),G(),J(),Te(),le(L),z()}V.addEventListener("change",()=>{slGoLang(V.value)});function Me(){return document.documentElement.lang}$e(Me(),!1);const pe=document.getElementById("boot");if(b)pe.remove(),c.classList.add("nointro","static");else{S.classList.add("typing"),setTimeout(()=>pe.remove(),1400),setTimeout(()=>S.classList.remove("typing"),3600);const e=["kick","youtube","dailymotion","steamtv","url","kick","twitch"];setTimeout(()=>{c.classList.add("surfing"),e.forEach((t,n)=>setTimeout(()=>{c.dataset.platform=t,n===e.length-1&&setTimeout(()=>{c.classList.remove("surfing"),M(r,!1)},160)},n*115))},1500)}})();</script>
+</body>
+</html>

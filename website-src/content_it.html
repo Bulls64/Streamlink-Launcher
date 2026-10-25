@@ -1,0 +1,837 @@
+<div class="wrap">
+  <div class="intro">
+    <div class="tag"><span class="num">DOCS</span><span>Launcher v1.5.1 · Chat v0.2.1</span></div>
+    <h1>Documentazione</h1>
+    <p>Tutto quello che serve per installare Streamlink, usare le due app e risolvere i problemi più comuni. Le etichette <span class="app l">Launcher</span> e <span class="app c">Chat</span> indicano a quale app si riferisce un passaggio.</p>
+    <label class="search" for="q">
+      <svg aria-hidden="true"><use href="#i-search"/></svg>
+      <input id="q" type="search" placeholder="Cerca: preferiti, SmartScreen, Kick, scorciatoia…" autocomplete="off" aria-label="Cerca nella documentazione">
+      <span class="count" id="count" aria-live="polite"></span>
+    </label>
+    <p class="syn" id="syn" aria-live="polite"></p>
+    <nav class="quick" aria-label="Accesso rapido">
+      <a href="#primi-passi">Primo stream</a><a href="#scrivere">Scrivere in chat</a><a href="#scorciatoie">Scorciatoie</a><a href="#risoluzione-problemi">Risoluzione dei problemi</a><a href="#segnalare">Segnalare un bug</a>
+    </nav>
+  </div>
+
+  <div class="layout">
+    <nav class="toc" aria-label="Sommario" id="toc">
+      <b>Scoprire</b>
+      <a href="#panoramica"><span>01</span>Le due app</a>
+      <a href="#tour-immagini"><span>02</span>Tour per immagini</a>
+      <a href="#streamlink"><span>03</span>Streamlink</a>
+      <a href="#installare"><span>04</span>Installare Streamlink</a>
+      <a href="#primi-passi"><span>05</span>Primi passi</a>
+      <b>Usare</b>
+      <a href="#scorciatoie"><span>06</span>Tastiera e mouse</a>
+      <a href="#preferiti"><span>07</span>Cronologia e preferiti</a>
+      <a href="#scrivere"><span>08</span>Scrivere in chat</a>
+      <a href="#piattaforme"><span>09</span>Emote e piattaforme</a>
+      <a href="#ricette"><span>10</span>Ricette</a>
+      <b>Mantenere</b>
+      <a href="#aggiornamenti"><span>11</span>Aggiornamenti</a>
+      <a href="#impostazioni"><span>12</span>Impostazioni</a>
+      <a href="#riservatezza"><span>13</span>Dati e privacy</a>
+      <a href="#risoluzione-problemi"><span>14</span>Risoluzione dei problemi</a>
+      <a href="#disinstallare"><span>15</span>Disinstallare</a>
+      <b>Andare oltre</b>
+      <a href="#segnalare"><span>16</span>Segnalare e contribuire</a>
+      <a href="#glossario"><span>17</span>Glossario</a>
+    </nav>
+
+    <article id="doc">
+      <!-- 01 -->
+      <section class="doc" id="panoramica">
+        <header><small>01 · Panoramica</small><h2>Cosa sono Streamlink Launcher e Streamlink Chat?</h2></header>
+        <div class="cards blk">
+          <div class="card">
+            <h3>Launcher</h3>
+            <p>Un'interfaccia leggera per Streamlink. Scrivi il nome di un canale o incolla un link, premi <kbd>Invio</kbd> e lo stream si apre nel tuo lettore video (VLC, mpv, PotPlayer…) invece che nel browser. Ricorda i tuoi preferiti, ti dice quali sono in diretta e apre una barra mini con <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd>.</p>
+          </div>
+          <div class="card">
+            <h3>Chat</h3>
+            <p>Il compagno del launcher, nello spirito di Chatterino: le chat di Twitch, Kick e Steam TV in un'unica finestra, una scheda per chat, ognuna con il colore della sua piattaforma. Lettura senza account, scrittura su Twitch e Kick dopo l'accesso, e ▶ per aprire lo stream con Streamlink.</p>
+          </div>
+        </div>
+        <div class="blk">
+          <h3>Piattaforme supportate</h3>
+          <div class="tbl"><table>
+            <thead><tr><th>Piattaforma</th><th>Launcher</th><th>Chat</th></tr></thead>
+            <tbody>
+              <tr><td>Twitch</td><td>Sì, senza pubblicità</td><td>Lettura e scrittura</td></tr>
+              <tr><td>Kick</td><td>Sì</td><td>Lettura e scrittura (sperimentale)</td></tr>
+              <tr><td>Steam TV</td><td>Sì</td><td>Sola lettura</td></tr>
+              <tr><td>YouTube, Dailymotion</td><td>Sì</td><td>No</td></tr>
+              <tr><td>Link diretto</td><td>Qualsiasi sito supportato da Streamlink</td><td>No</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+        <div class="blk">
+          <h3>Requisiti</h3>
+          <ul>
+            <li><b>Windows 10 o 11</b>: un <code>.exe</code> in un unico file, senza installazione.</li>
+            <li><b>Linux x86_64</b>: un'AppImage che include il proprio Python. Richiede glibc 2.35 o successiva (Ubuntu 22.04, Debian 12, Fedora 36, Linux Mint 21 o successive).</li>
+            <li><b>Dal codice sorgente</b>: Python 3.10 o successivo con Tcl/Tk, nessun'altra dipendenza.</li>
+            <li>Per guardare: <a href="#installare">Streamlink</a> e un lettore video, VLC come predefinito.</li>
+          </ul>
+          <p class="note"><b>Su Linux</b> il launcher non ha icona nell'area di notifica, scorciatoia globale, avvio con il sistema, trascinamento, notifiche delle dirette, anteprime degli stream né aggiornamento integrato.</p>
+        </div>
+        <div class="blk">
+          <h3>Lingue</h3>
+          <p>Le due app sono disponibili in inglese, francese, spagnolo, tedesco e italiano. Seguono la lingua del sistema; puoi cambiarla in <em>Impostazioni › Generale</em> (Launcher) o <em>Impostazioni › Visualizzazione</em> (Chat).</p>
+        </div>
+      </section>
+
+      <!-- 02 -->
+      <section class="doc" id="tour-immagini">
+        <header><small>02 · Per immagini</small><h2>Tour per immagini</h2></header>
+        <p class="lead">Fai clic su uno screenshot per ingrandirlo. I canali e i messaggi sono solo esempi. Gli screenshot mostrano le app in inglese.</p>
+        <div class="blk">
+          <div class="tabs" role="tablist" aria-label="Applicazione" data-group="visit">
+            <button type="button" role="tab" aria-selected="true" data-tab="launcher">Launcher</button>
+            <button type="button" role="tab" aria-selected="false" data-tab="chat">Chat</button>
+          </div>
+        </div>
+        <div class="pane on" data-group="visit" data-pane="launcher">
+          <div class="shots">
+            <figure class="wide blk"><button type="button" class="zoom"><img src="img/en/l_main.webp" width="900" height="660" alt="Schermata principale del launcher, tema scuro" loading="lazy"></button>
+              <figcaption><b>La schermata principale.</b> In alto, il campo di inserimento, la qualità e <em>Avvia</em>. Sotto, i pulsanti delle piattaforme, poi i tuoi preferiti della piattaforma selezionata (prima quelli in diretta, con anteprima) e i tuoi ultimi avvii. In basso, gli stream in corso e il pulsante <em>Registro</em>.</figcaption></figure>
+            <figure class="blk"><button type="button" class="zoom"><img src="img/en/l_mini.webp" width="605" height="289" alt="Barra della modalità mini" loading="lazy"></button>
+              <figcaption><b>La modalità mini.</b> Una barra mobile che si apre con <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd> da qualsiasi applicazione (Windows).</figcaption></figure>
+            <figure class="blk"><button type="button" class="zoom"><img src="img/en/l_drawer.webp" width="900" height="660" alt="Pannello del registro aperto" loading="lazy"></button>
+              <figcaption><b>Il pannello del registro.</b> Gli stream in corso, ognuno con <em>Interrompi</em>, e l'output di Streamlink.</figcaption></figure>
+            <figure class="blk"><button type="button" class="zoom"><img src="img/en/l_favorites.webp" width="900" height="660" alt="Pannello dei preferiti" loading="lazy"></button>
+              <figcaption><b>Il pannello Preferiti</b>, che si apre con <em>Mostra tutto</em>: stato, spettatori, ▶ e cestino.</figcaption></figure>
+            <figure class="blk"><button type="button" class="zoom"><img src="img/en/l_history.webp" width="900" height="660" alt="Pannello della cronologia" loading="lazy"></button>
+              <figcaption><b>La cronologia</b>, che si apre con l'icona dell'orologio o con <em>Cronologia completa</em>.</figcaption></figure>
+            <figure class="blk"><button type="button" class="zoom"><img src="img/en/l_settings.webp" width="900" height="660" alt="Pannello delle impostazioni del launcher" loading="lazy"></button>
+              <figcaption><b>Le impostazioni</b> (<kbd>Ctrl</kbd>+<kbd>,</kbd>), raggruppate per argomento: Generale, In diretta, Finestra e scorciatoia, Lettore video, Streamlink, Avanzate, Backup, Informazioni.</figcaption></figure>
+            <figure class="blk"><button type="button" class="zoom"><img src="img/en/l_main_light.webp" width="900" height="660" alt="Schermata principale, tema chiaro" loading="lazy"></button>
+              <figcaption><b>Il tema chiaro.</b> <em>Auto</em> segue la modalità chiara o scura di Windows.</figcaption></figure>
+          </div>
+        </div>
+        <div class="pane" data-group="visit" data-pane="chat">
+          <div class="shots tall">
+            <figure class="blk"><button type="button" class="zoom"><img src="img/en/c_twitch.webp" width="560" height="760" alt="Chat di Twitch connessa, tema scuro" loading="lazy"></button>
+              <figcaption><b>Una chat di Twitch connessa.</b> Badge, emote come immagini, una menzione del tuo nome evidenziata, un abbonamento che risalta. Il numero sulla scheda di Kick conta i messaggi non letti.</figcaption></figure>
+            <figure class="blk"><button type="button" class="zoom"><img src="img/en/c_kick_light.webp" width="560" height="760" alt="Chat di Kick in sola lettura, tema chiaro" loading="lazy"></button>
+              <figcaption><b>Una chat di Kick</b>, in sola lettura, tema chiaro. Ogni scheda prende il colore della sua piattaforma.</figcaption></figure>
+            <figure class="blk"><button type="button" class="zoom"><img src="img/en/c_steam_light.webp" width="560" height="760" alt="Chat di Steam TV" loading="lazy"></button>
+              <figcaption><b>Steam TV</b>, sempre in sola lettura.</figcaption></figure>
+            <figure class="blk"><button type="button" class="zoom"><img src="img/en/c_settings.webp" width="560" height="760" alt="Impostazioni della chat" loading="lazy"></button>
+              <figcaption><b>Le impostazioni della chat</b>: Visualizzazione, Emote, Menzioni, Account, Guarda, Aggiornamenti.</figcaption></figure>
+          </div>
+        </div>
+      </section>
+
+      <!-- 03 -->
+      <section class="doc" id="streamlink">
+        <header><small>03 · Il motore</small><h2>Che cos'è Streamlink?</h2></header>
+        <div class="blk">
+          <p><a href="https://streamlink.github.io/" target="_blank" rel="noopener">Streamlink</a> è un programma libero a riga di comando. Recupera il flusso video di uno stream e lo invia al tuo lettore. Così guardi Twitch, Kick o YouTube in VLC o mpv, senza la pagina web intorno: meno memoria, niente pubblicità di Twitch e le scorciatoie del tuo lettore.</p>
+          <p>Di solito Streamlink si usa in un terminale:</p>
+          <div class="term"><span class="pr">$ </span>streamlink https://www.twitch.tv/eslcs best</div>
+          <p>Streamlink Launcher scrive questo comando al posto tuo: riconosce la piattaforma, aggiunge le opzioni giuste e la qualità scelta, poi avvia Streamlink. Streamlink Chat lo usa per il suo pulsante ▶.</p>
+        </div>
+        <div class="blk">
+          <h3>Qualità</h3>
+          <p><code>best</code> sceglie la qualità più alta, <code>worst</code> la più bassa, <code>audio_only</code> solo l'audio (Twitch). Puoi anche chiedere una qualità precisa come <code>1080p60</code>, o un elenco di riserva: <code>720p60,720p,best</code> prende la prima disponibile.</p>
+        </div>
+        <div class="blk">
+          <h3>E la pubblicità di Twitch?</h3>
+          <p>Dalla versione 7.5.0, Streamlink filtra sempre la pubblicità degli stream di Twitch. La vecchia opzione <code>--twitch-disable-ads</code> non serve più (è deprecata, ma ancora accettata).</p>
+        </div>
+        <p class="note"><b>Streamlink è un progetto indipendente.</b> Nessuna delle due app lo include: lo installi a parte, una volta sola.</p>
+      </section>
+
+      <!-- 04 -->
+      <section class="doc" id="installare">
+        <header><small>04 · Installazione</small><h2>Dove scaricare Streamlink e come installarlo?</h2></header>
+        <div class="blk">
+          <p>Streamlink è disponibile sul suo sito ufficiale, <a href="https://streamlink.github.io/install.html" target="_blank" rel="noopener">streamlink.github.io/install</a>. Scegli il tuo sistema:</p>
+          <div class="tabs" role="tablist" aria-label="Sistema" data-group="os">
+            <button type="button" role="tab" aria-selected="true" data-tab="win">Windows</button>
+            <button type="button" role="tab" aria-selected="false" data-tab="linux">Linux</button>
+            <button type="button" role="tab" aria-selected="false" data-tab="pip">Python (pip)</button>
+          </div>
+        </div>
+        <div class="pane on blk" data-group="os" data-pane="win">
+          <h3>Windows: il programma di installazione (consigliato)</h3>
+          <ol>
+            <li>Apri la pagina delle <a href="https://github.com/streamlink/windows-builds/releases" target="_blank" rel="noopener">versioni di Streamlink per Windows</a>.</li>
+            <li>Scarica il programma di installazione <code>.exe</code> dell'ultima versione (Windows 10 o successivo, x86_64).</li>
+            <li>Avvialo e segui i passaggi. Aggiunge Streamlink al <code>PATH</code>: il launcher lo trova da solo.</li>
+          </ol>
+          <h3>Oppure con un gestore di pacchetti</h3>
+          <div class="term"><span class="cm"># winget (incluso in Windows 11)</span>
+<span class="pr">&gt; </span>winget install streamlink
+<span class="cm"># Chocolatey</span>
+<span class="pr">&gt; </span>choco install streamlink
+<span class="cm"># Scoop</span>
+<span class="pr">&gt; </span>scoop bucket add extras
+<span class="pr">&gt; </span>scoop install streamlink</div>
+        </div>
+        <div class="pane blk" data-group="os" data-pane="linux">
+          <h3>Linux: il pacchetto della tua distribuzione</h3>
+          <div class="term"><span class="cm"># Fedora</span>
+<span class="pr">$ </span>sudo dnf install streamlink
+<span class="cm"># Arch Linux</span>
+<span class="pr">$ </span>sudo pacman -S streamlink
+<span class="cm"># Debian testing / sid</span>
+<span class="pr">$ </span>sudo apt update &amp;&amp; sudo apt install streamlink</div>
+          <p class="note"><b>Ubuntu e derivate:</b> il sito di Streamlink sconsiglia il pacchetto di Ubuntu, che non è mantenuto. Usa l'installazione con Python (scheda successiva) o l'AppImage di Streamlink, offerta nella stessa pagina.</p>
+          <p>Ti serve anche un lettore, per esempio <code>sudo apt install mpv</code> o <code>sudo dnf install vlc</code>.</p>
+        </div>
+        <div class="pane blk" data-group="os" data-pane="pip">
+          <h3>Con Python (qualsiasi sistema)</h3>
+          <p>Richiede Python 3.10 o successivo.</p>
+          <div class="term"><span class="pr">$ </span>pip install -U streamlink</div>
+          <p>Lo stesso comando aggiorna Streamlink. Su Linux è meglio un ambiente virtuale o <code>pipx install streamlink</code>, per non toccare il Python di sistema.</p>
+        </div>
+        <div class="blk">
+          <h3>Verificare l'installazione</h3>
+          <div class="term"><span class="pr">$ </span>streamlink --version</div>
+          <p>Se il comando mostra un numero di versione, è tutto pronto. Nel <span class="app l">Launcher</span>, <em>Impostazioni › Streamlink</em> mostra anche la versione trovata.</p>
+        </div>
+        <div class="blk">
+          <h3>Streamlink installato altrove? <span class="app l">Launcher</span> <span class="app c">Chat</span></h3>
+          <p>Le app cercano Streamlink nel <code>PATH</code> e nelle posizioni abituali. Se si trova altrove, indica il percorso di <code>streamlink.exe</code> in <em>Impostazioni › Streamlink › Percorso personalizzato</em> (Launcher) o in <em>Impostazioni › Guarda</em> (Chat).</p>
+        </div>
+      </section>
+
+      <!-- 05 -->
+      <section class="doc" id="primi-passi">
+        <header><small>05 · Si comincia</small><h2>Primi passi</h2></header>
+        <div class="blk">
+          <h3>Dove mettere le app <span class="app l">Launcher</span> <span class="app c">Chat</span></h3>
+          <p>Scarica il file dalla pagina delle versioni (<a href="https://github.com/Bulls64/Streamlink-Launcher/releases/latest" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/releases/latest" target="_blank" rel="noopener">Chat</a>) e mettilo in una cartella tua, per esempio <span class="path">Documents\Streamlink</span>. Le impostazioni vengono salvate accanto e l'aggiornamento integrato può sostituire il file. Evita <span class="path">C:\Program Files</span>, che è protetta da scrittura.</p>
+          <p>Su Linux, rendi eseguibile l'AppImage, poi avviala:</p>
+          <div class="term"><span class="pr">$ </span>chmod +x StreamlinkLauncher-*-x86_64.AppImage
+<span class="pr">$ </span>./StreamlinkLauncher-*-x86_64.AppImage</div>
+          <p>Per avere una voce nel menu delle applicazioni, usa uno strumento come <a href="https://flathub.org/apps/it.mijorus.gearlever" target="_blank" rel="noopener">Gear Lever</a> o AppImageLauncher.</p>
+        </div>
+        <div class="blk">
+          <h3>Il tuo primo stream <span class="app l">Launcher</span></h3>
+          <ol class="steps">
+            <li>Assicurati che <a href="#installare">Streamlink</a> e un lettore video siano installati.</li>
+            <li>Scegli la piattaforma con il suo pulsante: Twitch, Kick, YouTube, Dailymotion, Steam TV o <em>Link diretto</em>.</li>
+            <li>Scrivi il nome del canale (<code>eslcs</code>) o incolla un link (<code>https://kick.com/…</code>): un link seleziona la piattaforma da solo.</li>
+            <li>Scegli la qualità se serve, poi <kbd>Invio</kbd> o <em>Avvia</em>. Il lettore si apre dopo qualche secondo.</li>
+            <li>Per seguire o fermare lo stream, apri il <em>Registro</em> in fondo alla finestra: mostra l'output di Streamlink e un pulsante <em>Interrompi</em>.</li>
+          </ol>
+        </div>
+        <div class="blk">
+          <h3>Tre modi più rapidi <span class="app l">Launcher</span></h3>
+          <ul>
+            <li><b>Copiare un link</b>: copia l'indirizzo di uno stream, poi torna al launcher. Ti propone di avviarlo, e il link è già nella barra mini. Si può disattivare in <em>Impostazioni › Streamlink › Rileva i link copiati</em>.</li>
+            <li><b>Trascinare e rilasciare</b> (Windows): trascina sulla finestra l'indirizzo dalla barra del browser, un testo selezionato o un collegamento Internet <code>.url</code>.</li>
+            <li><b>Modalità mini</b> (Windows): <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd> da qualsiasi applicazione, scrivi, <kbd>Invio</kbd>.</li>
+          </ul>
+        </div>
+        <div class="blk">
+          <h3>La tua prima chat <span class="app c">Chat</span></h3>
+          <ol class="steps">
+            <li>Scegli la piattaforma con il suo pulsante, sotto il campo <em>Aggiungi una chat</em>.</li>
+            <li>Scrivi il nome del canale o incolla un link, poi <kbd>Invio</kbd>. <kbd>Ctrl</kbd>+<kbd>T</kbd> porta il cursore in questo campo.</li>
+            <li>La chat si apre in una nuova scheda, in sola lettura. Per scrivere, collega il tuo account (vedi <a href="#scrivere">Scrivere in chat</a>).</li>
+            <li>Nell'intestazione della chat, ▶ apre lo stream con Streamlink e l'icona del link apre il canale nel browser.</li>
+          </ol>
+          <p>Il campo accetta un nome (<code>eslcs</code>), un prefisso (<code>kick:lunaria</code>, <code>steam:nome</code>) o un link: <code>twitch.tv/…</code>, <code>kick.com/…</code>, <code>steam.tv/…</code>, <code>steamcommunity.com/broadcast/watch/…</code>, link «popout» compresi. Le tue schede tornano al prossimo avvio.</p>
+        </div>
+      </section>
+
+      <!-- 06 -->
+      <section class="doc" id="scorciatoie">
+        <header><small>06 · Tastiera e mouse</small><h2>Scorciatoie da tastiera e clic utili</h2></header>
+        <div class="blk">
+          <h3>Finestra principale <span class="app l">Launcher</span></h3>
+          <div class="tbl"><table>
+            <thead><tr><th>Azione</th><th>Tasti</th></tr></thead>
+            <tbody>
+              <tr><td>Avviare lo stream o scegliere il suggerimento evidenziato</td><td><kbd>Invio</kbd></td></tr>
+              <tr><td>Scorrere i suggerimenti (preferiti, poi cronologia)</td><td><kbd>↓</kbd> <kbd>↑</kbd></td></tr>
+              <tr><td>Aprire le impostazioni</td><td><kbd>Ctrl</kbd>+<kbd>,</kbd></td></tr>
+              <tr><td>Chiudere un menu o un pannello</td><td><kbd>Esc</kbd></td></tr>
+              <tr><td>Opzioni di un preferito (avviare, compilare il campo, rimuovere)</td><td>Clic destro sulla sua scheda</td></tr>
+              <tr><td>Aprire la modalità mini, da qualsiasi punto (Windows)</td><td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd></td></tr>
+            </tbody>
+          </table></div>
+          <p>La scorciatoia globale può essere sostituita con <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Spazio</kbd>, <kbd>Ctrl</kbd>+<kbd>Maiusc</kbd>+<kbd>Spazio</kbd>, <kbd>Alt</kbd>+<kbd>Maiusc</kbd>+<kbd>S</kbd> o <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>L</kbd>, in <em>Impostazioni › Finestra e scorciatoia</em>.</p>
+        </div>
+        <div class="blk">
+          <h3>Modalità mini <span class="app l">Launcher</span></h3>
+          <div class="tbl"><table>
+            <thead><tr><th>Azione</th><th>Tasti</th></tr></thead>
+            <tbody>
+              <tr><td>Piattaforma successiva / precedente</td><td><kbd>Tab</kbd> / <kbd>Maiusc</kbd>+<kbd>Tab</kbd></td></tr>
+              <tr><td>Scorrere i suggerimenti</td><td><kbd>↓</kbd> <kbd>↑</kbd></td></tr>
+              <tr><td>Avviare</td><td><kbd>Invio</kbd></td></tr>
+              <tr><td>Chiudere la barra</td><td><kbd>Esc</kbd>, o clic altrove</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+        <div class="blk">
+          <h3>Schede e scrittura <span class="app c">Chat</span></h3>
+          <div class="tbl"><table>
+            <thead><tr><th>Azione</th><th>Tasti</th></tr></thead>
+            <tbody>
+              <tr><td>Aggiungere una chat</td><td><kbd>Ctrl</kbd>+<kbd>T</kbd>, poi un nome o un link e <kbd>Invio</kbd></td></tr>
+              <tr><td>Chat successiva / precedente</td><td><kbd>Ctrl</kbd>+<kbd>Tab</kbd> / <kbd>Ctrl</kbd>+<kbd>Maiusc</kbd>+<kbd>Tab</kbd></td></tr>
+              <tr><td>Chiudere la chat corrente</td><td><kbd>Ctrl</kbd>+<kbd>W</kbd></td></tr>
+              <tr><td>Inviare il messaggio</td><td><kbd>Invio</kbd></td></tr>
+              <tr><td>Richiamare i tuoi messaggi precedenti</td><td><kbd>↑</kbd> <kbd>↓</kbd></td></tr>
+              <tr><td>Completare un nome o un'emote (premi di nuovo per il successivo)</td><td><kbd>Tab</kbd></td></tr>
+              <tr><td>Completare solo i nomi utente</td><td>Inizia con <code>@</code>, poi <kbd>Tab</kbd></td></tr>
+              <tr><td>Copiare testo dalla chat</td><td>Selezionalo con il mouse, poi <kbd>Ctrl</kbd>+<kbd>C</kbd></td></tr>
+              <tr><td>Chiudere un menu o un pannello</td><td><kbd>Esc</kbd></td></tr>
+            </tbody>
+          </table></div>
+        </div>
+        <div class="blk">
+          <h3>Clic nella chat <span class="app c">Chat</span></h3>
+          <div class="tbl"><table>
+            <thead><tr><th>Dove</th><th>Clic</th><th>Cosa fa</th></tr></thead>
+            <tbody>
+              <tr><td>Un nome utente, o un <code>@nome</code> in un messaggio</td><td>Sinistro</td><td><em>Menziona</em> (se hai effettuato l'accesso), <em>Copia il nome</em>, <em>Apri la chat di …</em>, <em>Vedi il canale</em></td></tr>
+              <tr><td>Un messaggio</td><td>Destro</td><td><em>Copia il messaggio</em>, <em>Copia il nome</em></td></tr>
+              <tr><td>Un link</td><td>Sinistro</td><td>Lo apre nel browser</td></tr>
+              <tr><td>Una scheda</td><td>Destro</td><td><em>Guarda con Streamlink</em>, <em>Apri nel browser</em>, <em>Riconnetti</em>, <em>Chiudi la chat</em></td></tr>
+              <tr><td>Una scheda</td><td>Centrale</td><td>Chiude la chat</td></tr>
+              <tr><td><em>Nuovi messaggi</em></td><td>Sinistro</td><td>Torna in fondo. Scorrere verso l'alto nella chat mette in pausa lo scorrimento automatico.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- 07 -->
+      <section class="doc" id="preferiti">
+        <header><small>07 · Ogni giorno</small><h2>Come gestisco cronologia e preferiti?</h2></header>
+        <div class="blk">
+          <h3>Aggiungere un preferito <span class="app l">Launcher</span></h3>
+          <ol>
+            <li>Scegli la piattaforma con il suo pulsante (Twitch, Kick…) e scrivi il nome del canale.</li>
+            <li>Fai clic sulla scheda <em>Aggiungi ai preferiti</em> nella schermata principale.</li>
+          </ol>
+          <p>La schermata principale mostra i preferiti della piattaforma selezionata, prima quelli in diretta. <em>Mostra tutto</em> apre l'elenco completo.</p>
+        </div>
+        <div class="blk">
+          <h3>Avviare, modificare o rimuovere un preferito <span class="app l">Launcher</span></h3>
+          <ul>
+            <li><b>Avviare</b>: fai clic sulla sua scheda.</li>
+            <li><b>Altre opzioni</b>: clic destro sulla scheda, poi <em>Avvia</em>, <em>Compila il campo</em> o <em>Rimuovi dai preferiti</em>.</li>
+            <li><b>Nel pannello Preferiti</b>: un clic su una riga compila il campo, ▶ avvia, il cestino rimuove.</li>
+          </ul>
+        </div>
+        <div class="blk">
+          <h3>Chi è in diretta? <span class="app l">Launcher</span></h3>
+          <p>Con <em>Impostazioni › In diretta › Controlla chi è in diretta</em>, il launcher controlla i tuoi preferiti di Twitch e Kick finché è aperto, ogni 2, 5, 10, 15 o 30 minuti (5 come predefinito). <em>Anteprima delle dirette</em> aggiunge miniatura, titolo e numero di spettatori dei preferiti Twitch in diretta, e <em>Notifica di Windows</em> ti avvisa quando un preferito va in diretta: fai clic sulla notifica per guardarlo.</p>
+        </div>
+        <div class="blk">
+          <h3>Cronologia <span class="app l">Launcher</span></h3>
+          <ul>
+            <li>Vengono conservati gli ultimi 200 avvii. I più recenti compaiono in <em>Recenti</em>; ▶ li riavvia direttamente.</li>
+            <li><em>Cronologia completa</em> apre il pannello: un clic compila il campo, ▶ riavvia, il cestino elimina una voce, <em>Cancella tutto</em> svuota la cronologia.</li>
+            <li>I suggerimenti del campo di inserimento vengono dai tuoi preferiti, poi dalla cronologia: usa <kbd>↓</kbd> <kbd>↑</kbd>, poi <kbd>Invio</kbd>.</li>
+          </ul>
+        </div>
+        <div class="blk">
+          <h3>Fare un backup o passare a un altro PC <span class="app l">Launcher</span></h3>
+          <p><em>Impostazioni › Backup › Esporta…</em> salva impostazioni e preferiti in un unico file. <em>Importa…</em> li ripristina e ti lascia scegliere: <b>Sì</b> aggiunge i preferiti importati ai tuoi, <b>No</b> sostituisce i tuoi preferiti, <b>Annulla</b> non cambia nulla. I percorsi specifici del computer (Streamlink, lettore, script) non sono inclusi, e nemmeno la cronologia.</p>
+        </div>
+        <div class="blk">
+          <h3>E nella chat? <span class="app c">Chat</span></h3>
+          <p>Streamlink Chat non ha preferiti: le chat aperte tornano da sole al prossimo avvio. Chiudi una chat con <kbd>Ctrl</kbd>+<kbd>W</kbd> o con un clic centrale sulla sua scheda. Per aprire sempre le stesse chat in un colpo solo, vedi la ricetta <a href="#ricetta-collegamento">Aprire le tue chat da un collegamento</a>.</p>
+        </div>
+        <div class="blk">
+          <h3>Dove sono i file?</h3>
+          <div class="tbl"><table>
+            <thead><tr><th>App</th><th>File</th><th>Cartella</th></tr></thead>
+            <tbody>
+              <tr><td><span class="app l">Launcher</span></td><td><code>streams/favorites.json</code>, <code>streams/history.json</code>, <code>config.json</code>, <code>platforms.json</code>, <code>launcher.log</code></td><td>Accanto al <code>.exe</code>; altrimenti <span class="path">%APPDATA%\Streamlink Launcher</span> o <span class="path">~/.config/streamlink-launcher</span> (sempre per l'AppImage)</td></tr>
+              <tr><td><span class="app c">Chat</span></td><td><code>chat.json</code> (chat aperte, impostazioni, account), <code>cache/emotes/</code>, <code>chat.log</code></td><td>Accanto al <code>.exe</code>; altrimenti <span class="path">%APPDATA%\Streamlink Chat</span> o <span class="path">~/.config/streamlink-chat</span> (sempre per l'AppImage)</td></tr>
+            </tbody>
+          </table></div>
+          <p>Ogni file ha una copia <code>.bak</code> della versione precedente: se un file si danneggia, l'app lo recupera. Nel <span class="app l">Launcher</span>, <em>Impostazioni › Informazioni › Apri la cartella dei dati</em> apre la cartella giusta.</p>
+        </div>
+      </section>
+
+      <!-- 08 -->
+      <section class="doc" id="scrivere">
+        <header><small>08 · Account</small><h2>Scrivere in chat</h2></header>
+        <p class="lead">Per leggere non serve un account. Per scrivere ti serve una tua applicazione gratuita su ogni piattaforma: così nessun segreto viene distribuito con il programma. Lo fai una volta sola.</p>
+        <div class="blk">
+          <div class="tabs" role="tablist" aria-label="Piattaforma" data-group="acct">
+            <button type="button" role="tab" aria-selected="true" data-tab="twitch">Twitch</button>
+            <button type="button" role="tab" aria-selected="false" data-tab="kick">Kick</button>
+            <button type="button" role="tab" aria-selected="false" data-tab="steam">Steam TV</button>
+          </div>
+        </div>
+        <div class="pane on blk" data-group="acct" data-pane="twitch">
+          <h3>Collegare Twitch <span class="app c">Chat</span></h3>
+          <ol class="steps">
+            <li>Apri <a href="https://dev.twitch.tv/console/apps/create" target="_blank" rel="noopener">dev.twitch.tv/console/apps/create</a> e accedi con il tuo account Twitch. Twitch potrebbe chiederti di attivare l'autenticazione a due fattori per usare la console.</li>
+            <li>Dai un nome all'applicazione, aggiungi l'URL di reindirizzamento <code>http://localhost</code>, scegli la categoria <em>Chat Bot</em> e il tipo di client <b>Public</b>, poi creala.</li>
+            <li>Copia il suo <b>Client ID</b> e incollalo in <em>Impostazioni › Account (per scrivere)</em>.</li>
+            <li>Fai clic su <em>Accedi a Twitch</em>. Si apre una pagina <code>twitch.tv/activate</code>: inserisci il codice mostrato dall'app e autorizzala.</li>
+            <li>L'intestazione delle chat di Twitch passa a <em>Connesso</em>. La connessione si rinnova da sola.</li>
+          </ol>
+          <p>L'app chiede solo due autorizzazioni: leggere e scrivere in chat (<code>chat:read</code>, <code>chat:edit</code>).</p>
+        </div>
+        <div class="pane blk" data-group="acct" data-pane="kick">
+          <h3>Collegare Kick <span class="app c">Chat</span></h3>
+          <ol class="steps">
+            <li>Apri le <a href="https://kick.com/settings/developer" target="_blank" rel="noopener">impostazioni sviluppatore di Kick</a> e crea un'applicazione.</li>
+            <li>Dichiara l'URL di reindirizzamento <code>http://localhost:48125/callback</code> e spunta i permessi <em>read user info</em> e <em>write to chat</em>.</li>
+            <li>Incolla il suo <b>Client ID</b> e il suo <b>Client Secret</b> in <em>Impostazioni › Account (per scrivere)</em>.</li>
+            <li>Fai clic su <em>Accedi a Kick</em>: il browser si apre su Kick, autorizza l'applicazione. Kick ti rimanda a <code>localhost:48125</code>, dove l'app attende la risposta.</li>
+          </ol>
+          <p class="note"><b>La porta 48125 deve essere libera</b> durante l'accesso. Se un altro programma la usa, chiudilo mentre ti colleghi.</p>
+        </div>
+        <div class="pane blk" data-group="acct" data-pane="steam">
+          <h3>Steam TV <span class="app c">Chat</span></h3>
+          <p>Steam non permette di scrivere nella chat di una trasmissione da un altro programma: Steam TV resta in sola lettura, senza account.</p>
+        </div>
+        <div class="blk">
+          <h3>Dove vengono conservati i token? <span class="app c">Chat</span></h3>
+          <ul>
+            <li>In <code>chat.json</code>. Su Windows sono cifrati con DPAPI: solo il tuo account Windows, su questo PC, può rileggerli.</li>
+            <li>Su Linux sono salvati in chiaro nella tua cartella personale. Non condividere questo file.</li>
+            <li>Se copi <code>chat.json</code> su un altro PC, lì i token non potranno essere letti: accedi di nuovo.</li>
+          </ul>
+        </div>
+        <div class="blk">
+          <h3>Disconnettersi e revocare l'accesso <span class="app c">Chat</span></h3>
+          <ul>
+            <li><em>Disconnetti</em>, in <em>Impostazioni › Account</em>, elimina i token dal tuo PC.</li>
+            <li>Per revocare l'accesso anche dal lato di Twitch, apri <a href="https://www.twitch.tv/settings/connections" target="_blank" rel="noopener">Impostazioni › Connessioni</a> su Twitch e scollega la tua applicazione.</li>
+            <li>Dal lato di Kick, elimina l'applicazione nelle impostazioni sviluppatore.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 09 -->
+      <section class="doc" id="piattaforme">
+        <header><small>09 · Sotto il cofano</small><h2>Emote e piattaforme</h2></header>
+        <div class="blk">
+          <h3>Da dove vengono le emote? <span class="app c">Chat</span></h3>
+          <div class="tbl"><table>
+            <thead><tr><th>Fonte</th><th>Twitch</th><th>Kick</th><th>Steam TV</th></tr></thead>
+            <tbody>
+              <tr><td>Emote della piattaforma</td><td>Sì</td><td>Sì</td><td>Emoticon di Steam</td></tr>
+              <tr><td>BetterTTV</td><td>Globali e del canale</td><td>No</td><td>No</td></tr>
+              <tr><td>FrankerFaceZ</td><td>Globali e del canale</td><td>No</td><td>No</td></tr>
+              <tr><td>7TV</td><td>Globali e del canale</td><td>Del canale</td><td>No</td></tr>
+            </tbody>
+          </table></div>
+          <p>Ogni fornitore si può attivare o disattivare in <em>Impostazioni › Emote</em>. Gli elenchi vengono caricati dai loro server all'apertura di una chat.</p>
+        </div>
+        <div class="blk">
+          <h3>Formati, animazioni e cache <span class="app c">Chat</span></h3>
+          <ul>
+            <li>Tk, la libreria grafica, mostra solo PNG e GIF: un'emote offerta solo in WebP o AVIF resta come testo.</li>
+            <li>Le emote animate si muovono solo nella chat visualizzata, con al massimo 40 fotogrammi ciascuna. <em>Impostazioni › Visualizzazione › Emote animate</em> le blocca tutte.</li>
+            <li>Le immagini scaricate vengono conservate in <code>cache/emotes/</code> per non scaricarle di nuovo. Questa cartella non viene mai svuotata automaticamente: puoi eliminarla a chat chiusa, viene ricostruita quando serve.</li>
+          </ul>
+        </div>
+        <div class="blk">
+          <h3>Come viene letta ogni piattaforma</h3>
+          <div class="tbl"><table>
+            <thead><tr><th>Piattaforma</th><th>Chat: lettura</th><th>Chat: scrittura</th><th>Launcher: chi è in diretta</th></tr></thead>
+            <tbody>
+              <tr><td>Twitch</td><td>IRC su WebSocket, senza account</td><td>IRC con il tuo token</td><td>Accesso web pubblico di Twitch (non ufficiale)</td></tr>
+              <tr><td>Kick</td><td>Chat in tempo reale di Kick (Centrifugo), con la vecchia connessione Pusher come riserva. <b>Sperimentale</b></td><td>API ufficiale di Kick</td><td>Streamlink (<code>streamlink --json</code>)</td></tr>
+              <tr><td>Steam TV</td><td>API web delle trasmissioni di Steam, non documentata</td><td>Non possibile</td><td>No</td></tr>
+              <tr><td>YouTube, Dailymotion, link diretto</td><td>—</td><td>—</td><td>No</td></tr>
+            </tbody>
+          </table></div>
+          <p>Questi canali non ufficiali possono cambiare senza preavviso. Quando succede, lo stato della diretta resta sconosciuto o la chat va in errore finché l'app non viene aggiornata.</p>
+        </div>
+        <div class="blk">
+          <h3>Cosa mostra la chat <span class="app c">Chat</span></h3>
+          <ul>
+            <li>Badge (streamer, moderatore, VIP, abbonato…) e colori dei nomi adattati per restare leggibili sul tema.</li>
+            <li>Risposte, abbonamenti e altri eventi. I messaggi eliminati e quelli degli utenti bannati appaiono barrati.</li>
+            <li>I messaggi che citano il tuo nome o una parola di <em>Impostazioni › Menzioni</em> vengono evidenziati, e la loro scheda lo segnala.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 10 -->
+      <section class="doc" id="ricette">
+        <header><small>10 · Ricette</small><h2>Ricette per fare prima</h2></header>
+        <div class="blk" id="ricetta-lettore">
+          <h3>Scegliere il lettore del pulsante ▶ <span class="app c">Chat</span></h3>
+          <p>La chat avvia Streamlink senza alcuna opzione per il lettore, quindi Streamlink usa quello del suo file di configurazione, VLC come predefinito. Per passare a mpv, crea questo file (senza estensione) e aggiungi:</p>
+          <div class="term"><span class="fn">config</span>player=mpv
+player-args=--force-window=immediate</div>
+          <div class="tbl"><table>
+            <thead><tr><th>Sistema</th><th>File di configurazione di Streamlink</th></tr></thead>
+            <tbody>
+              <tr><td>Windows</td><td><span class="path">%APPDATA%\streamlink\config</span></td></tr>
+              <tr><td>Linux</td><td><span class="path">~/.config/streamlink/config</span></td></tr>
+            </tbody>
+          </table></div>
+          <p>Se mpv non è nel <code>PATH</code>, metti il suo percorso completo dopo <code>player=</code>. Il <span class="app l">Launcher</span> usa questo file anche quando <em>Impostazioni › Lettore video</em> è su <em>Predefinito (impostazione di Streamlink)</em>.</p>
+        </div>
+        <div class="blk">
+          <h3>Guardare con meno ritardo</h3>
+          <p>Streamlink ha una modalità a bassa latenza per Twitch e Kick. Il modo più semplice è attivarla per una sola piattaforma, con un file di configurazione per il suo plugin, accanto al file <code>config</code>:</p>
+          <div class="term"><span class="fn">config.twitch</span>twitch-low-latency</div>
+          <div class="term"><span class="fn">config.kick</span>kick-low-latency</div>
+          <p>Funziona con entrambe le app. Il guadagno dipende dallo streamer, che deve aver attivato la bassa latenza; la riproduzione potrebbe andare in buffering un po' più spesso.</p>
+        </div>
+        <div class="blk">
+          <h3>Registrare uno stream mentre lo guardi</h3>
+          <p>In un terminale, <code>--record</code> scrive lo stream in un file mentre lo guardi:</p>
+          <div class="term"><span class="pr">$ </span>streamlink --record "{author}-{time:%Y%m%d-%H%M}.ts" https://www.twitch.tv/eslcs best</div>
+          <p><code>{author}</code> diventa il nome del canale e <code>{time:…}</code> la data e l'ora. Apri il file <code>.ts</code> con VLC o mpv.</p>
+          <p><span class="app l">Launcher</span> Per farlo dal launcher, aggiungi una piattaforma dedicata in <code>platforms.json</code> (il link <em>Modifica platforms.json</em> in fondo alle impostazioni), con un percorso completo verso la tua cartella dei video:</p>
+          <div class="term"><span class="fn">platforms.json (una voce in più nell'elenco "platforms")</span>{
+  "id": "twitch-rec",
+  "name": "Twitch REC",
+  "input": "channel",
+  "url": "https://www.twitch.tv/{arg}",
+  "hosts": [],
+  "args": ["--record", "C:\\Users\\tu\\Videos\\{author}-{time:%Y%m%d-%H%M}.ts"],
+  "qualities": ["best", "1080p60", "720p60", "480p"],
+  "color": "#E91916",
+  "text_color": "#FFFFFF",
+  "live_check": "none"
+}</div>
+          <p>Riavvia il launcher: compare un pulsante <em>Twitch REC</em>. <code>hosts</code> resta vuoto perché i link di Twitch incollati continuino ad andare al normale pulsante Twitch. In JSON, ogni <code>\</code> di un percorso Windows si scrive <code>\\</code>.</p>
+        </div>
+        <div class="blk">
+          <h3>Mai più «qualità non trovata»</h3>
+          <p>Non tutti i canali offrono tutte le qualità. <span class="app l">Launcher</span> Nell'elenco delle qualità, scegli <em>Personalizzata…</em> e inserisci un elenco di riserva come <code>720p60,720p,best</code>: Streamlink prende la prima che esiste e il launcher la ricorda per questa piattaforma. <span class="app c">Chat</span> La qualità del pulsante ▶ si sceglie da un elenco fisso; tieni <code>best</code> se guardi canali molto diversi.</p>
+        </div>
+        <div class="blk" id="ricetta-collegamento">
+          <h3>Aprire le tue chat da un collegamento <span class="app c">Chat</span></h3>
+          <p>Streamlink Chat accetta le chat come argomenti. Crea un collegamento di Windows (clic destro sul desktop › <em>Nuovo › Collegamento</em>) con una destinazione come:</p>
+          <div class="term">"C:\Users\tu\Documents\Streamlink\StreamlinkChat.exe" --open twitch:eslcs --open kick:lunaria</div>
+          <p>Se la chat è già aperta, queste chat vengono aggiunte alla finestra esistente. Anche un link di canale funziona come argomento.</p>
+          <p class="tip"><b>Suggerimento:</b> prima rinomina l'eseguibile senza numero di versione, per esempio <code>StreamlinkChat.exe</code>. Un file che porta la sua versione nel nome cambia nome a ogni aggiornamento e il collegamento non lo troverebbe più. Un nome senza versione viene mantenuto.</p>
+        </div>
+        <div class="blk">
+          <h3>Avviare il launcher ridotto a icona <span class="app l">Launcher</span></h3>
+          <p><em>Impostazioni › Finestra e scorciatoia › Avvia con Windows</em> lo avvia nell'area di notifica. Puoi fare lo stesso con un tuo collegamento aggiungendo <code>--tray</code> dopo il percorso dell'eseguibile.</p>
+        </div>
+        <div class="blk">
+          <h3>Tenere i tuoi vecchi script <code>.bat</code> <span class="app l">Launcher</span></h3>
+          <p>Se prima avviavi gli stream con degli script, attiva <em>Impostazioni › Avanzate › Mostra gli script .bat</em> e scegli la <em>Cartella degli script</em>. Un pulsante <em>Script</em> elenca i file <code>.bat</code>, <code>.cmd</code>, <code>.ps1</code>, <code>.exe</code>, <code>.py</code> e <code>.lnk</code> di quella cartella. Il campo permette di passare un argomento allo script (solo lettere, cifre, <code>.</code>, <code>_</code> e <code>-</code>).</p>
+        </div>
+      </section>
+
+      <!-- 11 -->
+      <section class="doc" id="aggiornamenti">
+        <header><small>11 · Aggiornamenti</small><h2>Come aggiorno l'app?</h2></header>
+        <div class="blk">
+          <h3>Il launcher <span class="app l">Launcher</span></h3>
+          <ol>
+            <li>Apri <em>Impostazioni › Informazioni</em>: la scheda mostra la tua versione e l'ultima pubblicata su GitHub.</li>
+            <li>Se esiste una versione più recente, fai clic su <em>Aggiorna</em>. Il launcher scarica il nuovo <code>.exe</code>, ne verifica dimensione e impronta SHA-256, lo mette al posto del vecchio e si riavvia.</li>
+          </ol>
+          <ul>
+            <li><em>Cerca aggiornamenti all'avvio</em> fa il controllo da solo.</li>
+            <li><em>Aggiorna il launcher automaticamente</em> installa anche la nuova versione all'avvio, mai durante uno stream.</li>
+            <li>Un file che porta la sua versione nel nome (<code>StreamlinkLauncher-1.4.2.exe</code>) prende il nuovo numero; l'avvio con Windows segue il nuovo nome.</li>
+          </ul>
+        </div>
+        <div class="blk">
+          <h3>La chat <span class="app c">Chat</span></h3>
+          <p>Stessa idea in <em>Impostazioni › Aggiornamenti</em>: <em>Verifica</em>, poi <em>Aggiorna</em>. La chat si riavvia con le tue chat aperte. Un punto sul pulsante delle impostazioni segnala una nuova versione, e <em>Aggiornamenti automatici</em> (disattivato come predefinito) fa tutto da solo all'avvio.</p>
+        </div>
+        <p class="note"><b>AppImage o codice sorgente:</b> l'aggiornamento con un clic vale solo per il <code>.exe</code> di Windows messo in una cartella scrivibile (non <span class="path">C:\Program Files</span>). Con l'AppImage, <em>Aggiorna</em> apre la pagina della versione: scarica la nuova AppImage e sostituisci la vecchia. Dal codice sorgente, esegui <code>git pull</code>.</p>
+        <div class="blk">
+          <h3>Aggiornare Streamlink stesso</h3>
+          <p>Il launcher confronta la tua versione di Streamlink con l'ultima pubblicata. Se la tua è più vecchia, la scheda <em>Impostazioni › Streamlink</em> propone <em>Aggiorna</em>: con il programma di installazione di Windows apre la pagina di download, con pip copia il comando <code>pip install -U streamlink</code>. Con winget, Chocolatey, Scoop o la tua distribuzione Linux, usa il loro solito comando di aggiornamento (<code>winget upgrade streamlink</code>, per esempio).</p>
+        </div>
+        <div class="blk">
+          <h3>Cosa c'è di nuovo?</h3>
+          <div class="tbl"><table>
+            <thead><tr><th>App</th><th>Ultima versione</th><th>In breve</th></tr></thead>
+            <tbody>
+              <tr><td><span class="app l">Launcher</span></td><td>1.5.1 (24 ottobre 2026)</td><td>Codice di condotta, commenti in inglese nel codice. Nessun cambiamento di comportamento.</td></tr>
+              <tr><td><span class="app c">Chat</span></td><td>0.2.1 (24 ottobre 2026)</td><td>Pulsanti delle piattaforme nel campo di aggiunta, molta meno memoria con le emote animate, 500 messaggi conservati come predefinito, file delle impostazioni leggibile solo da te (Linux), messaggio chiaro quando la porta di accesso a Kick è occupata.</td></tr>
+            </tbody>
+          </table></div>
+          <p>I dettagli di ogni versione sono nel registro delle modifiche, in inglese e francese: <a href="https://github.com/Bulls64/Streamlink-Launcher/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Chat</a>. I download sono nelle pagine delle versioni: <a href="https://github.com/Bulls64/Streamlink-Launcher/releases" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/releases" target="_blank" rel="noopener">Chat</a>.</p>
+        </div>
+      </section>
+
+      <!-- 12 -->
+      <section class="doc" id="impostazioni">
+        <header><small>12 · Impostazioni</small><h2>Altre domande sulle impostazioni</h2></header>
+        <div class="faqs">
+          <details class="faq"><summary>Come scelgo il lettore video? <span class="app l">Launcher</span></summary><div class="a">
+            <p><em>Impostazioni › Lettore video</em>: scegli VLC, mpv, PotPlayer o un altro programma e indica il suo percorso se non viene trovato. <em>Argomenti del lettore</em> aggiunge opzioni, per esempio <code>--fullscreen</code>. <em>Predefinito (impostazione di Streamlink)</em> lascia decidere a Streamlink (vedi <a href="#ricetta-lettore">la ricetta</a>).</p></div></details>
+          <details class="faq"><summary>Come cambio la qualità predefinita? <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
+            <p>Nel launcher, l'elenco accanto al campo ricorda la qualità <b>per piattaforma</b>; <em>Personalizzata…</em> accetta una qualità precisa o un elenco di riserva. Nella chat è <em>Impostazioni › Guarda › Qualità</em>, usata dal pulsante ▶.</p></div></details>
+          <details class="faq"><summary>Come cambio la scorciatoia della modalità mini? <span class="app l">Launcher</span></summary><div class="a">
+            <p><em>Impostazioni › Finestra e scorciatoia</em>: attiva o disattiva <em>Scorciatoia globale</em> e scegli una combinazione diversa da <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd>. Lì viene mostrato anche lo stato della scorciatoia.</p></div></details>
+          <details class="faq"><summary>Il launcher può restare attivo in background? <span class="app l">Launcher</span></summary><div class="a">
+            <p>Sì: con <em>Riduci a icona nell'area di notifica</em>, chiudere la finestra lascia il launcher accanto all'orologio, con i tuoi stream e il controllo delle dirette. Clic destro sull'icona per riaprire la finestra, aprire la modalità mini, avviare un preferito in diretta o <em>Esci</em>. <em>Avvia con Windows</em> lo avvia ridotto a icona.</p></div></details>
+          <details class="faq"><summary>Come disattivo il rilevamento dei link copiati? <span class="app l">Launcher</span></summary><div class="a">
+            <p>Togli la spunta da <em>Rileva i link copiati</em> in <em>Impostazioni › Streamlink</em>. Gli appunti vengono letti solo sul tuo computer; nulla viene salvato o inviato.</p></div></details>
+          <details class="faq"><summary>Posso togliere i colori delle piattaforme? <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
+            <p>Sì: <em>Colori per piattaforma</em> in <em>Impostazioni › Generale</em> (Launcher) o <em>Impostazioni › Visualizzazione</em> (Chat).</p></div></details>
+          <details class="faq"><summary>Come aggiungo una piattaforma? <span class="app l">Launcher</span></summary><div class="a">
+            <p>Il link <em>Modifica platforms.json</em>, in fondo al pannello delle impostazioni, apre il file. Ogni voce indica:</p>
+            <ul>
+              <li><code>id</code> e <code>name</code>: un identificatore unico e il nome del pulsante;</li>
+              <li><code>input</code>: <code>channel</code>, <code>youtube</code>, <code>video</code>, <code>url</code> (qualsiasi link) o <code>none</code> (niente da scrivere);</li>
+              <li><code>url</code>: il modello dell'indirizzo, dove <code>{arg}</code> viene sostituito da ciò che scrivi;</li>
+              <li><code>hosts</code>: i domini che selezionano questo pulsante quando incolli un link;</li>
+              <li><code>args</code>: opzioni aggiuntive di Streamlink;</li>
+              <li><code>qualities</code>, <code>color</code>, <code>text_color</code>;</li>
+              <li><code>live_check</code>: <code>twitch</code>, <code>streamlink</code> o <code>none</code>.</li>
+            </ul>
+            <p>Salva, poi riavvia il launcher per vedere il nuovo pulsante. Un esempio completo si trova nella ricetta <em>Registrare uno stream</em>.</p></div></details>
+          <details class="faq"><summary>Come scrivo in una chat? <span class="app c">Chat</span></summary><div class="a">
+            <p>Collega il tuo account Twitch o Kick in <em>Impostazioni › Account (per scrivere)</em>. I passaggi sono spiegati in <a href="#scrivere">Scrivere in chat</a>.</p></div></details>
+          <details class="faq"><summary>Quali opzioni di visualizzazione offre la chat? <span class="app c">Chat</span></summary><div class="a">
+            <p><em>Impostazioni › Visualizzazione</em>: lingua, tema, dimensione del testo, ora dei messaggi, badge, emote animate, colori per piattaforma e numero di messaggi conservati per chat (500, 1000, 2000 o 5000). <em>Emote</em> attiva o disattiva BetterTTV, FrankerFaceZ e 7TV. <em>Menzioni</em> evidenzia i messaggi che citano il tuo nome o parole a tua scelta, separate da virgole.</p></div></details>
+        </div>
+      </section>
+
+      <!-- 13 -->
+      <section class="doc" id="riservatezza">
+        <header><small>13 · Privacy</small><h2>Dati e privacy</h2></header>
+        <p class="lead">Nessuna delle due app raccoglie dati o invia statistiche. Ecco tutto ciò che contattano, e perché.</p>
+        <div class="blk">
+          <h3>Cosa contatta il launcher <span class="app l">Launcher</span></h3>
+          <div class="tbl"><table>
+            <thead><tr><th>Quando</th><th>Dove</th><th>Disattivabile</th></tr></thead>
+            <tbody>
+              <tr><td>Stato della diretta dei preferiti Twitch</td><td>Accesso web pubblico di Twitch; immagini di anteprima dal server di immagini di Twitch</td><td>Sì (<em>In diretta</em>)</td></tr>
+              <tr><td>Stato della diretta dei preferiti Kick</td><td>Kick, tramite <code>streamlink --json</code></td><td>Sì (<em>In diretta</em>)</td></tr>
+              <tr><td>Ricerca di aggiornamenti</td><td>PyPI (versione di Streamlink) e <code>api.github.com</code> (versione del launcher)</td><td>Sì</td></tr>
+              <tr><td>Installazione di un aggiornamento</td><td><code>github.com</code>, solo quando fai clic su <em>Aggiorna</em> (o con gli aggiornamenti automatici)</td><td>Sì</td></tr>
+              <tr><td>Guardare uno stream</td><td>Streamlink contatta la piattaforma dello stream</td><td>—</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+        <div class="blk">
+          <h3>Cosa contatta la chat <span class="app c">Chat</span></h3>
+          <div class="tbl"><table>
+            <thead><tr><th>Quando</th><th>Dove</th><th>Disattivabile</th></tr></thead>
+            <tbody>
+              <tr><td>Leggere una chat</td><td>IRC di Twitch, <code>kick.com</code> / <code>web.kick.com</code> e il server in tempo reale di Kick, <code>steamcommunity.com</code></td><td>—</td></tr>
+              <tr><td>Mostrare le emote</td><td>Twitch, Kick, Steam, BetterTTV, FrankerFaceZ, 7TV</td><td>Sì, per fornitore</td></tr>
+              <tr><td>Scrivere</td><td>Le API ufficiali di accesso e di chat di Twitch e Kick</td><td>Non accedere</td></tr>
+              <tr><td>Aggiornamenti</td><td><code>api.github.com</code>, poi <code>github.com</code> per il download</td><td>Sì</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+        <div class="blk">
+          <h3>Cosa resta sul tuo PC</h3>
+          <ul>
+            <li><b>Impostazioni, preferiti, cronologia, chat aperte</b>: nei file descritti in <a href="#preferiti">Dove sono i file</a>, da nessun'altra parte.</li>
+            <li><b>Token di accesso</b> (Chat): cifrati con DPAPI su Windows, in chiaro nella tua cartella personale su Linux.</li>
+            <li><b>Appunti</b> (Launcher): letti solo per riconoscere un link di stream; né salvati né inviati.</li>
+            <li><b>Log</b>: <code>launcher.log</code> e <code>chat.log</code> annotano gli errori (due file da 512 KB al massimo ciascuno). Restano sul tuo PC, a meno che tu non li alleghi a una segnalazione.</li>
+            <li><b>Registro di Windows</b> (Launcher): un solo valore, <code>StreamlinkLauncher</code> in <span class="path">HKCU\Software\Microsoft\Windows\CurrentVersion\Run</span>, e solo se <em>Avvia con Windows</em> è attivo.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 14 -->
+      <section class="doc" id="risoluzione-problemi">
+        <header><small>14 · Risoluzione dei problemi</small><h2>Risoluzione dei problemi (FAQ)</h2></header>
+        <div class="faqs">
+          <details class="faq"><summary>«Streamlink non trovato» <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
+            <p>Installa Streamlink (vedi <a href="#installare">Installare Streamlink</a>), poi riavvia l'app. Se è installato altrove, indica il percorso di <code>streamlink.exe</code> nelle impostazioni. Verifica in un terminale che <code>streamlink --version</code> risponda.</p></div></details>
+          <details class="faq"><summary>Lo stream non parte <span class="app l">Launcher</span></summary><div class="a">
+            <p>Apri il pannello del registro in fondo alla finestra: lì compare il messaggio di errore di Streamlink. Le cause più comuni:</p>
+            <ul>
+              <li><code>No playable streams found</code>: il canale è offline, o il nome è scritto male.</li>
+              <li>La qualità richiesta non esiste per questo stream: scegli <code>best</code> o un <a href="#streamlink">elenco di riserva</a> con <em>Personalizzata…</em>.</li>
+              <li>Il lettore video non viene trovato: indica il suo percorso in <em>Impostazioni › Lettore video</em>.</li>
+            </ul></div></details>
+          <details class="faq"><summary>Lo stream scatta o si interrompe <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
+            <p>Prova una qualità più bassa (<code>720p</code>, <code>480p</code>): richiede meno banda. Se hai attivato la bassa latenza, toglila. I messaggi del registro dicono se Streamlink sta aspettando dati.</p></div></details>
+          <details class="faq"><summary>C'è l'audio, ma non il video <span class="app l">Launcher</span></summary><div class="a">
+            <p>Verifica che la qualità scelta non sia <code>audio_only</code>. Altrimenti aggiorna il lettore; con mpv, l'opzione <code>--force-window=immediate</code> apre subito la finestra.</p></div></details>
+          <details class="faq"><summary>Windows mostra «Windows ha protetto il PC» <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
+            <p>Gli eseguibili non hanno ancora una firma del codice, quindi SmartScreen avvisa al primo avvio. Non è un rilevamento.</p>
+            <ol>
+              <li>Verifica il file: in PowerShell, <code>Get-FileHash .\StreamlinkLauncher-1.5.1.exe</code>, e confronta con il <code>SHA256SUMS.txt</code> della versione.</li>
+              <li>Fai clic su <em>Ulteriori informazioni</em>, poi su <em>Esegui comunque</em>.</li>
+              <li>Se con il doppio clic non succede nulla: clic destro › <em>Proprietà</em> › spunta <em>Annulla blocco</em>, oppure <code>Unblock-File .\StreamlinkLauncher-1.5.1.exe</code>.</li>
+            </ol></div></details>
+          <details class="faq"><summary>Il mio antivirus blocca o elimina l'exe <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
+            <p>I programmi creati con PyInstaller vengono talvolta segnalati per errore. Verifica lo SHA-256, ripristina il file dalla quarantena, aggiungi la sua cartella alle esclusioni e segnala il falso positivo (Microsoft Defender: <a href="https://www.microsoft.com/wdsi/filesubmission" target="_blank" rel="noopener">invia un file</a>, categoria <em>Incorrectly detected as malware</em>). Puoi anche avviare l'app dal codice sorgente.</p></div></details>
+          <details class="faq"><summary><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd> non fa nulla <span class="app l">Launcher</span></summary><div class="a">
+            <p>Probabilmente un'altra applicazione usa questa scorciatoia. Il launcher ti avvisa all'avvio; scegline un'altra in <em>Impostazioni › Finestra e scorciatoia</em>. Ogni pressione ricevuta viene annotata nel registro. La scorciatoia globale esiste solo su Windows.</p></div></details>
+          <details class="faq"><summary>L'app non si apre una seconda volta <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
+            <p>È voluto: di ogni app gira una sola copia alla volta. Il launcher è probabilmente nell'area di notifica, accanto all'orologio. Per la chat, riaprirla invia le sue chat alla finestra già aperta.</p></div></details>
+          <details class="faq"><summary>«La cartella del launcher è protetta da scrittura» <span class="app l">Launcher</span></summary><div class="a">
+            <p>Il launcher non può scrivere accanto al suo <code>.exe</code> (per esempio in <span class="path">C:\Program Files</span>). Salva allora i suoi dati in <span class="path">%APPDATA%\Streamlink Launcher</span>. Tutto funziona, ma l'aggiornamento integrato non potrà sostituire il file: spostalo in una cartella tua.</p></div></details>
+          <details class="faq"><summary>L'AppImage non si avvia <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
+            <ul>
+              <li>Rendila eseguibile: <code>chmod +x</code> seguito dal nome del file.</li>
+              <li>Messaggio su FUSE: installa <code>libfuse2</code>, oppure avviala con <code>--appimage-extract-and-run</code>.</li>
+              <li>Errore su <code>GLIBC</code>: il tuo sistema è troppo vecchio (glibc 2.35 come minimo). Avvia l'app dal codice sorgente.</li>
+            </ul></div></details>
+          <details class="faq"><summary>Una chat di Kick resta in errore <span class="app c">Chat</span></summary><div class="a">
+            <p>Kick ha cambiato il suo sistema di chat il 13 ottobre 2026 e non lo documenta: il supporto è sperimentale, e la protezione anti-bot di Kick può bloccare alcune richieste (<em>Kick blocca la richiesta</em>). Clic destro sulla scheda › <em>Riconnetti</em>, oppure chiudi e riapri la chat. Se l'errore persiste, <a href="https://github.com/Bulls64/Streamlink-Chat/issues" target="_blank" rel="noopener">apri una segnalazione</a> con <code>chat.log</code>.</p></div></details>
+          <details class="faq"><summary>«Canale non trovato» <span class="app c">Chat</span></summary><div class="a">
+            <p>Controlla l'ortografia e la piattaforma selezionata: un nome scritto da solo va al pulsante selezionato. Incolla piuttosto il link del canale, che seleziona la piattaforma da solo.</p></div></details>
+          <details class="faq"><summary>La chat di Steam TV resta vuota <span class="app c">Chat</span></summary><div class="a">
+            <p>La chat esiste solo durante una trasmissione. Finché è offline, Streamlink Chat ricontrolla ogni 30 secondi e mostra i messaggi appena inizia la trasmissione.</p></div></details>
+          <details class="faq"><summary>Non riesco a scrivere in chat <span class="app c">Chat</span></summary><div class="a">
+            <p>Devi collegare il tuo account (vedi <a href="#scrivere">Scrivere in chat</a>). Steam TV resta in sola lettura. Su Twitch, verifica anche di non essere bannato dalla chat e che la stanza non sia riservata agli abbonati.</p></div></details>
+          <details class="faq"><summary>L'accesso a Kick non si completa <span class="app c">Chat</span></summary><div class="a">
+            <ul>
+              <li>Verifica che l'URL di reindirizzamento della tua applicazione Kick sia esattamente <code>http://localhost:48125/callback</code>.</li>
+              <li>Verifica Client ID e Client Secret (senza spazi in più).</li>
+              <li>La porta 48125 deve essere libera e il firewall non deve bloccare le connessioni locali.</li>
+            </ul></div></details>
+          <details class="faq"><summary>Devo accedere di nuovo dopo aver cambiato PC <span class="app c">Chat</span></summary><div class="a">
+            <p>È normale: su Windows i token sono cifrati per il tuo account su questo PC. Copiati altrove, non possono essere letti. Accedi di nuovo in <em>Impostazioni › Account</em>.</p></div></details>
+          <details class="faq"><summary>Alcune emote compaiono come testo <span class="app c">Chat</span></summary><div class="a">
+            <p>Tk mostra solo PNG e GIF. Un'emote offerta solo in WebP o AVIF resta come testo. Verifica anche che il suo fornitore (BetterTTV, FrankerFaceZ, 7TV) sia attivo in <em>Impostazioni › Emote</em> e che sia disponibile per questa piattaforma (vedi <a href="#piattaforme">Emote e piattaforme</a>).</p></div></details>
+          <details class="faq"><summary>La chat usa molta memoria <span class="app c">Chat</span></summary><div class="a">
+            <p>Le emote animate sono le più pesanti. Dalla 0.2.1 si animano solo nella chat visualizzata e la cache è limitata. Puoi ridurre ancora la memoria disattivando <em>Emote animate</em> o conservando 500 messaggi per chat (<em>Impostazioni › Visualizzazione</em>).</p></div></details>
+          <details class="faq"><summary>L'aggiornamento integrato non riesce <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
+            <p>L'app deve poter sostituire il proprio file: metti il <code>.exe</code> in una cartella tua (per esempio <span class="path">Documents\Streamlink</span>), non in <span class="path">C:\Program Files</span>. In caso di errore viene ripristinata la vecchia versione; puoi sempre scaricare la nuova dalla pagina delle versioni.</p></div></details>
+          <details class="faq"><summary>Un file di impostazioni è danneggiato <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
+            <p>All'avvio l'app prova la sua copia <code>.bak</code> e, per il launcher, mette da parte il file danneggiato come <code>.corrupt</code> e ti avvisa. Per ripartire da zero, chiudi l'app e rinomina il file in questione: verrà ricreato con le impostazioni predefinite.</p></div></details>
+        </div>
+        <p class="empty" id="empty" hidden>Nessun risultato. Prova un'altra parola o <a href="https://github.com/Bulls64/Streamlink-Launcher/issues" target="_blank" rel="noopener">fai la tua domanda su GitHub</a>.</p>
+      </section>
+
+      <!-- 15 -->
+      <section class="doc" id="disinstallare">
+        <header><small>15 · Disinstallazione</small><h2>Disinstallare senza lasciare tracce</h2></header>
+        <p class="lead">Le app non installano nulla: basta eliminare i loro file. Qualche precauzione evita residui.</p>
+        <div class="blk">
+          <h3>Il launcher su Windows <span class="app l">Launcher</span></h3>
+          <ol class="steps">
+            <li>Se <em>Avvia con Windows</em> è attivo, disattivalo prima in <em>Impostazioni › Finestra e scorciatoia</em>.</li>
+            <li>Annota dove sono i tuoi dati: <em>Impostazioni › Informazioni › Apri la cartella dei dati</em>. Se vuoi tenere i preferiti, fai un <em>Esporta…</em>.</li>
+            <li>Chiudi il launcher: clic destro sulla sua icona accanto all'orologio › <em>Esci</em>.</li>
+            <li>Elimina il <code>.exe</code>, poi la cartella dei dati (<code>config.json</code>, <code>platforms.json</code>, <code>streams/</code>, <code>launcher.log</code> e i file <code>.bak</code>), accanto al <code>.exe</code> o in <span class="path">%APPDATA%\Streamlink Launcher</span>.</li>
+          </ol>
+          <p class="tip"><b>Già eliminato senza disattivare l'avvio?</b> Disattiva la voce in Gestione attività › <em>App di avvio</em>, oppure elimina il valore <code>StreamlinkLauncher</code> da <span class="path">HKCU\Software\Microsoft\Windows\CurrentVersion\Run</span>.</p>
+        </div>
+        <div class="blk">
+          <h3>La chat su Windows <span class="app c">Chat</span></h3>
+          <ol class="steps">
+            <li>In <em>Impostazioni › Account</em>, fai clic su <em>Disconnetti</em> per ogni account, poi revoca l'accesso dal lato di Twitch o Kick se vuoi (vedi <a href="#scrivere">Scrivere in chat</a>).</li>
+            <li>Chiudi la chat.</li>
+            <li>Elimina il <code>.exe</code>, <code>chat.json</code> e il suo <code>.bak</code>, la cartella <code>cache/</code> e <code>chat.log</code>, accanto al <code>.exe</code> o in <span class="path">%APPDATA%\Streamlink Chat</span>.</li>
+          </ol>
+        </div>
+        <div class="blk">
+          <h3>Su Linux <span class="app l">Launcher</span> <span class="app c">Chat</span></h3>
+          <p>Elimina l'AppImage, poi le cartelle dei dati:</p>
+          <div class="term"><span class="pr">$ </span>rm -r ~/.config/streamlink-launcher ~/.config/streamlink-chat</div>
+          <p>Se hai creato una voce di menu con Gear Lever o AppImageLauncher, rimuovila da quello strumento.</p>
+        </div>
+        <div class="blk">
+          <h3>E Streamlink?</h3>
+          <p>Si disinstalla a parte, nello stesso modo in cui l'hai installato: <em>Impostazioni di Windows › App</em> per il programma di installazione, <code>winget uninstall streamlink</code>, <code>pip uninstall streamlink</code> o il gestore di pacchetti della tua distribuzione. Il suo file di configurazione si trova in <span class="path">%APPDATA%\streamlink</span> o <span class="path">~/.config/streamlink</span>.</p>
+        </div>
+      </section>
+
+      <!-- 16 -->
+      <section class="doc" id="segnalare">
+        <header><small>16 · Comunità</small><h2>Segnalare un bug e contribuire</h2></header>
+        <div class="blk">
+          <h3>Prima di aprire una segnalazione</h3>
+          <ul>
+            <li>Aggiorna l'app: solo l'ultima versione riceve correzioni.</li>
+            <li>Cerca tra le segnalazioni esistenti (<a href="https://github.com/Bulls64/Streamlink-Launcher/issues?q=is%3Aissue" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/issues?q=is%3Aissue" target="_blank" rel="noopener">Chat</a>): il problema potrebbe essere già noto.</li>
+            <li>Rileggi la <a href="#risoluzione-problemi">Risoluzione dei problemi</a>.</li>
+          </ul>
+        </div>
+        <div class="blk">
+          <h3>Cosa includere</h3>
+          <ul>
+            <li>L'app e la sua versione (<em>Impostazioni › Informazioni</em> o <em>Impostazioni › Aggiornamenti</em>).</li>
+            <li>Il tuo sistema (Windows 11, Ubuntu 24.04…) e il tipo di installazione: <code>.exe</code>, AppImage o codice sorgente.</li>
+            <li>La versione di Streamlink: <code>streamlink --version</code>.</li>
+            <li>Cosa hai fatto, cosa ti aspettavi e cosa è successo. Per una chat, la piattaforma e il canale.</li>
+            <li>Il log: <code>launcher.log</code> o <code>chat.log</code> (e <code>.log.1</code> se esiste), nella cartella dei dati. Per uno stream che non parte, copia anche il testo del pannello del registro.</li>
+          </ul>
+          <p class="tip"><b>Leggi il log prima di inviarlo.</b> Può contenere nomi di canali o percorsi del tuo PC; togli tutto ciò che non vuoi rendere pubblico.</p>
+          <p>Poi apri una segnalazione: <a href="https://github.com/Bulls64/Streamlink-Launcher/issues/new" target="_blank" rel="noopener">Launcher</a> o <a href="https://github.com/Bulls64/Streamlink-Chat/issues/new" target="_blank" rel="noopener">Chat</a>.</p>
+        </div>
+        <div class="blk">
+          <h3>Una vulnerabilità di sicurezza?</h3>
+          <p><b>Non</b> aprire una segnalazione pubblica. Usa il modulo privato di GitHub (<a href="https://github.com/Bulls64/Streamlink-Launcher/security/advisories/new" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/security/advisories/new" target="_blank" rel="noopener">Chat</a>) con la versione, i passaggi per riprodurla e l'impatto. Riceverai una risposta entro una settimana circa.</p>
+        </div>
+        <div class="blk">
+          <h3>Contribuire</h3>
+          <p>Segnalazioni di bug, traduzioni e pull request sono benvenute.</p>
+          <ol>
+            <li>Per qualsiasi cosa più grande di una piccola correzione, apri prima una segnalazione per parlarne.</li>
+            <li>Ti basta Python 3.10 o successivo, senza dipendenze di terze parti. Tkinter è necessario per l'interfaccia.</li>
+            <li>Esegui i controlli prima della pull request:</li>
+          </ol>
+          <div class="term"><span class="pr">$ </span>python -m unittest discover -s tests -v
+<span class="pr">$ </span>python -m pip install ruff &amp;&amp; python -m ruff check .
+<span class="pr">$ </span>xvfb-run -a python -m unittest tests.test_gui</div>
+          <ul>
+            <li>Aggiungi una riga sotto <em>Unreleased</em> in <code>CHANGELOG.md</code>, in inglese e in francese.</li>
+            <li>Le versioni vengono pubblicate dal manutentore.</li>
+          </ul>
+        </div>
+        <div class="blk">
+          <h3>Tradurre le app</h3>
+          <p>I testi si trovano in <code>lang/*.json</code>, un file per lingua (<code>fr</code>, <code>en</code>, <code>es</code>, <code>de</code>, <code>it</code>). Ogni lingua deve avere esattamente le stesse chiavi: un test lo verifica. Per una nuova lingua, copia <code>en.json</code>, traduci i valori senza toccare le chiavi né le <code>{variabili}</code> e tieni i testi brevi, soprattutto nel launcher.</p>
+        </div>
+      </section>
+
+      <!-- 17 -->
+      <section class="doc" id="glossario">
+        <header><small>17 · Vocabolario</small><h2>Glossario</h2></header>
+        <nav class="letters" aria-label="Lettere"><a href="#gl-num">#</a><a href="#gl-a">A</a><a href="#gl-b">B</a><a href="#gl-c">C</a><a href="#gl-d">D</a><a href="#gl-e">E</a><a href="#gl-f">F</a><a href="#gl-g">G</a><a href="#gl-h">H</a><a href="#gl-i">I</a><a href="#gl-l">L</a><a href="#gl-m">M</a><a href="#gl-o">O</a><a href="#gl-p">P</a><a href="#gl-q">Q</a><a href="#gl-r">R</a><a href="#gl-s">S</a><a href="#gl-t">T</a><a href="#gl-w">W</a></nav>
+        <dl class="gl-list">
+          <div class="gl" id="gl-num"><dt>7TV</dt><dd>Servizio di emote di terze parti, spesso animate, per Twitch e Kick.</dd></div>
+          <div class="gl"><dt>.bak</dt><dd>Copia della versione precedente di un file di impostazioni, usata per recuperarlo se si danneggia.</dd></div>
+          <div class="gl" id="gl-a"><dt>AppImage</dt><dd>Formato di applicazione Linux in un unico file, senza nulla da installare. Le AppImage delle app includono il proprio Python.</dd></div>
+          <div class="gl"><dt>Area di notifica</dt><dd>Le icone accanto all'orologio di Windows. Il launcher può restare attivo lì con la finestra chiusa.</dd></div>
+          <div class="gl" id="gl-b"><dt>Badge</dt><dd>Piccola icona davanti a un nome utente: streamer, moderatore, VIP, abbonato…</dd></div>
+          <div class="gl"><dt>BetterTTV (BTTV)</dt><dd>Estensione popolare che aggiunge emote alle chat di Twitch.</dd></div>
+          <div class="gl" id="gl-c"><dt>Centrifugo</dt><dd>Sistema di messaggistica in tempo reale usato dalla chat di Kick da ottobre 2026.</dd></div>
+          <div class="gl"><dt>Client ID, Client Secret</dt><dd>Identificatore (pubblico) e password (segreta) dell'applicazione che crei su Twitch o Kick per scrivere in chat.</dd></div>
+          <div class="gl"><dt>Codice dispositivo</dt><dd>Metodo di accesso di Twitch: l'app mostra un codice, tu lo inserisci su <code>twitch.tv/activate</code>.</dd></div>
+          <div class="gl" id="gl-d"><dt>DPAPI</dt><dd>Funzione di cifratura di Windows: solo il tuo account, sul tuo PC, può rileggere ciò che protegge. Protegge i token della chat.</dd></div>
+          <div class="gl" id="gl-e"><dt>Elenco di riserva</dt><dd>Più qualità separate da virgole: Streamlink prende la prima disponibile.</dd></div>
+          <div class="gl"><dt>Emote</dt><dd>Piccola immagine usata come una parola in chat, per esempio <code>KEKW</code>.</dd></div>
+          <div class="gl" id="gl-f"><dt>Falso positivo</dt><dd>Un file sicuro segnalato per errore da un antivirus.</dd></div>
+          <div class="gl"><dt>FrankerFaceZ (FFZ)</dt><dd>Un'altra estensione di emote per Twitch.</dd></div>
+          <div class="gl"><dt>FUSE</dt><dd>Componente Linux che permette di avviare un'AppImage senza estrarla. Pacchetto <code>libfuse2</code>.</dd></div>
+          <div class="gl" id="gl-g"><dt>glibc</dt><dd>Libreria di base dei sistemi Linux. Le AppImage richiedono la versione 2.35 o successiva.</dd></div>
+          <div class="gl" id="gl-h"><dt>HLS</dt><dd>Formato di streaming diviso in piccoli segmenti, usato da Twitch e Kick.</dd></div>
+          <div class="gl" id="gl-i"><dt>IRC</dt><dd>Vecchio protocollo di chat su cui si basa la chat di Twitch.</dd></div>
+          <div class="gl" id="gl-l"><dt>Latenza</dt><dd>Ritardo tra ciò che accade dal lato dello streamer e ciò che vedi.</dd></div>
+          <div class="gl"><dt>Lettore</dt><dd>Programma che mostra il video inviato da Streamlink: VLC, mpv, PotPlayer…</dd></div>
+          <div class="gl"><dt>Link diretto</dt><dd>Pulsante del launcher che accetta qualsiasi link supportato da Streamlink.</dd></div>
+          <div class="gl" id="gl-m"><dt>Menzione</dt><dd>Messaggio che cita il tuo nome utente o una parola che hai scelto. Viene evidenziato.</dd></div>
+          <div class="gl"><dt>Modalità mini</dt><dd>La barra mobile del launcher, aperta da una scorciatoia globale, per avviare uno stream senza aprire la finestra.</dd></div>
+          <div class="gl" id="gl-o"><dt>OAuth</dt><dd>Metodo standard per permettere a un'app di agire a tuo nome senza darle la tua password.</dd></div>
+          <div class="gl" id="gl-p"><dt>PATH</dt><dd>Elenco delle cartelle in cui il sistema cerca i programmi. Il programma di installazione di Streamlink lo aggiunge lì.</dd></div>
+          <div class="gl"><dt>platforms.json</dt><dd>File del launcher che descrive le piattaforme: indirizzo, opzioni, qualità, colore, stato della diretta.</dd></div>
+          <div class="gl"><dt>Plugin</dt><dd>Parte di Streamlink che sa leggere un determinato sito (<code>twitch</code>, <code>kick</code>, <code>steam</code>…).</dd></div>
+          <div class="gl"><dt>Portabile</dt><dd>Un'app che salva le impostazioni accanto al suo file: puoi spostarla o copiarla su una chiavetta USB.</dd></div>
+          <div class="gl"><dt>Preferito</dt><dd>Canale salvato nel launcher, avviabile con un clic, con il suo stato della diretta.</dd></div>
+          <div class="gl"><dt>Pusher</dt><dd>Vecchio sistema in tempo reale della chat di Kick, mantenuto come riserva.</dd></div>
+          <div class="gl"><dt>PyInstaller</dt><dd>Strumento che trasforma un programma Python in un unico <code>.exe</code>.</dd></div>
+          <div class="gl" id="gl-q"><dt>Qualità</dt><dd>Risoluzione dello stream richiesta a Streamlink: <code>best</code>, <code>1080p60</code>, <code>audio_only</code>…</dd></div>
+          <div class="gl" id="gl-r"><dt>Registro</dt><dd>Il pannello in fondo al launcher, e i file <code>launcher.log</code> e <code>chat.log</code> che annotano gli errori.</dd></div>
+          <div class="gl"><dt>Release</dt><dd>Versione pubblicata su GitHub, con i suoi file da scaricare e <code>SHA256SUMS.txt</code>.</dd></div>
+          <div class="gl" id="gl-s"><dt>SHA-256</dt><dd>L'impronta di un file. Se corrisponde a quella della release, il file non è stato alterato.</dd></div>
+          <div class="gl"><dt>SmartScreen</dt><dd>Protezione di Windows che avvisa al primo avvio di un programma recente o non firmato.</dd></div>
+          <div class="gl"><dt>Sola lettura</dt><dd>Una chat che puoi leggere ma in cui non puoi scrivere: senza account collegato, o sempre su Steam TV.</dd></div>
+          <div class="gl"><dt>Streamlink</dt><dd>Programma libero che recupera uno stream e lo invia al tuo lettore. Le due app si basano su di esso.</dd></div>
+          <div class="gl" id="gl-t"><dt>Token</dt><dd>Chiave temporanea che Twitch o Kick dà all'app dopo l'accesso. Sostituisce la tua password, che l'app non vede mai.</dd></div>
+          <div class="gl" id="gl-w"><dt>WebSocket</dt><dd>Connessione che resta aperta tra l'app e il server per ricevere i messaggi man mano che arrivano.</dd></div>
+        </dl>
+      </section>
+    </article>
+  </div>
+</div>
+
+<footer><div class="wrap">Streamlink Launcher e Streamlink Chat, di Bulls64. Licenza MIT. Questo progetto non è affiliato a Streamlink, Twitch, Kick, YouTube, Dailymotion o Valve.</div></footer>

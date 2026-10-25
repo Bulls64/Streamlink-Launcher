@@ -3,8 +3,8 @@
 Mêmes sources que l'artefact (site_head/body/script.html, content_fr/en.html, docs_script.html),
 mais une vraie page par langue et par rubrique, pré-rendue, pour que les moteurs indexent tout :
 
-    /            accueil en français        /en/          accueil en anglais
-    /docs/       documentation en français  /en/docs/     documentation en anglais
+    /            accueil en français        /en/ /es/ /de/ /it/          accueil dans les autres langues
+    /docs/       documentation en français  /en/docs/ /es/docs/ …       documentation dans les autres langues
 
 Sortie : ../website/  (publié par .github/workflows/pages.yml)
 Usage :  python3 gh_build.py [URL_DU_SITE] [--no-minify]
@@ -23,7 +23,9 @@ OUT = here.parent / "website"
 FONTS = here / "node_modules" / "@fontsource"
 read = lambda n: (here / n).read_text(encoding="utf-8")
 
-PATHS = {("home", "fr"): "", ("home", "en"): "en/", ("docs", "fr"): "docs/", ("docs", "en"): "en/docs/"}
+LANGS = ("fr", "en", "es", "de", "it")                         # le français est la langue par défaut (à la racine)
+PATHS = {("home", l): ("" if l == "fr" else f"{l}/") for l in LANGS}
+PATHS.update({("docs", l): ("docs/" if l == "fr" else f"{l}/docs/") for l in LANGS})
 def up(cur): return "../" * cur.count("/")                    # chemin relatif vers la racine du site
 def link(cur, kind, lang, frag=""): return (up(cur) + PATHS[(kind, lang)] or "./") + frag
 def absu(kind, lang): return BASE + PATHS[(kind, lang)]
@@ -41,9 +43,24 @@ META = {
                      "Installer Streamlink, lancer un premier stream, écrire dans le chat Twitch ou Kick, raccourcis, réglages et dépannage : le guide complet des deux applis."),
     ("docs", "en"): ("Documentation · Streamlink Launcher & Chat",
                      "Install Streamlink, open your first stream, write in Twitch or Kick chat, shortcuts, settings and troubleshooting: the complete guide to both apps."),
+    ("home", "es"): ("Streamlink Launcher y Chat: Twitch y Kick en VLC o mpv",
+                     "Aplicaciones libres para Windows y Linux: mira Twitch, Kick, YouTube y Steam TV en VLC, mpv o PotPlayer, con los chats en una ventana aparte."),
+    ("docs", "es"): ("Documentación · Streamlink Launcher y Chat",
+                     "Instalar Streamlink, abrir tu primer stream, escribir en el chat de Twitch o Kick, atajos, ajustes y solución de problemas: la guía completa de las dos aplicaciones."),
+    ("home", "de"): ("Streamlink Launcher & Chat: Twitch und Kick in VLC oder mpv",
+                     "Freie Apps für Windows und Linux: Twitch, Kick, YouTube und Steam TV in VLC, mpv oder PotPlayer ansehen, mit den Chats in einem eigenen Fenster."),
+    ("docs", "de"): ("Dokumentation · Streamlink Launcher & Chat",
+                     "Streamlink installieren, den ersten Stream öffnen, im Twitch- oder Kick-Chat schreiben, Tastenkürzel, Einstellungen und Fehlerbehebung: das vollständige Handbuch der beiden Apps."),
+    ("home", "it"): ("Streamlink Launcher e Chat: Twitch e Kick in VLC o mpv",
+                     "App libere per Windows e Linux: guarda Twitch, Kick, YouTube e Steam TV in VLC, mpv o PotPlayer, con le chat in una finestra a parte."),
+    ("docs", "it"): ("Documentazione · Streamlink Launcher e Chat",
+                     "Installare Streamlink, aprire il primo stream, scrivere nella chat di Twitch o Kick, scorciatoie, impostazioni e risoluzione dei problemi: la guida completa delle due app."),
 }
-OG_ALT = {"fr": "Streamlink Launcher et Streamlink Chat : le live sort du navigateur.", "en": "Streamlink Launcher and Streamlink Chat: live, minus the browser."}
-LOCALE = {"fr": "fr_FR", "en": "en_US"}
+OG_ALT = {"fr": "Streamlink Launcher et Streamlink Chat : le live sort du navigateur.", "en": "Streamlink Launcher and Streamlink Chat: live, minus the browser.",
+          "es": "Streamlink Launcher y Streamlink Chat: el directo, fuera del navegador.", "de": "Streamlink Launcher und Streamlink Chat: Live, aber ohne Browser.",
+          "it": "Streamlink Launcher e Streamlink Chat: il live esce dal browser."}
+IMG_DIR = {l: ("fr" if l == "fr" else "en") for l in LANGS}      # es, de, it : mêmes captures que l'anglais
+LOCALE = {"fr": "fr_FR", "en": "en_US", "es": "es_ES", "de": "de_DE", "it": "it_IT"}
 
 # ---------------------------------------------------------------- textes anglais du script du site
 SCRIPT = read("site_script.html")
@@ -52,7 +69,9 @@ def js_object(name):
     j = SCRIPT.index("\n  };", i) + 4
     r = subprocess.run(["node", "-e", f"process.stdout.write(JSON.stringify({SCRIPT[i:j]}))"], capture_output=True, text=True, check=True)
     return json.loads(r.stdout)
-EN, T = js_object("EN"), js_object("T")
+EN, T, HOME_TR, T_TR = js_object("EN"), js_object("T"), js_object("HOME_TR"), js_object("T_TR")
+DICT = {"en": EN, **{l: {**EN, **HOME_TR[l]} for l in HOME_TR}}          # textes de l'accueil par langue (le français est dans la page)
+TT = {"en": T["en"], **{l: {**T["en"], **T_TR[l]} for l in T_TR}}        # textes produits par le script (placeholders, alt…)
 
 # ---------------------------------------------------------------- morceaux de page
 HEAD = read("site_head.html")
@@ -77,22 +96,23 @@ def font_css(prefix):
 def translate(html, lang):
     """Pré-rend un morceau de page dans la langue voulue (attributs data-i18n du site)."""
     if lang == "fr": return html
+    D, TL = DICT[lang], TT[lang]
     soup = BeautifulSoup(html, "html.parser")
     for el in soup.select("[data-i18n]"):
-        v = EN.get(el["data-i18n"])
+        v = D.get(el["data-i18n"])
         if v is not None: el.clear(); el.append(BeautifulSoup(v, "html.parser"))
     for el in soup.select("[data-i18n-aria]"):
-        v = EN.get(el["data-i18n-aria"])
+        v = D.get(el["data-i18n-aria"])
         if v is not None: el["aria-label"] = v
     for el in soup.select("[data-i18n-alt]"):
-        v = EN.get(el["data-i18n-alt"])
+        v = D.get(el["data-i18n-alt"])
         if v is not None: el["alt"] = v
     shot = soup.select_one("#shot")
-    if shot: shot["alt"] = T["en"]["alt"]["l_main"]
+    if shot: shot["alt"] = TL["alt"]["l_main"]
     q = soup.select_one("#q")
-    if q: q["placeholder"] = T["en"]["ph"]["twitch"]
+    if q: q["placeholder"] = TL["ph"]["twitch"]
     say = soup.select_one("#say")
-    if say: say["placeholder"] = T["en"]["ch"]["twitch"][1]
+    if say: say["placeholder"] = TL["ch"]["twitch"][1]
     return str(soup)
 
 def header(cur, kind, lang):
@@ -104,30 +124,39 @@ def header(cur, kind, lang):
         h = h.replace('<a href="#docs" id="nav-docs">', f'<a href="{link(cur, "docs", lang)}" id="nav-docs" aria-current="page">')
     else:
         h = h.replace('<a href="#docs" id="nav-docs">', f'<a href="{link(cur, "docs", lang)}" id="nav-docs">')
-    h = h.replace('<option value="fr" lang="fr">', '<option value="fr" lang="fr"' + (' selected' if lang == "fr" else '') + '>')
-    h = h.replace('<option value="en" lang="en">', '<option value="en" lang="en"' + (' selected' if lang == "en" else '') + '>')
+    for l in LANGS:
+        h = h.replace(f'<option value="{l}" lang="{l}">', f'<option value="{l}" lang="{l}"' + (' selected' if lang == l else '') + '>')
     return translate(h, lang)
 
 # ---------------------------------------------------------------- données structurées
 AUTHOR = {"@type": "Person", "@id": BASE + "#author", "name": "Bulls64", "url": "https://github.com/Bulls64"}
+APP_DESC = {
+    "Launcher": {
+        "fr": "Interface légère pour Streamlink : ouvre Twitch, Kick, YouTube, Dailymotion et Steam TV dans VLC, mpv ou PotPlayer, avec favoris en direct et mode mini.",
+        "en": "Lightweight interface for Streamlink: opens Twitch, Kick, YouTube, Dailymotion and Steam TV in VLC, mpv or PotPlayer, with live favorites and a mini mode.",
+        "es": "Interfaz ligera para Streamlink: abre Twitch, Kick, YouTube, Dailymotion y Steam TV en VLC, mpv o PotPlayer, con favoritos en directo y modo mini.",
+        "de": "Schlanke Oberfläche für Streamlink: öffnet Twitch, Kick, YouTube, Dailymotion und Steam TV in VLC, mpv oder PotPlayer, mit Live-Favoriten und Mini-Modus.",
+        "it": "Interfaccia leggera per Streamlink: apre Twitch, Kick, YouTube, Dailymotion e Steam TV in VLC, mpv o PotPlayer, con preferiti in diretta e modalità mini."},
+    "Chat": {
+        "fr": "Chats Twitch, Kick et Steam TV dans une seule fenêtre, un onglet par chaîne, lecture sans compte et écriture après connexion.",
+        "en": "Twitch, Kick and Steam TV chats in one window, one tab per channel, read without an account and write once logged in.",
+        "es": "Los chats de Twitch, Kick y Steam TV en una sola ventana, una pestaña por canal; lectura sin cuenta y escritura tras iniciar sesión.",
+        "de": "Die Chats von Twitch, Kick und Steam TV in einem Fenster, ein Tab pro Kanal; Lesen ohne Konto, Schreiben nach der Anmeldung.",
+        "it": "Le chat di Twitch, Kick e Steam TV in un'unica finestra, una scheda per canale; lettura senza account e scrittura dopo l'accesso."},
+}
 def apps(lang):
-    fr = lang == "fr"
     def app(name, ver, repo, desc, shot):
         return {"@type": "SoftwareApplication", "name": name, "softwareVersion": ver,
                 "applicationCategory": "MultimediaApplication", "operatingSystem": "Windows 10, Windows 11, Linux",
                 "description": desc, "url": absu("home", lang) + ("#launcher" if "Launcher" in name else "#chat"),
                 "downloadUrl": f"https://github.com/Bulls64/{repo}/releases/latest",
-                "screenshot": BASE + f"assets/img/site/{lang}/{shot}.webp",
+                "screenshot": BASE + f"assets/img/site/{IMG_DIR[lang]}/{shot}.webp",
                 "license": "https://opensource.org/licenses/MIT", "isAccessibleForFree": True,
                 "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
-                "author": {"@id": BASE + "#author"}, "sameAs": f"https://github.com/Bulls64/{repo}", "inLanguage": ["fr", "en"]}
+                "author": {"@id": BASE + "#author"}, "sameAs": f"https://github.com/Bulls64/{repo}", "inLanguage": list(LANGS)}
     return [
-        app("Streamlink Launcher", LAUNCHER, "Streamlink-Launcher",
-            "Interface légère pour Streamlink : ouvre Twitch, Kick, YouTube, Dailymotion et Steam TV dans VLC, mpv ou PotPlayer, avec favoris en direct et mode mini." if fr else
-            "Lightweight interface for Streamlink: opens Twitch, Kick, YouTube, Dailymotion and Steam TV in VLC, mpv or PotPlayer, with live favorites and a mini mode.", "l_main"),
-        app("Streamlink Chat", CHAT, "Streamlink-Chat",
-            "Chats Twitch, Kick et Steam TV dans une seule fenêtre, un onglet par chaîne, lecture sans compte et écriture après connexion." if fr else
-            "Twitch, Kick and Steam TV chats in one window, one tab per channel, read without an account and write once logged in.", "c_tw"),
+        app("Streamlink Launcher", LAUNCHER, "Streamlink-Launcher", APP_DESC["Launcher"][lang], "l_main"),
+        app("Streamlink Chat", CHAT, "Streamlink-Chat", APP_DESC["Chat"][lang], "c_tw"),
     ]
 
 def faq_items(content_html):
@@ -144,7 +173,7 @@ def faq_items(content_html):
 
 def jsonld(kind, lang, content=None):
     title, desc = META[(kind, lang)]
-    site = {"@type": "WebSite", "@id": BASE + "#website", "url": BASE, "name": "Streamlink Launcher & Chat", "inLanguage": ["fr", "en"], "publisher": {"@id": BASE + "#author"}}
+    site = {"@type": "WebSite", "@id": BASE + "#website", "url": BASE, "name": "Streamlink Launcher & Chat", "inLanguage": list(LANGS), "publisher": {"@id": BASE + "#author"}}
     page = {"@type": "WebPage" if kind == "home" else "TechArticle", "@id": absu(kind, lang) + "#page", "url": absu(kind, lang),
             "name": title, "description": desc, "inLanguage": lang, "isPartOf": {"@id": BASE + "#website"},
             "dateModified": TODAY, "image": BASE + f"assets/og/{kind}-{lang}.jpg", "author": {"@id": BASE + "#author"}}
@@ -164,7 +193,8 @@ def jsonld(kind, lang, content=None):
 
 def head(cur, kind, lang, extra_css="", content=None):
     title, desc = META[(kind, lang)]
-    other = "en" if lang == "fr" else "fr"
+    alt_locales = "".join(f'<meta property="og:locale:alternate" content="{LOCALE[l]}">\n' for l in LANGS if l != lang)
+    hreflangs = "".join(f'<link rel="alternate" hreflang="{l}" href="{absu(kind, l)}">\n' for l in LANGS)
     p = up(cur)
     esc = lambda s: s.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;")
     return f"""<!doctype html>
@@ -177,16 +207,14 @@ def head(cur, kind, lang, extra_css="", content=None):
 <meta name="author" content="Bulls64">
 <meta name="google-site-verification" content="{GOOGLE_SITE_VERIFICATION}">
 <link rel="canonical" href="{absu(kind, lang)}">
-<link rel="alternate" hreflang="fr" href="{absu(kind, 'fr')}">
-<link rel="alternate" hreflang="en" href="{absu(kind, 'en')}">
-<link rel="alternate" hreflang="x-default" href="{absu(kind, 'fr')}">
+{hreflangs}<link rel="alternate" hreflang="x-default" href="{absu(kind, 'fr')}">
 <meta property="og:type" content="{'website' if kind == 'home' else 'article'}">
 <meta property="og:site_name" content="Streamlink Launcher &amp; Chat">
 <meta property="og:title" content="{esc(title)}">
 <meta property="og:description" content="{esc(desc)}">
 <meta property="og:url" content="{absu(kind, lang)}">
 <meta property="og:locale" content="{LOCALE[lang]}">
-<meta property="og:locale:alternate" content="{LOCALE[other]}">
+{alt_locales.rstrip()}
 <meta property="og:image" content="{BASE}assets/og/{kind}-{lang}.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -213,17 +241,21 @@ def head(cur, kind, lang, extra_css="", content=None):
 # ---------------------------------------------------------------- scripts
 def lang_switch_js(cur, kind):
     """Le menu de langue mène à la page de l'autre langue (même section quand c'est possible)."""
-    alt = {l: link(cur, kind, l) for l in ("fr", "en")}
-    idmap = {}
+    alt = {l: link(cur, kind, l) for l in LANGS}
+    idmap = {}                                       # ancre de la rubrique -> ancre de la même rubrique dans chaque langue
     if kind == "docs":
-        ids = {l: re.findall(r'<section class="doc" id="([^"]+)"', read(f"content_{l}.html")) for l in ("fr", "en")}
-        assert len(ids["fr"]) == len(ids["en"])
-        for a, b in zip(ids["fr"], ids["en"]): idmap[a] = b; idmap[b] = a
+        ids = {l: re.findall(r'<section class="doc" id="([^"]+)"', read(f"content_{l}.html")) for l in LANGS}
+        assert all(len(v) == len(ids["fr"]) for v in ids.values()), {l: len(v) for l, v in ids.items()}
+        for i in range(len(ids["fr"])):
+            same = {l: ids[l][i] for l in LANGS}
+            for a in set(same.values()):
+                assert idmap.get(a, same) == same, f"ancre ambiguë : {a}"
+                idmap[a] = same
     return ("<script>\nwindow.SL_PAGES = " + json.dumps({"alt": alt, "ids": idmap}, ensure_ascii=False) + ";\n"
             "function slGoLang(l) {\n"
             "  try { localStorage.setItem(\"slSiteLang\", l); } catch {}\n"
             "  let id = \"\"; try { id = decodeURIComponent(location.hash.slice(1)); } catch {}\n"
-            "  const target = SL_PAGES.ids[id] || (id && document.getElementById(id) && !Object.keys(SL_PAGES.ids).length ? id : \"\");\n"
+            "  const target = (SL_PAGES.ids[id] && SL_PAGES.ids[id][l]) || (id && document.getElementById(id) && !Object.keys(SL_PAGES.ids).length ? id : \"\");\n"
             "  location.href = SL_PAGES.alt[l] + (target ? \"#\" + target : \"\");\n"
             "}\n</script>\n")
 
@@ -244,23 +276,43 @@ def home_script(cur, lang):
     s = re.sub(r"  function startLang\(\) \{.*?\n  \}\n", "  function startLang() { return document.documentElement.lang; }\n", s, count=1, flags=re.S)
     sub("  route();\n", "")
     sub('if (reduce || view === "docs")', "if (reduce)")
-    # Page pré-rendue dans une seule langue : le dictionnaire anglais, la copie des textes français
+    # Page pré-rendue dans une seule langue : les dictionnaires, la copie des textes français
     # et leur réapplication au chargement ne servent plus (le HTML est déjà dans la bonne langue).
+    extra = ""                                   # es, de, it : leurs textes du script, fusionnés avec les anglais
+    if lang not in ("fr", "en"):
+        extra = f'  T["{lang}"] = Object.assign({{}}, T.en, {lang_block(s, "  const T_TR = {", lang)});\n'
     cut("  const EN = {", "  /* textes produits par le script */")
     sub("    const d = DICT[l];\n", "")
     s = re.sub(r"    document\.querySelectorAll\(\"\[data-i18n(?:-aria|-alt)?\]\"\)\.forEach\(el => \{ const v = d\[.*?\n", "", s)
     assert "DICT" not in s and "const EN" not in s
-    s = keep_lang(s, "  const T = {", lang, "{")
+    s = keep_lang(s, "  const T = {", lang if lang in ("fr", "en") else "en", "{")
+    s = re.sub(r"  for \(const l in T_TR\) \{.*?\}\n", lambda m: extra, s, count=1, flags=re.S)
+    assert "T_TR" not in s and "HOME_TR" not in s
     sub('  let lang = "fr";', "  let lang = document.documentElement.lang;")
     imgs = {l: {k: f"{up(cur)}assets/img/site/{l}/{k}.webp" for k in ("l_main", "l_mini", "l_set", "l_light", "c_tw", "c_kick", "c_light")} for l in ("fr", "en")}
+    imgs = {l: imgs[IMG_DIR[l]] for l in LANGS}
     return s.replace("{{IMG_JSON}}", json.dumps({lang: imgs[lang]})), imgs
 
-def keep_lang(s, start, lang, opener):
-    """Dans un objet { fr: …, en: … } du script, ne garde que la langue de la page."""
+def lang_spans(s, start, opener):
+    """Dans un objet { fr: …, en: …, es: … } du script : (début de l'objet, fin, {langue: (début, fin)})."""
     i = s.index(start)
-    fr, en = s.index(f"\n    fr: {opener}", i), s.index(f"\n    en: {opener}", i)
-    end = s.index("\n  };", en)
-    return s[:en] + s[end:] if lang == "fr" else s[:fr] + s[en:]
+    end = s.index("\n  };", i)
+    pos = {l: s.index(f"\n    {l}: {opener}", i) for l in LANGS if 0 <= s.find(f"\n    {l}: {opener}", i) < end}
+    order = sorted(pos.values()) + [end]
+    return i, end, {l: (p, order[order.index(p) + 1]) for l, p in pos.items()}
+
+def keep_lang(s, start, lang, opener):
+    """Dans un objet { fr: …, en: …, es: … } du script, ne garde que la langue de la page."""
+    _, end, spans = lang_spans(s, start, opener)
+    first = min(a for a, _ in spans.values())
+    a, b = spans[lang]
+    return s[:first] + s[a:b] + s[end:]
+
+def lang_block(s, start, lang):
+    """Le texte { … } d'une langue dans un objet du script (sans la virgule finale)."""
+    _, _, spans = lang_spans(s, start, "{")
+    a, b = spans[lang]
+    return s[a:b].split(": ", 1)[1].strip().rstrip(",")
 
 def docs_script(lang):
     s = read("docs_script.html")
@@ -341,8 +393,8 @@ def build():
     # fichiers pour les moteurs
     urls = []
     for kind in ("home", "docs"):
-        for lang in ("fr", "en"):
-            alts = "".join(f'\n    <xhtml:link rel="alternate" hreflang="{l}" href="{absu(kind, l)}"/>' for l in ("fr", "en"))
+        for lang in LANGS:
+            alts = "".join(f'\n    <xhtml:link rel="alternate" hreflang="{l}" href="{absu(kind, l)}"/>' for l in LANGS)
             alts += f'\n    <xhtml:link rel="alternate" hreflang="x-default" href="{absu(kind, "fr")}"/>'
             urls.append(f"  <url>\n    <loc>{absu(kind, lang)}</loc>\n    <lastmod>{TODAY}</lastmod>{alts}\n  </url>")
     (OUT / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
@@ -394,6 +446,7 @@ nav a:hover {{ border-color: var(--accent); }}
   <nav>
     <a href="{b}">Accueil</a><a href="{b}docs/">Documentation</a>
     <a href="{b}en/" lang="en">Home (English)</a><a href="{b}en/docs/" lang="en">Docs (English)</a>
+    <a href="{b}es/" lang="es">Inicio (Español)</a><a href="{b}de/" lang="de">Startseite (Deutsch)</a><a href="{b}it/" lang="it">Home (Italiano)</a>
   </nav>
 </main>
 </body>

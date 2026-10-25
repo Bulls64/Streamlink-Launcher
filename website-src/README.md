@@ -1,14 +1,14 @@
 # Sources du site
 
-`gh_build.py` génère `../website/` (4 pages pré-rendues, sitemap, robots.txt, 404…), publié par
+`gh_build.py` génère `../website/` (10 pages pré-rendues : accueil et documentation en français, anglais, espagnol, allemand et italien ; sitemap, robots.txt, 404…), publié par
 `.github/workflows/pages.yml`. Ne modifie pas `website/` à la main : il est reconstruit à chaque génération.
 
 | Fichier | Rôle |
 |---|---|
-| `content_fr.html`, `content_en.html` | le texte de la documentation |
-| `site_head.html`, `site_body.html`, `site_script.html` | l'accueil (CSS, HTML, démo et textes anglais) |
+| `content_fr.html`, `content_en.html`, `content_es.html`, `content_de.html`, `content_it.html` | le texte de la documentation, une langue par fichier (mêmes rubriques, dans le même ordre) |
+| `site_head.html`, `site_body.html`, `site_script.html` | l'accueil (CSS, HTML, démo ; le français est dans la page, les autres langues dans le script) |
 | `shell_head.html`, `docs_script.html`, `docs_embed.py` | la mise en page et le script de la doc |
-| `img/` | captures (accueil dans `img/site/{fr,en}`, doc dans `img/` et `img/en`) |
+| `img/` | captures (accueil dans `img/site/{fr,en}`, doc dans `img/` et `img/en` ; l'espagnol, l'allemand et l'italien réutilisent les captures anglaises) |
 | `gh_assets/` | icônes et images de partage (refaites par `make_assets.mjs`) |
 
 ## Générer
@@ -21,4 +21,5 @@
 Les adresses absolues (canonical, hreflang, sitemap, Open Graph, JSON-LD, 404) suivent l'URL donnée.
 
 Pour refaire les icônes et les images de partage : `npx playwright install chromium && node make_assets.mjs`
+(`ONLY=home-es,docs-es node make_assets.mjs` ne refait que les images de partage nommées)
 (Playwright cherche Chromium là où il l'installe ; ou donne son chemin avec la variable `CHROMIUM`).
