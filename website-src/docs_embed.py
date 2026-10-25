@@ -1,4 +1,4 @@
-"""docs_embed.py : transforme la doc (shell_head.html, content_fr/en.html) en section intégrable au site.
+"""docs_embed.py : transforme la doc (docs.css, content_*.html) en section intégrable au site.
 - CSS de la doc limité à #docs (rien ne déborde sur le reste du site) ;
 - classes communes avec le site renommées en d-… ; recherche renommée dq (le site a déjà un #q)."""
 import re
@@ -39,8 +39,8 @@ def scope(css):
     return "".join(out)
 
 def css():
-    h = read("shell_head.html")
-    c = h[h.index("<style>") + 7:h.index("/* Menu de langue")]
+    c = read("docs.css")
+    c = c[:c.index("/* Menu de langue")]
     # l'en-tête de la doc est remplacé par celui du site
     c = re.sub(r"\n\.top[^\n]*|\n\.brand[^\n]*|\n\.nav[^\n]*", "", c)
     return scope(c)
