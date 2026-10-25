@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Website and documentation in Spanish, German and Italian**, next to French and English (10 pages, with `hreflang` links and an updated sitemap). The language menu now offers all five.
 - **Website: CSS and JavaScript in separate files** (`assets/css/`, `assets/js/`) instead of inside each page, with a content fingerprint (`?v=…`) so browsers pick up new versions. Pages are lighter and the styles are cached from one page to the next. Same look and behavior.
 - **Website: Streamlink Chat 0.2.2** (download links, version shown, "What's new" table in the five languages).
+- **Website: Streamlink Launcher 1.5.2** (download links, version shown, "What's new" table in the five languages).
 
 ### Planned
 - Viewing statistics (time per channel, peak hours).
@@ -258,6 +259,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Site et documentation en espagnol, allemand et italien**, en plus du français et de l'anglais (10 pages, avec liens `hreflang` et plan du site mis à jour). Le menu de langue en propose maintenant cinq.
 - **Site : CSS et JavaScript dans des fichiers à part** (`assets/css/`, `assets/js/`) au lieu d'être dans chaque page, avec une empreinte du contenu (`?v=…`) pour que les navigateurs prennent les nouvelles versions. Pages plus légères, styles gardés en cache d'une page à l'autre. Même apparence, même fonctionnement.
 - **Site : Streamlink Chat 0.2.2** (liens de téléchargement, version affichée, tableau « Nouveautés » dans les cinq langues).
+- **Site : Streamlink Launcher 1.5.2** (liens de téléchargement, version affichée, tableau « Nouveautés » dans les cinq langues).
 
 ### Prévu
 - Statistiques de visionnage (temps par chaîne, heures de pointe).
