@@ -35,7 +35,7 @@ def absu(kind, lang): return BASE + PATHS[(kind, lang)]
 # Google Search Console, propriété « Préfixe de l'URL » (validation par balise HTML)
 GOOGLE_SITE_VERIFICATION = "CNNycSFV-w4cvtyv4_P8k8AITTl89dwfBTBh9jasFlM"
 
-LAUNCHER, CHAT = "1.5.1", "0.2.1"
+LAUNCHER, CHAT = "1.5.1", "0.2.2"
 META = {
     ("home", "fr"): ("Streamlink Launcher & Chat : Twitch et Kick dans VLC ou mpv",
                      "Applis libres pour Windows et Linux : regarde Twitch, Kick, YouTube et Steam TV dans VLC, mpv ou PotPlayer, avec les chats dans une fenêtre à part."),
