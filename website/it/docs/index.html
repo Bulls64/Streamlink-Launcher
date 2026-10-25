@@ -1,0 +1,1479 @@
+<!doctype html>
+<html lang="it" class="nointro static">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Documentazione · Streamlink Launcher e Chat</title>
+<meta name="description" content="Installare Streamlink, aprire il primo stream, scrivere nella chat di Twitch o Kick, scorciatoie, impostazioni e risoluzione dei problemi: la guida completa delle due app.">
+<meta name="author" content="Bulls64">
+<meta name="google-site-verification" content="CNNycSFV-w4cvtyv4_P8k8AITTl89dwfBTBh9jasFlM">
+<link rel="canonical" href="https://bulls64.github.io/Streamlink-Launcher/it/docs/">
+<link rel="alternate" hreflang="fr" href="https://bulls64.github.io/Streamlink-Launcher/docs/">
+<link rel="alternate" hreflang="en" href="https://bulls64.github.io/Streamlink-Launcher/en/docs/">
+<link rel="alternate" hreflang="es" href="https://bulls64.github.io/Streamlink-Launcher/es/docs/">
+<link rel="alternate" hreflang="de" href="https://bulls64.github.io/Streamlink-Launcher/de/docs/">
+<link rel="alternate" hreflang="it" href="https://bulls64.github.io/Streamlink-Launcher/it/docs/">
+<link rel="alternate" hreflang="x-default" href="https://bulls64.github.io/Streamlink-Launcher/docs/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Streamlink Launcher &amp; Chat">
+<meta property="og:title" content="Documentazione · Streamlink Launcher e Chat">
+<meta property="og:description" content="Installare Streamlink, aprire il primo stream, scrivere nella chat di Twitch o Kick, scorciatoie, impostazioni e risoluzione dei problemi: la guida completa delle due app.">
+<meta property="og:url" content="https://bulls64.github.io/Streamlink-Launcher/it/docs/">
+<meta property="og:locale" content="it_IT">
+<meta property="og:locale:alternate" content="fr_FR">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="es_ES">
+<meta property="og:locale:alternate" content="de_DE">
+<meta property="og:image" content="https://bulls64.github.io/Streamlink-Launcher/assets/og/docs-it.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Streamlink Launcher e Streamlink Chat: il live esce dal browser.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Documentazione · Streamlink Launcher e Chat">
+<meta name="twitter:description" content="Installare Streamlink, aprire il primo stream, scrivere nella chat di Twitch o Kick, scorciatoie, impostazioni e risoluzione dei problemi: la guida completa delle due app.">
+<meta name="twitter:image" content="https://bulls64.github.io/Streamlink-Launcher/assets/og/docs-it.jpg">
+<meta name="theme-color" content="#E9ECF1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1116" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../../favicon.ico" sizes="32x32">
+<link rel="icon" href="../../assets/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="../../site.webmanifest">
+<link rel="preload" href="../../assets/fonts/instrument-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../../assets/fonts/big-shoulders-display-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://bulls64.github.io/Streamlink-Launcher/#website","url":"https://bulls64.github.io/Streamlink-Launcher/","name":"Streamlink Launcher & Chat","inLanguage":["fr","en","es","de","it"],"publisher":{"@id":"https://bulls64.github.io/Streamlink-Launcher/#author"}},{"@type":"Person","@id":"https://bulls64.github.io/Streamlink-Launcher/#author","name":"Bulls64","url":"https://github.com/Bulls64"},{"@type":"TechArticle","@id":"https://bulls64.github.io/Streamlink-Launcher/it/docs/#page","url":"https://bulls64.github.io/Streamlink-Launcher/it/docs/","name":"Documentazione · Streamlink Launcher e Chat","description":"Installare Streamlink, aprire il primo stream, scrivere nella chat di Twitch o Kick, scorciatoie, impostazioni e risoluzione dei problemi: la guida completa delle due app.","inLanguage":"it","isPartOf":{"@id":"https://bulls64.github.io/Streamlink-Launcher/#website"},"dateModified":"2026-10-25","image":"https://bulls64.github.io/Streamlink-Launcher/assets/og/docs-it.jpg","author":{"@id":"https://bulls64.github.io/Streamlink-Launcher/#author"},"headline":"Documentation Streamlink Launcher & Chat","about":[{"@type":"SoftwareApplication","name":"Streamlink Launcher"},{"@type":"SoftwareApplication","name":"Streamlink Chat"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Streamlink Launcher & Chat","item":"https://bulls64.github.io/Streamlink-Launcher/it/"},{"@type":"ListItem","position":2,"name":"Documentation","item":"https://bulls64.github.io/Streamlink-Launcher/it/docs/"}]},{"@type":"FAQPage","@id":"https://bulls64.github.io/Streamlink-Launcher/it/docs/#faq-data","inLanguage":"it","mainEntity":[{"@type":"Question","name":"Come scelgo il lettore video?","acceptedAnswer":{"@type":"Answer","text":"Impostazioni › Lettore video : scegli VLC, mpv, PotPlayer o un altro programma e indica il suo percorso se non viene trovato. Argomenti del lettore aggiunge opzioni, per esempio --fullscreen . Predefinito (impostazione di Streamlink) lascia decidere a Streamlink (vedi la ricetta )."}},{"@type":"Question","name":"Come cambio la qualità predefinita?","acceptedAnswer":{"@type":"Answer","text":"Nel launcher, l'elenco accanto al campo ricorda la qualità per piattaforma ; Personalizzata… accetta una qualità precisa o un elenco di riserva. Nella chat è Impostazioni › Guarda › Qualità , usata dal pulsante ▶."}},{"@type":"Question","name":"Come cambio la scorciatoia della modalità mini?","acceptedAnswer":{"@type":"Answer","text":"Impostazioni › Finestra e scorciatoia : attiva o disattiva Scorciatoia globale e scegli una combinazione diversa da Ctrl + Alt + S . Lì viene mostrato anche lo stato della scorciatoia."}},{"@type":"Question","name":"Il launcher può restare attivo in background?","acceptedAnswer":{"@type":"Answer","text":"Sì: con Riduci a icona nell'area di notifica , chiudere la finestra lascia il launcher accanto all'orologio, con i tuoi stream e il controllo delle dirette. Clic destro sull'icona per riaprire la finestra, aprire la modalità mini, avviare un preferito in diretta o Esci . Avvia con Windows lo avvia ridotto a icona."}},{"@type":"Question","name":"Come disattivo il rilevamento dei link copiati?","acceptedAnswer":{"@type":"Answer","text":"Togli la spunta da Rileva i link copiati in Impostazioni › Streamlink . Gli appunti vengono letti solo sul tuo computer; nulla viene salvato o inviato."}},{"@type":"Question","name":"Posso togliere i colori delle piattaforme?","acceptedAnswer":{"@type":"Answer","text":"Sì: Colori per piattaforma in Impostazioni › Generale (Launcher) o Impostazioni › Visualizzazione (Chat)."}},{"@type":"Question","name":"Come aggiungo una piattaforma?","acceptedAnswer":{"@type":"Answer","text":"Il link Modifica platforms.json , in fondo al pannello delle impostazioni, apre il file. Ogni voce indica: id e name : un identificatore unico e il nome del pulsante; input : channel , youtube , video , url (qualsiasi link) o none (niente da scrivere); url : il modello dell'indirizzo, dove {arg} viene sostituito da ciò che scrivi; hosts : i domini che selezionano questo pulsante quando incolli un link; args : opzioni aggiuntive di Streamlink; qualities , color , text_color ; live_check : twitch , streamlink o none . Salva, poi riavvia il launcher per vedere il nuovo pulsante. Un esempio completo si trova nella ricetta Registrare uno stream ."}},{"@type":"Question","name":"Come scrivo in una chat?","acceptedAnswer":{"@type":"Answer","text":"Collega il tuo account Twitch o Kick in Impostazioni › Account (per scrivere) . I passaggi sono spiegati in Scrivere in chat ."}},{"@type":"Question","name":"Quali opzioni di visualizzazione offre la chat?","acceptedAnswer":{"@type":"Answer","text":"Impostazioni › Visualizzazione : lingua, tema, dimensione del testo, ora dei messaggi, badge, emote animate, colori per piattaforma e numero di messaggi conservati per chat (500, 1000, 2000 o 5000). Emote attiva o disattiva BetterTTV, FrankerFaceZ e 7TV. Menzioni evidenzia i messaggi che citano il tuo nome o parole a tua scelta, separate da virgole."}},{"@type":"Question","name":"«Streamlink non trovato»","acceptedAnswer":{"@type":"Answer","text":"Installa Streamlink (vedi Installare Streamlink ), poi riavvia l'app. Se è installato altrove, indica il percorso di streamlink.exe nelle impostazioni. Verifica in un terminale che streamlink --version risponda."}},{"@type":"Question","name":"Lo stream non parte","acceptedAnswer":{"@type":"Answer","text":"Apri il pannello del registro in fondo alla finestra: lì compare il messaggio di errore di Streamlink. Le cause più comuni: No playable streams found : il canale è offline, o il nome è scritto male. La qualità richiesta non esiste per questo stream: scegli best o un elenco di riserva con Personalizzata… . Il lettore video non viene trovato: indica il suo percorso in Impostazioni › Lettore video ."}},{"@type":"Question","name":"Lo stream scatta o si interrompe","acceptedAnswer":{"@type":"Answer","text":"Prova una qualità più bassa ( 720p , 480p ): richiede meno banda. Se hai attivato la bassa latenza, toglila. I messaggi del registro dicono se Streamlink sta aspettando dati."}},{"@type":"Question","name":"C'è l'audio, ma non il video","acceptedAnswer":{"@type":"Answer","text":"Verifica che la qualità scelta non sia audio_only . Altrimenti aggiorna il lettore; con mpv, l'opzione --force-window=immediate apre subito la finestra."}},{"@type":"Question","name":"Windows mostra «Windows ha protetto il PC»","acceptedAnswer":{"@type":"Answer","text":"Gli eseguibili non hanno ancora una firma del codice, quindi SmartScreen avvisa al primo avvio. Non è un rilevamento. Verifica il file: in PowerShell, Get-FileHash .\\StreamlinkLauncher-1.5.1.exe , e confronta con il SHA256SUMS.txt della versione. Fai clic su Ulteriori informazioni , poi su Esegui comunque . Se con il doppio clic non succede nulla: clic destro › Proprietà › spunta Annulla blocco , oppure Unblock-File .\\StreamlinkLauncher-1.5.1.exe ."}},{"@type":"Question","name":"Il mio antivirus blocca o elimina l'exe","acceptedAnswer":{"@type":"Answer","text":"I programmi creati con PyInstaller vengono talvolta segnalati per errore. Verifica lo SHA-256, ripristina il file dalla quarantena, aggiungi la sua cartella alle esclusioni e segnala il falso positivo (Microsoft Defender: invia un file , categoria Incorrectly detected as malware ). Puoi anche avviare l'app dal codice sorgente."}},{"@type":"Question","name":"Ctrl + Alt + S non fa nulla","acceptedAnswer":{"@type":"Answer","text":"Probabilmente un'altra applicazione usa questa scorciatoia. Il launcher ti avvisa all'avvio; scegline un'altra in Impostazioni › Finestra e scorciatoia . Ogni pressione ricevuta viene annotata nel registro. La scorciatoia globale esiste solo su Windows."}},{"@type":"Question","name":"L'app non si apre una seconda volta","acceptedAnswer":{"@type":"Answer","text":"È voluto: di ogni app gira una sola copia alla volta. Il launcher è probabilmente nell'area di notifica, accanto all'orologio. Per la chat, riaprirla invia le sue chat alla finestra già aperta."}},{"@type":"Question","name":"«La cartella del launcher è protetta da scrittura»","acceptedAnswer":{"@type":"Answer","text":"Il launcher non può scrivere accanto al suo .exe (per esempio in C:\\Program Files ). Salva allora i suoi dati in %APPDATA%\\Streamlink Launcher . Tutto funziona, ma l'aggiornamento integrato non potrà sostituire il file: spostalo in una cartella tua."}},{"@type":"Question","name":"L'AppImage non si avvia","acceptedAnswer":{"@type":"Answer","text":"Rendila eseguibile: chmod +x seguito dal nome del file. Messaggio su FUSE: installa libfuse2 , oppure avviala con --appimage-extract-and-run . Errore su GLIBC : il tuo sistema è troppo vecchio (glibc 2.35 come minimo). Avvia l'app dal codice sorgente."}},{"@type":"Question","name":"Una chat di Kick resta in errore","acceptedAnswer":{"@type":"Answer","text":"Kick ha cambiato il suo sistema di chat il 13 ottobre 2026 e non lo documenta: il supporto è sperimentale, e la protezione anti-bot di Kick può bloccare alcune richieste ( Kick blocca la richiesta ). Clic destro sulla scheda › Riconnetti , oppure chiudi e riapri la chat. Se l'errore persiste, apri una segnalazione con chat.log ."}},{"@type":"Question","name":"«Canale non trovato»","acceptedAnswer":{"@type":"Answer","text":"Controlla l'ortografia e la piattaforma selezionata: un nome scritto da solo va al pulsante selezionato. Incolla piuttosto il link del canale, che seleziona la piattaforma da solo."}},{"@type":"Question","name":"La chat di Steam TV resta vuota","acceptedAnswer":{"@type":"Answer","text":"La chat esiste solo durante una trasmissione. Finché è offline, Streamlink Chat ricontrolla ogni 30 secondi e mostra i messaggi appena inizia la trasmissione."}},{"@type":"Question","name":"Non riesco a scrivere in chat","acceptedAnswer":{"@type":"Answer","text":"Devi collegare il tuo account (vedi Scrivere in chat ). Steam TV resta in sola lettura. Su Twitch, verifica anche di non essere bannato dalla chat e che la stanza non sia riservata agli abbonati."}},{"@type":"Question","name":"L'accesso a Kick non si completa","acceptedAnswer":{"@type":"Answer","text":"Verifica che l'URL di reindirizzamento della tua applicazione Kick sia esattamente http://localhost:48125/callback . Verifica Client ID e Client Secret (senza spazi in più). La porta 48125 deve essere libera e il firewall non deve bloccare le connessioni locali."}},{"@type":"Question","name":"Devo accedere di nuovo dopo aver cambiato PC","acceptedAnswer":{"@type":"Answer","text":"È normale: su Windows i token sono cifrati per il tuo account su questo PC. Copiati altrove, non possono essere letti. Accedi di nuovo in Impostazioni › Account ."}},{"@type":"Question","name":"Alcune emote compaiono come testo","acceptedAnswer":{"@type":"Answer","text":"Tk mostra solo PNG e GIF. Un'emote offerta solo in WebP o AVIF resta come testo. Verifica anche che il suo fornitore (BetterTTV, FrankerFaceZ, 7TV) sia attivo in Impostazioni › Emote e che sia disponibile per questa piattaforma (vedi Emote e piattaforme )."}},{"@type":"Question","name":"La chat usa molta memoria","acceptedAnswer":{"@type":"Answer","text":"Le emote animate sono le più pesanti. Dalla 0.2.1 si animano solo nella chat visualizzata e la cache è limitata. Puoi ridurre ancora la memoria disattivando Emote animate o conservando 500 messaggi per chat ( Impostazioni › Visualizzazione )."}},{"@type":"Question","name":"L'aggiornamento integrato non riesce","acceptedAnswer":{"@type":"Answer","text":"L'app deve poter sostituire il proprio file: metti il .exe in una cartella tua (per esempio Documents\\Streamlink ), non in C:\\Program Files . In caso di errore viene ripristinata la vecchia versione; puoi sempre scaricare la nuova dalla pagina delle versioni."}},{"@type":"Question","name":"Un file di impostazioni è danneggiato","acceptedAnswer":{"@type":"Answer","text":"All'avvio l'app prova la sua copia .bak e, per il launcher, mette da parte il file danneggiato come .corrupt e ti avvisa. Per ripartire da zero, chiudi l'app e rinomina il file in questione: verrà ricreato con le impostazioni predefinite."}}]}]}
+</script>
+<style>
+@font-face { font-family: "Big Shoulders Display"; font-style: normal; font-weight: 600; font-display: swap; src: url("../../assets/fonts/big-shoulders-display-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Big Shoulders Display"; font-style: normal; font-weight: 800; font-display: swap; src: url("../../assets/fonts/big-shoulders-display-latin-800-normal.woff2") format("woff2"); }
+@font-face { font-family: "Big Shoulders Display"; font-style: normal; font-weight: 900; font-display: swap; src: url("../../assets/fonts/big-shoulders-display-latin-900-normal.woff2") format("woff2"); }
+@font-face { font-family: "Instrument Sans"; font-style: normal; font-weight: 400; font-display: swap; src: url("../../assets/fonts/instrument-sans-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Instrument Sans"; font-style: normal; font-weight: 500; font-display: swap; src: url("../../assets/fonts/instrument-sans-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Instrument Sans"; font-style: normal; font-weight: 600; font-display: swap; src: url("../../assets/fonts/instrument-sans-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Instrument Sans"; font-style: normal; font-weight: 700; font-display: swap; src: url("../../assets/fonts/instrument-sans-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Instrument Sans"; font-style: italic; font-weight: 400; font-display: swap; src: url("../../assets/fonts/instrument-sans-latin-400-italic.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("../../assets/fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 500; font-display: swap; src: url("../../assets/fonts/ibm-plex-mono-latin-500-normal.woff2") format("woff2"); }
+
+/* Mise en page : une régie de diffusion. Deux « canaux » (CH1 lanceur, CH2 chat) présentés comme des moniteurs ;
+   l'accent de toute la page suit la plateforme détectée dans la démo, comme les applis elles-mêmes. */
+@property --p { syntax: '<color>'; inherits: true; initial-value: #9146FF; }
+@property --p-ink-l { syntax: '<color>'; inherits: true; initial-value: #6E2BD9; }
+@property --p-ink-d { syntax: '<color>'; inherits: true; initial-value: #B794FF; }
+:root {
+  --bg: #E9ECF1;
+  --surface: #F7F8FA;
+  --raised: #FFFFFF;
+  --ink: #13151B;
+  --muted: #586071;
+  --line: #CDD2DB;
+  --term: #171A21;
+  --term-ink: #DCE0E8;
+  --term-dim: #7D8597;
+  --live: #E5232F;
+  --ok: #1E9E5A;
+  --p: #9146FF; --p-on: #FFFFFF; --p-ink-l: #6E2BD9; --p-ink-d: #B794FF;
+  --accent-ink: var(--p-ink-l);
+  --font-display: "Big Shoulders Display", "Arial Narrow", "Roboto Condensed", Impact, sans-serif;
+  --font-body: "Instrument Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", "Cascadia Mono", Consolas, "Courier New", monospace;
+  --step--1: 0.8125rem; --step-0: 1rem; --step-1: 1.25rem; --step-2: 1.75rem; --step-3: clamp(2.4rem, 5vw, 3.6rem); --step-4: clamp(3.4rem, 9.5vw, 7.4rem);
+  transition: --p .45s ease, --p-ink-l .45s ease, --p-ink-d .45s ease;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1116; --surface: #161920; --raised: #1C2029; --ink: #ECEEF3; --muted: #959CAD; --line: #2A2F3A;
+    --term: #0A0C10; --term-ink: #DCE0E8; --term-dim: #6F7789; --ok: #3CCB7F;
+    --accent-ink: var(--p-ink-d); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1116; --surface: #161920; --raised: #1C2029; --ink: #ECEEF3; --muted: #959CAD; --line: #2A2F3A;
+  --term: #0A0C10; --term-ink: #DCE0E8; --term-dim: #6F7789; --ok: #3CCB7F;
+  --accent-ink: var(--p-ink-d); color-scheme: dark;
+}
+:root[data-platform="twitch"] { --p: #9146FF; --p-on: #FFFFFF; --p-ink-l: #6E2BD9; --p-ink-d: #B794FF; }
+:root[data-platform="kick"] { --p: #53FC18; --p-on: #0B0D0A; --p-ink-l: #2B8A05; --p-ink-d: #6BFF3A; }
+:root[data-platform="youtube"] { --p: #D91A1A; --p-on: #FFFFFF; --p-ink-l: #BE1515; --p-ink-d: #FF6464; }
+:root[data-platform="dailymotion"] { --p: #0A6CFF; --p-on: #FFFFFF; --p-ink-l: #0A5AD4; --p-ink-d: #64A2FF; }
+:root[data-platform="steamtv"] { --p: #66C0F4; --p-on: #0B1A26; --p-ink-l: #1C6896; --p-ink-d: #7FCBF5; }
+:root[data-platform="url"] { --p: #6B7180; --p-on: #FFFFFF; --p-ink-l: #4B5060; --p-ink-d: #AEB3C0; }
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: var(--step-0); line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent-ink); text-underline-offset: 3px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 3px; border-radius: 4px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+p { margin: 0; }
+kbd {
+  font-family: var(--font-mono); font-size: .82em; padding: .1em .45em; border-radius: 5px;
+  border: 1px solid var(--line); border-bottom-width: 2px; background: var(--raised); color: var(--ink); white-space: nowrap;
+}
+code { font-family: var(--font-mono); font-size: .9em; }
+
+.wrap {
+  max-width: 1180px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.band { padding-block: clamp(56px, 9vw, 112px); }
+.band + .band { border-top: 1px solid var(--line); }
+
+/* --- en-tête */
+.top { padding-block: 18px; }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--ink); text-decoration: none; letter-spacing: -.01em; }
+.brand svg { width: 30px; height: 30px; flex: none; }
+.nav { display: flex; gap: 6px 20px; flex-wrap: wrap; font-size: var(--step--1); font-weight: 500; }
+.nav a { color: var(--muted); text-decoration: none; }
+.nav a:hover { color: var(--ink); }
+
+/* --- hero */
+.hero { padding-block: clamp(28px, 6vw, 72px) clamp(32px, 4vw, 48px); }
+.onair {
+  display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: var(--step--1);
+  text-transform: uppercase; letter-spacing: .08em; color: var(--muted);
+}
+.onair i { width: 9px; height: 9px; border-radius: 50%; background: var(--live); box-shadow: 0 0 0 4px color-mix(in srgb, var(--live) 22%, transparent); animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 50% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--live) 0%, transparent); } }
+.hero h1 {
+  font-family: var(--font-display); font-weight: 900; font-size: var(--step-4); line-height: .9;
+  text-transform: uppercase; letter-spacing: -.005em; margin-top: 18px; max-width: 12ch;
+}
+.hero h1 em { font-style: normal; color: var(--accent-ink); }
+.lede { margin-top: 22px; max-width: 60ch; font-size: var(--step-1); line-height: 1.5; color: var(--muted); }
+.lede strong { color: var(--ink); font-weight: 600; }
+
+/* --- démo du champ du lanceur */
+.demo { margin-top: clamp(32px, 5vw, 52px); display: grid; gap: 14px; }
+.demo-label { font-family: var(--font-mono); font-size: var(--step--1); color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+.demo-label b { color: var(--ink); font-weight: 500; text-transform: uppercase; letter-spacing: .08em; }
+.console {
+  background: var(--raised); border: 1px solid var(--line); border-radius: 18px; padding: clamp(14px, 2.4vw, 22px);
+  display: grid; gap: 14px;
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 4%, transparent), 0 24px 60px -36px color-mix(in srgb, var(--p) 55%, transparent);
+}
+.fieldrow { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; }
+.field {
+  display: flex; align-items: center; gap: 10px; min-width: 0;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 0 12px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.field:focus-within { border-color: var(--p); box-shadow: 0 0 0 4px color-mix(in srgb, var(--p) 26%, transparent); }
+.field svg { width: 18px; height: 18px; flex: none; color: var(--muted); }
+.field input {
+  flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 1.05rem;
+  padding-block: 14px; outline: none;
+}
+.field input::placeholder { color: var(--muted); }
+.field .hint { font-size: 12px; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 1px 7px; white-space: nowrap; }
+.select {
+  appearance: none; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 12px;
+  font: inherit; padding: 0 38px 0 14px; min-height: 50px; cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 20px) 52%, calc(100% - 15px) 52%; background-size: 5px 5px; background-repeat: no-repeat;
+}
+.go {
+  display: inline-flex; align-items: center; gap: 10px; border: 0; border-radius: 12px; padding: 0 22px; min-height: 50px;
+  background: var(--p); color: var(--p-on); font: inherit; font-weight: 700; cursor: pointer; white-space: nowrap;
+  transition: transform .12s ease, filter .2s;
+}
+.go:hover { filter: brightness(1.06); }
+.go:active { transform: translateY(1px); }
+.go svg { width: 14px; height: 14px; }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill {
+  display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: transparent; color: var(--ink);
+  border-radius: 999px; padding: 7px 14px; font: inherit; font-size: .92rem; font-weight: 500; cursor: pointer;
+  transition: background .2s, color .2s, border-color .2s;
+}
+.pill i { width: 8px; height: 8px; border-radius: 50%; background: var(--dot); }
+.pill[aria-pressed="true"] { background: var(--p); border-color: var(--p); color: var(--p-on); }
+.pill[aria-pressed="true"] i { background: var(--p-on); }
+.term {
+  background: var(--term); color: var(--term-ink); border-radius: 12px; padding: 14px 16px;
+  font-family: var(--font-mono); font-size: .9rem; line-height: 1.55; overflow-x: auto; white-space: pre;
+}
+.term .pr { color: var(--term-dim); user-select: none; }
+.term .opt { color: #F5C26B; }
+.term .url { color: #8FD3FF; }
+.term .q { color: #9EF0A8; }
+.term .err { color: #FF8B8B; }
+.term .cm { color: var(--term-dim); }
+.status {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: .92rem; color: var(--muted);
+  border-top: 1px dashed var(--line); padding-top: 12px;
+}
+.status .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--line); flex: none; }
+.status.running .dot { background: var(--ok); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ok) 20%, transparent); }
+.status.running strong { color: var(--ink); }
+.examples { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: var(--step--1); color: var(--muted); align-items: baseline; }
+.examples button {
+  border: 0; background: none; padding: 0; font: inherit; font-family: var(--font-mono); color: var(--accent-ink); cursor: pointer;
+  text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px;
+}
+
+/* --- canaux */
+.ch-head { display: grid; gap: 14px; max-width: 760px; }
+.ch-tag { font-family: var(--font-mono); font-size: var(--step--1); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.ch-tag .num { border: 1px solid var(--ink); color: var(--ink); padding: 1px 8px; border-radius: 4px; font-weight: 500; }
+.ch-tag .ver { color: var(--accent-ink); }
+.ch-head h2 { font-family: var(--font-display); font-weight: 800; font-size: var(--step-3); line-height: .95; text-transform: uppercase; }
+.ch-head p { color: var(--muted); font-size: 1.1rem; max-width: 62ch; }
+.ch-grid { margin-top: clamp(30px, 4vw, 48px); display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); align-items: start; }
+.ch-grid.flip { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); }
+
+/* moniteur : fenêtre Windows */
+.monitor { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #121318; box-shadow: 0 30px 70px -40px rgba(10, 12, 20, .55); }
+.titlebar { display: flex; align-items: center; gap: 10px; background: #0D0E12; color: #C9CDD6; font-size: 12px; padding: 0 0 0 12px; height: 32px; }
+.titlebar svg { width: 15px; height: 15px; }
+.titlebar span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.titlebar .ctl { display: flex; height: 100%; }
+.titlebar .ctl b { width: 42px; display: grid; place-items: center; font-weight: 400; color: #9AA0AC; }
+.monitor img { display: block; width: 100%; height: auto; aspect-ratio: 900 / 660; }
+.views { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.views button {
+  border: 1px solid var(--line); background: transparent; color: var(--muted); font: inherit; font-size: var(--step--1);
+  padding: 6px 12px; border-radius: 8px; cursor: pointer;
+}
+.views button[aria-pressed="true"] { color: var(--ink); border-color: var(--ink); }
+
+.feats { display: grid; gap: 0; }
+.feat { display: grid; grid-template-columns: 9.5rem minmax(0, 1fr); gap: 16px; padding-block: 15px; border-top: 1px solid var(--line); }
+.feat:last-child { border-bottom: 1px solid var(--line); }
+.feat dt { font-weight: 700; font-size: .95rem; }
+.feat dd { margin: 0; color: var(--muted); font-size: .95rem; }
+.feat dd code { color: var(--ink); }
+
+/* raccourci du mode mini */
+.combo { margin-top: 28px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.combo .keys { display: flex; gap: 8px; align-items: center; }
+.combo .keys kbd { font-size: 1.05rem; padding: .45em .8em; border-radius: 9px; border-bottom-width: 4px; }
+.combo .keys kbd.press { transform: translateY(2px); border-bottom-width: 2px; border-color: var(--p); }
+.combo p { color: var(--muted); max-width: 34ch; font-size: .95rem; }
+
+/* specs */
+.specs { margin-top: clamp(36px, 5vw, 56px); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.spec { padding: 18px 20px; display: grid; gap: 4px; }
+.spec + .spec { border-left: 1px solid var(--line); }
+.spec b { font-family: var(--font-display); font-weight: 800; font-size: 2.6rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.spec span { color: var(--muted); font-size: var(--step--1); }
+
+/* --- démo du chat */
+.chat {
+  --c: #9146FF; --c-on: #FFFFFF; --c-tint: color-mix(in srgb, #181A21 92%, var(--c));
+  background: #121318; color: #E7E9EE; border-radius: 14px; border: 1px solid var(--line); overflow: hidden;
+  font-size: 14px; line-height: 1.45; box-shadow: 0 30px 70px -40px rgba(10, 12, 20, .55);
+  display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; height: 560px; position: relative;
+}
+.chat[data-p="kick"] { --c: #53FC18; --c-on: #0B0D0A; }
+.chat[data-p="steamtv"] { --c: #2A475E; --c-on: #C7D5E0; --c-tint: color-mix(in srgb, #181A21 86%, #4E7DA3); }
+.chat-top { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 6px; }
+.chat-top b { font-size: 18px; }
+.chat-top small { color: #8C92A0; font-family: var(--font-mono); font-size: 11px; }
+.tabs { display: flex; gap: 6px; padding: 8px 14px; overflow-x: auto; }
+.tab {
+  display: inline-flex; align-items: center; gap: 7px; border-radius: 999px; padding: 5px 12px; cursor: pointer; flex: none;
+  border: 1px solid color-mix(in srgb, #2C303A 55%, var(--tc)); background: transparent; color: #E7E9EE; font: inherit; font-size: 13px; font-weight: 600;
+}
+.tab i { width: 7px; height: 7px; border-radius: 50%; background: var(--tc); }
+.tab .n { background: #2E323C; border-radius: 999px; padding: 0 6px; font-size: 11px; font-weight: 600; }
+.tab[aria-selected="true"] { background: var(--tc); color: var(--ton); border-color: var(--tc); }
+.tab[aria-selected="true"] i { background: var(--ton); }
+.card {
+  margin: 4px 14px 0; border: 1px solid color-mix(in srgb, #2C303A 40%, var(--c)); border-radius: 12px; background: var(--c-tint);
+  display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; transition: background .35s, border-color .35s;
+}
+.card-head { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid color-mix(in srgb, #2C303A 40%, var(--c)); }
+.card-head .pd { width: 8px; height: 8px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 1px #ffffff22; }
+.card-head b { font-size: 15px; }
+.card-head .st { color: #3CCB7F; font-size: 12px; display: inline-flex; align-items: center; gap: 5px; }
+.card-head .st::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.log { overflow-y: auto; padding: 8px 12px 10px; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #3A3F4B transparent; }
+.msg { padding: 2px 4px; border-radius: 4px; overflow-wrap: anywhere; }
+.msg.new { animation: slidein .28s ease-out; }
+@keyframes slidein { from { opacity: 0; transform: translateY(6px); } }
+.msg time { color: #7E8494; font-size: 12px; font-variant-numeric: tabular-nums; margin-right: 6px; }
+.msg .u { font-weight: 700; }
+.msg.mention { background: #4A3A1C; }
+.msg.first { background: #1D3A30; }
+.msg.event { background: color-mix(in srgb, #181A21 70%, var(--c)); }
+.msg.deleted { color: #7E8494; text-decoration: line-through; }
+.msg.deleted .u { color: #7E8494 !important; }
+.bd { display: inline-grid; place-items: center; width: 16px; height: 16px; border-radius: 4px; color: #fff; font-size: 10px; font-weight: 800; vertical-align: -3px; margin-right: 3px; }
+.emo { display: inline-block; width: 22px; height: 22px; vertical-align: -6px; margin: 0 2px; }
+.paused {
+  position: absolute; left: 50%; bottom: 74px; transform: translateX(-50%); border: 0; cursor: pointer;
+  background: var(--c); color: var(--c-on); font: inherit; font-size: 13px; font-weight: 700; padding: 7px 14px; border-radius: 999px;
+  box-shadow: 0 8px 22px -8px rgba(0, 0, 0, .6);
+}
+.compose { display: flex; gap: 8px; padding: 12px 14px 14px; }
+.compose input {
+  flex: 1; min-width: 0; border: 1px solid #2C303A; background: #181A21; color: #E7E9EE; border-radius: 10px; padding: 11px 13px; font: inherit; font-size: 14px; outline: none;
+}
+.compose input:focus { border-color: var(--c); }
+.compose input:disabled { opacity: .75; }
+.compose button { border: 0; width: 44px; border-radius: 10px; background: var(--c); color: var(--c-on); cursor: pointer; display: grid; place-items: center; }
+.compose button:disabled { opacity: .45; cursor: default; }
+.compose svg { width: 17px; height: 17px; }
+.chat-note { margin-top: 12px; color: var(--muted); font-size: var(--step--1); }
+
+.ptable { width: 100%; border-collapse: collapse; font-size: .93rem; }
+.ptable th, .ptable td { text-align: left; padding: 11px 10px 11px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+.ptable th { font-family: var(--font-mono); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.ptable td:first-child { font-weight: 700; white-space: nowrap; }
+.ptable td:first-child i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 8px; }
+.ptable .exp { font-family: var(--font-mono); font-size: 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; margin-left: 4px; white-space: nowrap; }
+.tbl { overflow-x: auto; }
+.shots { margin-top: 26px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.shots figure { margin: 0; display: grid; gap: 6px; }
+.shots img { border-radius: 8px; border: 1px solid var(--line); aspect-ratio: 560 / 780; width: 100%; height: auto; display: block; }
+.shots figcaption { font-size: 12px; color: var(--muted); font-family: var(--font-mono); }
+
+/* --- ensemble */
+.pair { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(20px, 3vw, 36px); margin-top: clamp(30px, 4vw, 44px); }
+.pair div { display: grid; gap: 8px; align-content: start; }
+.pair h3 { font-size: 1.1rem; }
+.pair p { color: var(--muted); font-size: .95rem; }
+
+/* --- téléchargement */
+.dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: clamp(30px, 4vw, 44px); }
+.app { border: 1px solid var(--line); background: var(--surface); border-radius: 18px; padding: clamp(18px, 3vw, 28px); display: grid; gap: 18px; align-content: start; }
+.app header { display: flex; align-items: center; gap: 14px; }
+.app header svg { width: 46px; height: 46px; flex: none; }
+.app h3 { font-family: var(--font-display); font-weight: 800; font-size: 1.9rem; line-height: 1; text-transform: uppercase; }
+.app header small { display: block; color: var(--muted); font-family: var(--font-mono); font-size: 12px; margin-top: 4px; }
+.files { display: grid; gap: 8px; }
+.file {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center;
+  border: 1px solid var(--line); background: var(--raised); border-radius: 12px; padding: 12px 14px; color: var(--ink); text-decoration: none;
+  transition: border-color .2s, transform .15s;
+}
+.file:hover { border-color: var(--p); transform: translateY(-1px); }
+.file .os { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); width: 4.2rem; }
+.file b { font-weight: 600; overflow-wrap: anywhere; font-size: .95rem; }
+.file span { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.steps { display: grid; gap: 10px; counter-reset: s; }
+.steps li { list-style: none; display: grid; grid-template-columns: 1.6rem minmax(0, 1fr); gap: 8px; font-size: .92rem; color: var(--muted); }
+.steps li::before { counter-increment: s; content: counter(s); font-family: var(--font-mono); font-size: 12px; color: var(--ink); border: 1px solid var(--line); border-radius: 50%; width: 1.4rem; height: 1.4rem; display: grid; place-items: center; }
+.steps { padding: 0; margin: 0; }
+.cmd { display: flex; align-items: center; gap: 8px; background: var(--term); color: var(--term-ink); border-radius: 8px; padding: 6px 6px 6px 12px; margin-top: 6px; }
+.cmd code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; font-size: .82rem; }
+.cmd button { border: 1px solid #3A3F4B; background: transparent; color: var(--term-ink); border-radius: 6px; font: inherit; font-size: 12px; padding: 4px 9px; cursor: pointer; }
+.app .links { display: flex; gap: 8px 18px; flex-wrap: wrap; font-size: .9rem; }
+.trust { margin-top: 22px; color: var(--muted); font-size: .92rem; max-width: 80ch; }
+
+footer { padding-block: 34px 48px; border-top: 1px solid var(--line); color: var(--muted); font-size: var(--step--1); }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 10px 28px; justify-content: space-between; }
+
+
+/* --- animation de chargement : mise sous tension façon écran de régie, puis « zapping » des plateformes */
+.boot { position: fixed; inset: 0; z-index: 100; background: var(--bg); pointer-events: none;
+  animation: boot-open .55s cubic-bezier(.7, 0, .3, 1) .5s forwards; }
+.boot::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 2px; margin-top: -1px;
+  background: var(--p); box-shadow: 0 0 18px 2px var(--p), 0 0 60px 6px color-mix(in srgb, var(--p) 45%, transparent);
+  transform: scaleX(0); animation: boot-line .5s cubic-bezier(.2, .8, .2, 1) forwards; }
+.boot::after { content: "CH 1 · SIGNAL"; position: absolute; left: 50%; top: calc(50% + 16px); transform: translateX(-50%);
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .2em; color: var(--muted); animation: boot-fade .5s ease forwards; }
+@keyframes boot-line { 0% { transform: scaleX(0); opacity: 1; } 100% { transform: scaleX(1); opacity: 1; } }
+@keyframes boot-open { 0% { clip-path: inset(0 0 0 0); } 99% { clip-path: inset(50% 0 50% 0); opacity: 1; } 100% { clip-path: inset(50% 0 50% 0); opacity: 0; visibility: hidden; } }
+@keyframes boot-fade { 0%, 60% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes rise { from { opacity: 0; transform: translateY(26px); } }
+@keyframes word { from { opacity: 0; transform: translateY(.45em) skewY(4deg); filter: blur(6px); } }
+@keyframes drop { from { opacity: 0; transform: translateY(-12px); } }
+@keyframes type { from { clip-path: inset(0 100% 0 0); } }
+.top { animation: drop .6s ease-out .95s backwards; }
+.onair { animation: rise .6s ease-out 1s backwards; }
+.hero h1 .w { display: inline-block; animation: word .7s cubic-bezier(.2, .8, .2, 1) backwards; }
+.hero h1 .w:nth-child(1) { animation-delay: 1.05s; } .hero h1 .w:nth-child(2) { animation-delay: 1.13s; }
+.hero h1 .w:nth-child(3) { animation-delay: 1.21s; } .hero h1 .w:nth-child(4) { animation-delay: 1.29s; }
+.hero h1 .w:nth-child(5) { animation-delay: 1.37s; }
+.lede { animation: rise .7s ease-out 1.45s backwards; }
+.demo { animation: rise .8s cubic-bezier(.2, .8, .2, 1) 1.6s backwards; }
+.term.typing .l2 { display: inline-block; animation: type 1s steps(46) 2.3s backwards; }
+:root.surfing { transition: --p .12s linear, --p-ink-l .12s linear, --p-ink-d .12s linear; }
+
+@media (max-width: 900px) {
+  .ch-grid, .ch-grid.flip, .dl { grid-template-columns: minmax(0, 1fr); }
+  .pair { grid-template-columns: minmax(0, 1fr); }
+  .specs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .spec:nth-child(3) { border-left: 0; }
+  .spec:nth-child(n+3) { border-top: 1px solid var(--line); }
+}
+@media (max-width: 620px) {
+  .fieldrow { grid-template-columns: minmax(0, 1fr) auto; }
+  .fieldrow .field { grid-column: 1 / -1; }
+  .go { justify-content: center; }
+  .feat { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .shots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .shots figure:last-child { display: none; }
+  .chat { height: 500px; }
+  .field .hint { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .boot { display: none; }
+}
+/* --- menu de langue */
+.top-right { display: flex; align-items: center; gap: 12px 20px; flex-wrap: wrap; }
+.langsel { position: relative; display: inline-flex; align-items: center; }
+.langsel svg { position: absolute; left: 10px; width: 16px; height: 16px; color: var(--muted); pointer-events: none; }
+.langsel::after { content: ""; position: absolute; right: 12px; top: 50%; width: 6px; height: 6px; border-right: 1.6px solid var(--muted); border-bottom: 1.6px solid var(--muted); transform: translateY(-70%) rotate(45deg); pointer-events: none; }
+.langsel select { appearance: none; -webkit-appearance: none; font: inherit; font-size: var(--step--1); font-weight: 600; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 6px 32px; cursor: pointer; }
+.langsel select:hover { border-color: var(--p); }
+.themebtn { display: inline-flex; align-items: center; gap: 8px; font: inherit; font-size: var(--step--1); font-weight: 600; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px 6px 11px; cursor: pointer; }
+.themebtn svg { width: 16px; height: 16px; color: var(--muted); flex: none; }
+.themebtn:hover { border-color: var(--p); }
+.themebtn:hover svg { color: var(--accent-ink); }
+@media (max-width: 620px) { .themebtn { padding: 6px 9px; } .themebtn span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+:root.static .hero h1 .w { animation: none; }
+/* --- vue Docs (onglet du header) */
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+.nav a[aria-current="page"] { color: var(--ink); text-decoration: underline; text-decoration-color: var(--p); text-decoration-thickness: 2px; text-underline-offset: 6px; }
+:root.nointro .top { animation: none; }
+#docs { border-top: 1px solid var(--line); }
+#docs {
+  --bg: #E9ECF1; --surface: #F7F8FA; --raised: #FFFFFF; --ink: #13151B; --muted: #586071; --line: #CDD2DB;
+  --term: #171A21; --term-ink: #DCE0E8; --term-dim: #7D8597;
+  --p: #9146FF; --p-on: #FFFFFF; --accent-ink: #6E2BD9;
+  --launcher: #6E2BD9; --chat: #1C6896; --warn-bg: #FFF4D6; --warn-ink: #7A5200; --mark: #FFE58A;
+  --tip-bg: #E3F1FA; --tip-ink: #154F73; --shade: rgba(10, 12, 16, .82);
+  --font-display: "Big Shoulders Display", "Arial Narrow", "Roboto Condensed", Impact, sans-serif;
+  --font-body: "Instrument Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", "Cascadia Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+:root:not([data-theme="light"]) #docs {
+    --bg: #0F1116; --surface: #161920; --raised: #1C2029; --ink: #ECEEF3; --muted: #959CAD; --line: #2A2F3A;
+    --term: #0A0C10; --term-ink: #DCE0E8; --term-dim: #6F7789; --accent-ink: #B794FF;
+    --launcher: #B794FF; --chat: #7FCBF5; --warn-bg: #3A2F12; --warn-ink: #F5D27A; --mark: #6B5A12;
+    --tip-bg: #12293A; --tip-ink: #A9D8F5; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] #docs {
+  --bg: #0F1116; --surface: #161920; --raised: #1C2029; --ink: #ECEEF3; --muted: #959CAD; --line: #2A2F3A;
+  --term: #0A0C10; --term-ink: #DCE0E8; --term-dim: #6F7789; --accent-ink: #B794FF;
+  --launcher: #B794FF; --chat: #7FCBF5; --warn-bg: #3A2F12; --warn-ink: #F5D27A; --mark: #6B5A12;
+  --tip-bg: #12293A; --tip-ink: #A9D8F5; color-scheme: dark;
+}
+#docs { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 1rem; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+#docs a { color: var(--accent-ink); text-underline-offset: 3px; }
+#docs :focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 3px; border-radius: 4px; }
+#docs h1, #docs h2, #docs h3 { text-wrap: balance; margin: 0; }
+#docs p { margin: 0; }
+#docs code { font-family: var(--font-mono); font-size: .88em; background: var(--surface); border: 1px solid var(--line); border-radius: 5px; padding: .05em .35em; overflow-wrap: anywhere; }
+#docs kbd { font-family: var(--font-mono); font-size: .82em; padding: .1em .45em; border-radius: 5px; border: 1px solid var(--line); border-bottom-width: 2px; background: var(--raised); white-space: nowrap; }
+#docs mark { background: var(--mark); color: inherit; border-radius: 2px; }
+#docs .d-wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+#docs .intro { padding-block: clamp(32px, 6vw, 64px) 28px; display: grid; gap: 16px; }
+#docs .tag { font-family: var(--font-mono); font-size: .8rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+#docs .tag .d-num { border: 1px solid var(--ink); color: var(--ink); padding: 1px 8px; border-radius: 4px; }
+#docs .intro > * { min-width: 0; }
+#docs .intro h1 { font-family: var(--font-display); font-weight: 900; font-size: clamp(2.3rem, 10vw, 5.6rem); overflow-wrap: anywhere; line-height: .9; text-transform: uppercase; }
+#docs .intro p { color: var(--muted); font-size: 1.15rem; max-width: 62ch; }
+#docs .search { display: flex; align-items: center; gap: 10px; width: 100%; background: var(--raised); border: 1px solid var(--line); border-radius: 12px; padding: 0 14px; margin-top: 8px; }
+#docs .search:focus-within { border-color: var(--p); box-shadow: 0 0 0 4px color-mix(in srgb, var(--p) 24%, transparent); }
+#docs .search svg { width: 18px; height: 18px; color: var(--muted); flex: none; }
+#docs .search input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); font: inherit; padding-block: 13px; outline: none; }
+#docs .search .count { font-family: var(--font-mono); font-size: .75rem; color: var(--muted); white-space: nowrap; }
+#docs .search input { font-size: 1.05rem; }
+#docs .syn { font-size: .85rem; color: var(--muted); min-height: 1.4em; }
+#docs .quick { display: flex; flex-wrap: wrap; gap: 8px; }
+#docs .quick a { font-size: .85rem; font-weight: 600; text-decoration: none; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; }
+#docs .quick a:hover { border-color: var(--p); }
+#docs .layout > * { min-width: 0; }
+#docs .layout { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); padding-bottom: 80px; align-items: start; }
+#docs .toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); max-height: calc(100vh - 40px); overflow-y: auto; display: grid; gap: 1px; font-size: .88rem; scrollbar-width: thin; }
+#docs .toc b { font-family: var(--font-mono); font-size: .72rem; font-weight: 500; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 10px 0 6px; }
+#docs .toc b:first-child { margin-top: 0; }
+#docs .toc a { display: grid; grid-template-columns: 1.6rem minmax(0, 1fr); gap: 4px; color: var(--muted); text-decoration: none; padding: 5px 10px; border-radius: 8px; border-left: 2px solid transparent; }
+#docs .toc a span { font-family: var(--font-mono); font-size: .75rem; padding-top: .15em; }
+#docs .toc a:hover { color: var(--ink); background: var(--surface); }
+#docs .toc a.on { color: var(--ink); background: var(--surface); border-left-color: var(--p); font-weight: 600; }
+#docs .toc a.dim { opacity: .35; }
+#docs article { display: grid; gap: clamp(48px, 7vw, 80px); min-width: 0; }
+#docs section.doc { display: grid; gap: 18px; scroll-margin-top: 20px; min-width: 0; }
+#docs section.doc > * { min-width: 0; }
+#docs section.doc > header { display: grid; gap: 6px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+#docs section.doc > header small { font-family: var(--font-mono); font-size: .75rem; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+#docs section.doc h2 { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.9rem, 3.6vw, 2.6rem); line-height: 1; text-transform: uppercase; }
+#docs .lead { color: var(--muted); font-size: 1.05rem; max-width: 70ch; }
+#docs .blk { display: grid; gap: 10px; min-width: 0; }
+#docs .blk h3 { font-size: 1.08rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+#docs .blk p, #docs .blk li { color: color-mix(in srgb, var(--ink) 82%, var(--muted)); max-width: 72ch; }
+#docs .blk ul, #docs .blk ol { margin: 0; padding-left: 1.25rem; display: grid; gap: 6px; }
+#docs .d-app { font-family: var(--font-mono); font-size: .68rem; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; border: 1px solid currentColor; border-radius: 4px; padding: 0 6px; line-height: 1.6; }
+#docs .d-app.l { color: var(--launcher); }
+#docs .d-app.c { color: var(--chat); }
+#docs .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+#docs .d-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: grid; gap: 8px; align-content: start; }
+#docs .d-card h3 { font-family: var(--font-display); font-weight: 800; font-size: 1.5rem; text-transform: uppercase; line-height: 1; }
+#docs .d-card p { color: var(--muted); font-size: .95rem; }
+#docs .d-tbl { overflow-x: auto; }
+#docs table { border-collapse: collapse; width: 100%; font-size: .92rem; }
+#docs th, #docs td { text-align: left; padding: 9px 12px 9px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+#docs th { font-family: var(--font-mono); font-weight: 500; font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+#docs td kbd { margin-block: 1px; display: inline-block; }
+#docs .d-term { background: var(--term); color: var(--term-ink); border-radius: 10px; padding: 12px 14px; padding-right: 76px; font-family: var(--font-mono); font-size: .86rem; line-height: 1.6; overflow-x: auto; white-space: pre; position: relative; }
+#docs .d-term .d-pr { color: var(--term-dim); user-select: none; }
+#docs .d-term .d-cm { color: var(--term-dim); }
+#docs .d-term button { position: absolute; top: 8px; right: 8px; border: 1px solid #3A3F4B; background: var(--term); color: var(--term-ink); border-radius: 6px; font: inherit; font-size: .72rem; padding: 2px 8px; cursor: pointer; }
+#docs .d-term .fn { display: block; color: var(--term-dim); font-size: .75rem; margin-bottom: 4px; user-select: none; }
+#docs .note { background: var(--warn-bg); color: var(--warn-ink); border-radius: 10px; padding: 12px 14px; font-size: .93rem; max-width: 72ch; }
+#docs .note b { font-weight: 700; }
+#docs .tip { background: var(--tip-bg); color: var(--tip-ink); border-radius: 10px; padding: 12px 14px; font-size: .93rem; max-width: 72ch; }
+#docs .tip code { background: transparent; border-color: color-mix(in srgb, var(--tip-ink) 30%, transparent); }
+#docs .path { font-family: var(--font-mono); font-size: .85em; overflow-wrap: anywhere; }
+#docs .d-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+#docs .d-tabs button { border: 1px solid var(--line); background: transparent; color: var(--muted); font: inherit; font-size: .9rem; font-weight: 600; padding: 7px 16px; border-radius: 999px; cursor: pointer; }
+#docs .d-tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+#docs .pane:not(.on) { display: none; }
+#docs .pane { display: grid; gap: 14px; }
+#docs .d-shots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+#docs .d-shots.tall { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+#docs figure { margin: 0; display: grid; gap: 8px; align-content: start; }
+#docs figure .zoom { display: block; padding: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface); cursor: zoom-in; width: 100%; }
+#docs figure img { display: block; width: 100%; height: auto; }
+#docs figure .zoom:hover { border-color: var(--p); }
+#docs figcaption { font-size: .88rem; color: var(--muted); }
+#docs figcaption b { color: var(--ink); font-weight: 600; }
+#docs figure.wide { grid-column: 1 / -1; }
+#docs dialog.lb { border: 0; padding: 0; background: transparent; max-width: min(96vw, 1100px); max-height: 94vh; }
+#docs dialog.lb::backdrop { background: var(--shade); }
+#docs dialog.lb img { display: block; max-width: 100%; max-height: 86vh; width: auto; height: auto; border-radius: 10px; margin: 0 auto; }
+#docs dialog.lb p { color: #E6E8EE; text-align: center; font-size: .9rem; padding: 10px 8px 0; }
+#docs dialog.lb button { position: fixed; top: 14px; right: 14px; border: 1px solid #444A57; background: #1C2029; color: #fff; border-radius: 999px; width: 40px; height: 40px; font-size: 1.2rem; cursor: pointer; }
+#docs .d-steps { counter-reset: s; list-style: none; padding: 0 !important; display: grid; gap: 12px !important; }
+#docs .d-steps > li { counter-increment: s; position: relative; padding-left: 40px; }
+#docs .d-steps > li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: var(--bg); font-family: var(--font-mono); font-size: .8rem; display: grid; place-items: center; }
+#docs .gl-list { display: grid; gap: 0; border-top: 1px solid var(--line); }
+#docs .gl { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 4px 20px; padding: 12px 0; border-bottom: 1px solid var(--line); scroll-margin-top: 20px; }
+#docs .gl dt { font-weight: 700; }
+#docs .gl dd { margin: 0; color: color-mix(in srgb, var(--ink) 82%, var(--muted)); max-width: 68ch; }
+#docs .gl:target { background: color-mix(in srgb, var(--p) 10%, transparent); }
+#docs .letters { display: flex; flex-wrap: wrap; gap: 4px; font-family: var(--font-mono); font-size: .8rem; }
+#docs .letters a { text-decoration: none; border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; color: var(--muted); }
+#docs details.faq { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+#docs details.faq summary { cursor: pointer; list-style: none; padding: 14px 44px 14px 16px; font-weight: 600; position: relative; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+#docs details.faq summary::-webkit-details-marker { display: none; }
+#docs details.faq summary::after { content: "+"; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-family: var(--font-mono); font-size: 1.2rem; color: var(--muted); }
+#docs details.faq[open] summary::after { content: "–"; }
+#docs details.faq .a { padding: 0 16px 16px; display: grid; gap: 10px; }
+#docs details.faq .a p, #docs details.faq .a li { color: color-mix(in srgb, var(--ink) 82%, var(--muted)); max-width: 70ch; }
+#docs details.faq .a ol, #docs details.faq .a ul { margin: 0; padding-left: 1.25rem; display: grid; gap: 4px; }
+#docs .faqs { display: grid; gap: 8px; }
+#docs .empty { color: var(--muted); font-style: italic; }
+#docs .hidden-by-search { display: none !important; }
+#docs footer { border-top: 1px solid var(--line); padding-block: 28px 40px; color: var(--muted); font-size: .82rem; }
+@media (max-width: 880px) {
+#docs .layout { grid-template-columns: minmax(0, 1fr); }
+#docs .toc { position: static; max-height: none; display: flex; overflow-x: auto; gap: 6px; padding-bottom: 6px; margin-inline: -4px; }
+#docs .toc b { display: none; }
+#docs .toc a { flex: none; grid-template-columns: auto auto; border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; white-space: nowrap; }
+#docs .toc a.on { border-color: var(--p); }
+#docs .cards { grid-template-columns: minmax(0, 1fr); }
+#docs .d-shots.tall { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+#docs .d-shots { grid-template-columns: minmax(0, 1fr); }
+#docs .gl { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="logo" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="var(--p)"/><path d="M12.5 9.6v12.8c0 .8.9 1.3 1.6.8l9.6-6.4c.6-.4.6-1.2 0-1.6l-9.6-6.4c-.7-.5-1.6 0-1.6.8z" fill="var(--p-on)"/></symbol>
+    <symbol id="logo-chat" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="var(--p)"/><path d="M9 10.5c0-1.4 1.1-2.5 2.5-2.5h9c1.4 0 2.5 1.1 2.5 2.5v7c0 1.4-1.1 2.5-2.5 2.5h-5.2L12 23.4V20h-.5C10.1 20 9 18.9 9 17.5z" fill="var(--p-on)"/></symbol>
+    <symbol id="i-search" viewBox="0 0 20 20"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12.6 12.6 17 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 20 20"><circle cx="10" cy="10" r="3.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.3 4.3l1.4 1.4M14.3 14.3l1.4 1.4M4.3 15.7l1.4-1.4M14.3 5.7l1.4-1.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 20 20"><path d="M16.5 11.6A6.8 6.8 0 0 1 8.4 3.5a6.8 6.8 0 1 0 8.1 8.1z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 10h15M10 2.5c2.2 2.3 3.2 4.8 3.2 7.5s-1 5.2-3.2 7.5c-2.2-2.3-3.2-4.8-3.2-7.5s1-5.2 3.2-7.5z" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+    <symbol id="i-play" viewBox="0 0 14 14"><path d="M3 1.8v10.4c0 .6.7 1 1.2.6l8-5.2c.5-.3.5-1 0-1.3l-8-5.1C3.7.8 3 1.2 3 1.8z" fill="currentColor"/></symbol>
+    <symbol id="i-send" viewBox="0 0 20 20"><path d="M3 3.5 17 10 3 16.5l2.2-6.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M5.2 10H11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="emo" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#F2C94C"/><circle cx="8.3" cy="9.6" r="1.6" fill="#3B2A0A"/><circle cx="15.7" cy="9.6" r="1.6" fill="#3B2A0A"/><path d="M7 14c1.3 2.4 3 3.4 5 3.4s3.7-1 5-3.4" fill="none" stroke="#3B2A0A" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="emo2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#A6E36B"/><path d="M6.5 9.5h4M13.5 9.5h4" stroke="#1E3309" stroke-width="2" stroke-linecap="round"/><ellipse cx="12" cy="16" rx="3.4" ry="2.4" fill="#1E3309"/></symbol>
+  </defs>
+</svg>
+
+<header class="top">
+<div class="wrap">
+<a class="brand" href="../../it/"><svg aria-hidden="true"><use href="#logo"></use></svg>Streamlink Launcher <span style="color:var(--muted);font-weight:500">&amp; Chat</span></a>
+<div class="top-right">
+<nav aria-label="Sections" class="nav">
+<a href="../../it/#launcher">Launcher</a>
+<a href="../../it/#chat">Chat</a>
+<a data-i18n="nav_dl" href="../../it/#download">Scarica</a>
+<a href="https://github.com/Bulls64" rel="noopener" target="_blank">GitHub</a>
+<a aria-current="page" href="../../it/docs/" id="nav-docs">Docs</a>
+</nav>
+<button class="themebtn" id="theme" type="button"><svg aria-hidden="true"><use href="#i-moon"></use></svg><span id="themeLabel">Mode sombre</span></button>
+<label class="langsel"><span class="sr" data-i18n="lang_label">Lingua</span><svg aria-hidden="true"><use href="#i-globe"></use></svg>
+<select id="lang"><option lang="fr" value="fr">Français</option><option lang="en" value="en">English</option><option lang="es" value="es">Español</option><option lang="de" value="de">Deutsch</option><option lang="it" selected="" value="it">Italiano</option></select>
+</label>
+</div>
+</div>
+</header>
+
+<div id="docs" class="docs-view">
+<main id="docroot">
+<div class="d-wrap">
+  <div class="intro">
+    <div class="tag"><span class="d-num">DOCS</span><span>Launcher v1.5.1 · Chat v0.2.1</span></div>
+    <h1>Documentazione</h1>
+    <p>Tutto quello che serve per installare Streamlink, usare le due app e risolvere i problemi più comuni. Le etichette <span class="d-app l">Launcher</span> e <span class="d-app c">Chat</span> indicano a quale app si riferisce un passaggio.</p>
+    <label class="search" for="dq">
+      <svg aria-hidden="true"><use href="#i-search"/></svg>
+      <input id="dq" type="search" placeholder="Cerca: preferiti, SmartScreen, Kick, scorciatoia…" autocomplete="off" aria-label="Cerca nella documentazione">
+      <span class="count" id="count" aria-live="polite"></span>
+    </label>
+    <p class="syn" id="syn" aria-live="polite"></p>
+    <nav class="quick" aria-label="Accesso rapido">
+      <a href="#primi-passi">Primo stream</a><a href="#scrivere">Scrivere in chat</a><a href="#scorciatoie">Scorciatoie</a><a href="#risoluzione-problemi">Risoluzione dei problemi</a><a href="#segnalare">Segnalare un bug</a>
+    </nav>
+  </div>
+
+  <div class="layout">
+    <nav class="toc" aria-label="Sommario" id="toc">
+      <b>Scoprire</b>
+      <a href="#panoramica"><span>01</span>Le due app</a>
+      <a href="#tour-immagini"><span>02</span>Tour per immagini</a>
+      <a href="#streamlink"><span>03</span>Streamlink</a>
+      <a href="#installare"><span>04</span>Installare Streamlink</a>
+      <a href="#primi-passi"><span>05</span>Primi passi</a>
+      <b>Usare</b>
+      <a href="#scorciatoie"><span>06</span>Tastiera e mouse</a>
+      <a href="#preferiti"><span>07</span>Cronologia e preferiti</a>
+      <a href="#scrivere"><span>08</span>Scrivere in chat</a>
+      <a href="#piattaforme"><span>09</span>Emote e piattaforme</a>
+      <a href="#ricette"><span>10</span>Ricette</a>
+      <b>Mantenere</b>
+      <a href="#aggiornamenti"><span>11</span>Aggiornamenti</a>
+      <a href="#impostazioni"><span>12</span>Impostazioni</a>
+      <a href="#riservatezza"><span>13</span>Dati e privacy</a>
+      <a href="#risoluzione-problemi"><span>14</span>Risoluzione dei problemi</a>
+      <a href="#disinstallare"><span>15</span>Disinstallare</a>
+      <b>Andare oltre</b>
+      <a href="#segnalare"><span>16</span>Segnalare e contribuire</a>
+      <a href="#glossario"><span>17</span>Glossario</a>
+    </nav>
+
+    <article id="doc">
+      <!-- 01 -->
+      <section class="doc" id="panoramica">
+        <header><small>01 · Panoramica</small><h2>Cosa sono Streamlink Launcher e Streamlink Chat?</h2></header>
+        <div class="cards blk">
+          <div class="d-card">
+            <h3>Launcher</h3>
+            <p>Un'interfaccia leggera per Streamlink. Scrivi il nome di un canale o incolla un link, premi <kbd>Invio</kbd> e lo stream si apre nel tuo lettore video (VLC, mpv, PotPlayer…) invece che nel browser. Ricorda i tuoi preferiti, ti dice quali sono in diretta e apre una barra mini con <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd>.</p>
+          </div>
+          <div class="d-card">
+            <h3>Chat</h3>
+            <p>Il compagno del launcher, nello spirito di Chatterino: le chat di Twitch, Kick e Steam TV in un'unica finestra, una scheda per chat, ognuna con il colore della sua piattaforma. Lettura senza account, scrittura su Twitch e Kick dopo l'accesso, e ▶ per aprire lo stream con Streamlink.</p>
+          </div>
+        </div>
+        <div class="blk">
+          <h3>Piattaforme supportate</h3>
+          <div class="d-tbl"><table>
+            <thead><tr><th>Piattaforma</th><th>Launcher</th><th>Chat</th></tr></thead>
+            <tbody>
+              <tr><td>Twitch</td><td>Sì, senza pubblicità</td><td>Lettura e scrittura</td></tr>
+              <tr><td>Kick</td><td>Sì</td><td>Lettura e scrittura (sperimentale)</td></tr>
+              <tr><td>Steam TV</td><td>Sì</td><td>Sola lettura</td></tr>
+              <tr><td>YouTube, Dailymotion</td><td>Sì</td><td>No</td></tr>
+              <tr><td>Link diretto</td><td>Qualsiasi sito supportato da Streamlink</td><td>No</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+        <div class="blk">
+          <h3>Requisiti</h3>
+          <ul>
+            <li><b>Windows 10 o 11</b>: un <code>.exe</code> in un unico file, senza installazione.</li>
+            <li><b>Linux x86_64</b>: un'AppImage che include il proprio Python. Richiede glibc 2.35 o successiva (Ubuntu 22.04, Debian 12, Fedora 36, Linux Mint 21 o successive).</li>
+            <li><b>Dal codice sorgente</b>: Python 3.10 o successivo con Tcl/Tk, nessun'altra dipendenza.</li>
+            <li>Per guardare: <a href="#installare">Streamlink</a> e un lettore video, VLC come predefinito.</li>
+          </ul>
+          <p class="note"><b>Su Linux</b> il launcher non ha icona nell'area di notifica, scorciatoia globale, avvio con il sistema, trascinamento, notifiche delle dirette, anteprime degli stream né aggiornamento integrato.</p>
+        </div>
+        <div class="blk">
+          <h3>Lingue</h3>
+          <p>Le due app sono disponibili in inglese, francese, spagnolo, tedesco e italiano. Seguono la lingua del sistema; puoi cambiarla in <em>Impostazioni › Generale</em> (Launcher) o <em>Impostazioni › Visualizzazione</em> (Chat).</p>
+        </div>
+      </section>
+
+      <!-- 02 -->
+      <section class="doc" id="tour-immagini">
+        <header><small>02 · Per immagini</small><h2>Tour per immagini</h2></header>
+        <p class="lead">Fai clic su uno screenshot per ingrandirlo. I canali e i messaggi sono solo esempi. Gli screenshot mostrano le app in inglese.</p>
+        <div class="blk">
+          <div class="d-tabs" role="tablist" aria-label="Applicazione" data-group="visit">
+            <button type="button" role="tab" aria-selected="true" data-tab="launcher">Launcher</button>
+            <button type="button" role="tab" aria-selected="false" data-tab="chat">Chat</button>
+          </div>
+        </div>
+        <div class="pane on" data-group="visit" data-pane="launcher">
+          <div class="d-shots">
+            <figure class="wide blk"><button type="button" class="zoom"><img src="../../assets/img/docs/en/l_main.webp" decoding="async" width="900" height="660" alt="Schermata principale del launcher, tema scuro" loading="lazy"></button>
+              <figcaption><b>La schermata principale.</b> In alto, il campo di inserimento, la qualità e <em>Avvia</em>. Sotto, i pulsanti delle piattaforme, poi i tuoi preferiti della piattaforma selezionata (prima quelli in diretta, con anteprima) e i tuoi ultimi avvii. In basso, gli stream in corso e il pulsante <em>Registro</em>.</figcaption></figure>
+            <figure class="blk"><button type="button" class="zoom"><img src="../../assets/img/docs/en/l_mini.webp" decoding="async" width="605" height="289" alt="Barra della modalità mini" loading="lazy"></button>
+              <figcaption><b>La modalità mini.</b> Una barra mobile che si apre con <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd> da qualsiasi applicazione (Windows).</figcaption></figure>
+            <figure class="blk"><button type="button" class="zoom"><img src="../../assets/img/docs/en/l_drawer.webp" decoding="async" width="900" height="660" alt="Pannello del registro aperto" loading="lazy"></button>
+              <figcaption><b>Il pannello del registro.</b> Gli stream in corso, ognuno con <em>Interrompi</em>, e l'output di Streamlink.</figcaption></figure>
+            <figure class="blk"><button type="button" class="zoom"><img src="../../assets/img/docs/en/l_favorites.webp" decoding="async" width="900" height="660" alt="Pannello dei preferiti" loading="lazy"></button>
+              <figcaption><b>Il pannello Preferiti</b>, che si apre con <em>Mostra tutto</em>: stato, spettatori, ▶ e cestino.</figcaption></figure>
+            <figure class="blk"><button type="button" class="zoom"><img src="../../assets/img/docs/en/l_history.webp" decoding="async" width="900" height="660" alt="Pannello della cronologia" loading="lazy"></button>
+              <figcaption><b>La cronologia</b>, che si apre con l'icona dell'orologio o con <em>Cronologia completa</em>.</figcaption></figure>
+            <figure class="blk"><button type="button" class="zoom"><img src="../../assets/img/docs/en/l_settings.webp" decoding="async" width="900" height="660" alt="Pannello delle impostazioni del launcher" loading="lazy"></button>
+              <figcaption><b>Le impostazioni</b> (<kbd>Ctrl</kbd>+<kbd>,</kbd>), raggruppate per argomento: Generale, In diretta, Finestra e scorciatoia, Lettore video, Streamlink, Avanzate, Backup, Informazioni.</figcaption></figure>
+            <figure class="blk"><button type="button" class="zoom"><img src="../../assets/img/docs/en/l_main_light.webp" decoding="async" width="900" height="660" alt="Schermata principale, tema chiaro" loading="lazy"></button>
+              <figcaption><b>Il tema chiaro.</b> <em>Auto</em> segue la modalità chiara o scura di Windows.</figcaption></figure>
+          </div>
+        </div>
+        <div class="pane" data-group="visit" data-pane="chat">
+          <div class="d-shots tall">
+            <figure class="blk"><button type="button" class="zoom"><img src="../../assets/img/docs/en/c_twitch.webp" decoding="async" width="560" height="760" alt="Chat di Twitch connessa, tema scuro" loading="lazy"></button>
+              <figcaption><b>Una chat di Twitch connessa.</b> Badge, emote come immagini, una menzione del tuo nome evidenziata, un abbonamento che risalta. Il numero sulla scheda di Kick conta i messaggi non letti.</figcaption></figure>
+            <figure class="blk"><button type="button" class="zoom"><img src="../../assets/img/docs/en/c_kick_light.webp" decoding="async" width="560" height="760" alt="Chat di Kick in sola lettura, tema chiaro" loading="lazy"></button>
+              <figcaption><b>Una chat di Kick</b>, in sola lettura, tema chiaro. Ogni scheda prende il colore della sua piattaforma.</figcaption></figure>
+            <figure class="blk"><button type="button" class="zoom"><img src="../../assets/img/docs/en/c_steam_light.webp" decoding="async" width="560" height="760" alt="Chat di Steam TV" loading="lazy"></button>
+              <figcaption><b>Steam TV</b>, sempre in sola lettura.</figcaption></figure>
+            <figure class="blk"><button type="button" class="zoom"><img src="../../assets/img/docs/en/c_settings.webp" decoding="async" width="560" height="760" alt="Impostazioni della chat" loading="lazy"></button>
+              <figcaption><b>Le impostazioni della chat</b>: Visualizzazione, Emote, Menzioni, Account, Guarda, Aggiornamenti.</figcaption></figure>
+          </div>
+        </div>
+      </section>
+
+      <!-- 03 -->
+      <section class="doc" id="streamlink">
+        <header><small>03 · Il motore</small><h2>Che cos'è Streamlink?</h2></header>
+        <div class="blk">
+          <p><a href="https://streamlink.github.io/" target="_blank" rel="noopener">Streamlink</a> è un programma libero a riga di comando. Recupera il flusso video di uno stream e lo invia al tuo lettore. Così guardi Twitch, Kick o YouTube in VLC o mpv, senza la pagina web intorno: meno memoria, niente pubblicità di Twitch e le scorciatoie del tuo lettore.</p>
+          <p>Di solito Streamlink si usa in un terminale:</p>
+          <div class="d-term"><span class="d-pr">$ </span>streamlink https://www.twitch.tv/eslcs best</div>
+          <p>Streamlink Launcher scrive questo comando al posto tuo: riconosce la piattaforma, aggiunge le opzioni giuste e la qualità scelta, poi avvia Streamlink. Streamlink Chat lo usa per il suo pulsante ▶.</p>
+        </div>
+        <div class="blk">
+          <h3>Qualità</h3>
+          <p><code>best</code> sceglie la qualità più alta, <code>worst</code> la più bassa, <code>audio_only</code> solo l'audio (Twitch). Puoi anche chiedere una qualità precisa come <code>1080p60</code>, o un elenco di riserva: <code>720p60,720p,best</code> prende la prima disponibile.</p>
+        </div>
+        <div class="blk">
+          <h3>E la pubblicità di Twitch?</h3>
+          <p>Dalla versione 7.5.0, Streamlink filtra sempre la pubblicità degli stream di Twitch. La vecchia opzione <code>--twitch-disable-ads</code> non serve più (è deprecata, ma ancora accettata).</p>
+        </div>
+        <p class="note"><b>Streamlink è un progetto indipendente.</b> Nessuna delle due app lo include: lo installi a parte, una volta sola.</p>
+      </section>
+
+      <!-- 04 -->
+      <section class="doc" id="installare">
+        <header><small>04 · Installazione</small><h2>Dove scaricare Streamlink e come installarlo?</h2></header>
+        <div class="blk">
+          <p>Streamlink è disponibile sul suo sito ufficiale, <a href="https://streamlink.github.io/install.html" target="_blank" rel="noopener">streamlink.github.io/install</a>. Scegli il tuo sistema:</p>
+          <div class="d-tabs" role="tablist" aria-label="Sistema" data-group="os">
+            <button type="button" role="tab" aria-selected="true" data-tab="win">Windows</button>
+            <button type="button" role="tab" aria-selected="false" data-tab="linux">Linux</button>
+            <button type="button" role="tab" aria-selected="false" data-tab="pip">Python (pip)</button>
+          </div>
+        </div>
+        <div class="pane on blk" data-group="os" data-pane="win">
+          <h3>Windows: il programma di installazione (consigliato)</h3>
+          <ol>
+            <li>Apri la pagina delle <a href="https://github.com/streamlink/windows-builds/releases" target="_blank" rel="noopener">versioni di Streamlink per Windows</a>.</li>
+            <li>Scarica il programma di installazione <code>.exe</code> dell'ultima versione (Windows 10 o successivo, x86_64).</li>
+            <li>Avvialo e segui i passaggi. Aggiunge Streamlink al <code>PATH</code>: il launcher lo trova da solo.</li>
+          </ol>
+          <h3>Oppure con un gestore di pacchetti</h3>
+          <div class="d-term"><span class="d-cm"># winget (incluso in Windows 11)</span>
+<span class="d-pr">&gt; </span>winget install streamlink
+<span class="d-cm"># Chocolatey</span>
+<span class="d-pr">&gt; </span>choco install streamlink
+<span class="d-cm"># Scoop</span>
+<span class="d-pr">&gt; </span>scoop bucket add extras
+<span class="d-pr">&gt; </span>scoop install streamlink</div>
+        </div>
+        <div class="pane blk" data-group="os" data-pane="linux">
+          <h3>Linux: il pacchetto della tua distribuzione</h3>
+          <div class="d-term"><span class="d-cm"># Fedora</span>
+<span class="d-pr">$ </span>sudo dnf install streamlink
+<span class="d-cm"># Arch Linux</span>
+<span class="d-pr">$ </span>sudo pacman -S streamlink
+<span class="d-cm"># Debian testing / sid</span>
+<span class="d-pr">$ </span>sudo apt update &amp;&amp; sudo apt install streamlink</div>
+          <p class="note"><b>Ubuntu e derivate:</b> il sito di Streamlink sconsiglia il pacchetto di Ubuntu, che non è mantenuto. Usa l'installazione con Python (scheda successiva) o l'AppImage di Streamlink, offerta nella stessa pagina.</p>
+          <p>Ti serve anche un lettore, per esempio <code>sudo apt install mpv</code> o <code>sudo dnf install vlc</code>.</p>
+        </div>
+        <div class="pane blk" data-group="os" data-pane="pip">
+          <h3>Con Python (qualsiasi sistema)</h3>
+          <p>Richiede Python 3.10 o successivo.</p>
+          <div class="d-term"><span class="d-pr">$ </span>pip install -U streamlink</div>
+          <p>Lo stesso comando aggiorna Streamlink. Su Linux è meglio un ambiente virtuale o <code>pipx install streamlink</code>, per non toccare il Python di sistema.</p>
+        </div>
+        <div class="blk">
+          <h3>Verificare l'installazione</h3>
+          <div class="d-term"><span class="d-pr">$ </span>streamlink --version</div>
+          <p>Se il comando mostra un numero di versione, è tutto pronto. Nel <span class="d-app l">Launcher</span>, <em>Impostazioni › Streamlink</em> mostra anche la versione trovata.</p>
+        </div>
+        <div class="blk">
+          <h3>Streamlink installato altrove? <span class="d-app l">Launcher</span> <span class="d-app c">Chat</span></h3>
+          <p>Le app cercano Streamlink nel <code>PATH</code> e nelle posizioni abituali. Se si trova altrove, indica il percorso di <code>streamlink.exe</code> in <em>Impostazioni › Streamlink › Percorso personalizzato</em> (Launcher) o in <em>Impostazioni › Guarda</em> (Chat).</p>
+        </div>
+      </section>
+
+      <!-- 05 -->
+      <section class="doc" id="primi-passi">
+        <header><small>05 · Si comincia</small><h2>Primi passi</h2></header>
+        <div class="blk">
+          <h3>Dove mettere le app <span class="d-app l">Launcher</span> <span class="d-app c">Chat</span></h3>
+          <p>Scarica il file dalla pagina delle versioni (<a href="https://github.com/Bulls64/Streamlink-Launcher/releases/latest" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/releases/latest" target="_blank" rel="noopener">Chat</a>) e mettilo in una cartella tua, per esempio <span class="path">Documents\Streamlink</span>. Le impostazioni vengono salvate accanto e l'aggiornamento integrato può sostituire il file. Evita <span class="path">C:\Program Files</span>, che è protetta da scrittura.</p>
+          <p>Su Linux, rendi eseguibile l'AppImage, poi avviala:</p>
+          <div class="d-term"><span class="d-pr">$ </span>chmod +x StreamlinkLauncher-*-x86_64.AppImage
+<span class="d-pr">$ </span>./StreamlinkLauncher-*-x86_64.AppImage</div>
+          <p>Per avere una voce nel menu delle applicazioni, usa uno strumento come <a href="https://flathub.org/apps/it.mijorus.gearlever" target="_blank" rel="noopener">Gear Lever</a> o AppImageLauncher.</p>
+        </div>
+        <div class="blk">
+          <h3>Il tuo primo stream <span class="d-app l">Launcher</span></h3>
+          <ol class="d-steps">
+            <li>Assicurati che <a href="#installare">Streamlink</a> e un lettore video siano installati.</li>
+            <li>Scegli la piattaforma con il suo pulsante: Twitch, Kick, YouTube, Dailymotion, Steam TV o <em>Link diretto</em>.</li>
+            <li>Scrivi il nome del canale (<code>eslcs</code>) o incolla un link (<code>https://kick.com/…</code>): un link seleziona la piattaforma da solo.</li>
+            <li>Scegli la qualità se serve, poi <kbd>Invio</kbd> o <em>Avvia</em>. Il lettore si apre dopo qualche secondo.</li>
+            <li>Per seguire o fermare lo stream, apri il <em>Registro</em> in fondo alla finestra: mostra l'output di Streamlink e un pulsante <em>Interrompi</em>.</li>
+          </ol>
+        </div>
+        <div class="blk">
+          <h3>Tre modi più rapidi <span class="d-app l">Launcher</span></h3>
+          <ul>
+            <li><b>Copiare un link</b>: copia l'indirizzo di uno stream, poi torna al launcher. Ti propone di avviarlo, e il link è già nella barra mini. Si può disattivare in <em>Impostazioni › Streamlink › Rileva i link copiati</em>.</li>
+            <li><b>Trascinare e rilasciare</b> (Windows): trascina sulla finestra l'indirizzo dalla barra del browser, un testo selezionato o un collegamento Internet <code>.url</code>.</li>
+            <li><b>Modalità mini</b> (Windows): <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd> da qualsiasi applicazione, scrivi, <kbd>Invio</kbd>.</li>
+          </ul>
+        </div>
+        <div class="blk">
+          <h3>La tua prima chat <span class="d-app c">Chat</span></h3>
+          <ol class="d-steps">
+            <li>Scegli la piattaforma con il suo pulsante, sotto il campo <em>Aggiungi una chat</em>.</li>
+            <li>Scrivi il nome del canale o incolla un link, poi <kbd>Invio</kbd>. <kbd>Ctrl</kbd>+<kbd>T</kbd> porta il cursore in questo campo.</li>
+            <li>La chat si apre in una nuova scheda, in sola lettura. Per scrivere, collega il tuo account (vedi <a href="#scrivere">Scrivere in chat</a>).</li>
+            <li>Nell'intestazione della chat, ▶ apre lo stream con Streamlink e l'icona del link apre il canale nel browser.</li>
+          </ol>
+          <p>Il campo accetta un nome (<code>eslcs</code>), un prefisso (<code>kick:lunaria</code>, <code>steam:nome</code>) o un link: <code>twitch.tv/…</code>, <code>kick.com/…</code>, <code>steam.tv/…</code>, <code>steamcommunity.com/broadcast/watch/…</code>, link «popout» compresi. Le tue schede tornano al prossimo avvio.</p>
+        </div>
+      </section>
+
+      <!-- 06 -->
+      <section class="doc" id="scorciatoie">
+        <header><small>06 · Tastiera e mouse</small><h2>Scorciatoie da tastiera e clic utili</h2></header>
+        <div class="blk">
+          <h3>Finestra principale <span class="d-app l">Launcher</span></h3>
+          <div class="d-tbl"><table>
+            <thead><tr><th>Azione</th><th>Tasti</th></tr></thead>
+            <tbody>
+              <tr><td>Avviare lo stream o scegliere il suggerimento evidenziato</td><td><kbd>Invio</kbd></td></tr>
+              <tr><td>Scorrere i suggerimenti (preferiti, poi cronologia)</td><td><kbd>↓</kbd> <kbd>↑</kbd></td></tr>
+              <tr><td>Aprire le impostazioni</td><td><kbd>Ctrl</kbd>+<kbd>,</kbd></td></tr>
+              <tr><td>Chiudere un menu o un pannello</td><td><kbd>Esc</kbd></td></tr>
+              <tr><td>Opzioni di un preferito (avviare, compilare il campo, rimuovere)</td><td>Clic destro sulla sua scheda</td></tr>
+              <tr><td>Aprire la modalità mini, da qualsiasi punto (Windows)</td><td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd></td></tr>
+            </tbody>
+          </table></div>
+          <p>La scorciatoia globale può essere sostituita con <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Spazio</kbd>, <kbd>Ctrl</kbd>+<kbd>Maiusc</kbd>+<kbd>Spazio</kbd>, <kbd>Alt</kbd>+<kbd>Maiusc</kbd>+<kbd>S</kbd> o <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>L</kbd>, in <em>Impostazioni › Finestra e scorciatoia</em>.</p>
+        </div>
+        <div class="blk">
+          <h3>Modalità mini <span class="d-app l">Launcher</span></h3>
+          <div class="d-tbl"><table>
+            <thead><tr><th>Azione</th><th>Tasti</th></tr></thead>
+            <tbody>
+              <tr><td>Piattaforma successiva / precedente</td><td><kbd>Tab</kbd> / <kbd>Maiusc</kbd>+<kbd>Tab</kbd></td></tr>
+              <tr><td>Scorrere i suggerimenti</td><td><kbd>↓</kbd> <kbd>↑</kbd></td></tr>
+              <tr><td>Avviare</td><td><kbd>Invio</kbd></td></tr>
+              <tr><td>Chiudere la barra</td><td><kbd>Esc</kbd>, o clic altrove</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+        <div class="blk">
+          <h3>Schede e scrittura <span class="d-app c">Chat</span></h3>
+          <div class="d-tbl"><table>
+            <thead><tr><th>Azione</th><th>Tasti</th></tr></thead>
+            <tbody>
+              <tr><td>Aggiungere una chat</td><td><kbd>Ctrl</kbd>+<kbd>T</kbd>, poi un nome o un link e <kbd>Invio</kbd></td></tr>
+              <tr><td>Chat successiva / precedente</td><td><kbd>Ctrl</kbd>+<kbd>Tab</kbd> / <kbd>Ctrl</kbd>+<kbd>Maiusc</kbd>+<kbd>Tab</kbd></td></tr>
+              <tr><td>Chiudere la chat corrente</td><td><kbd>Ctrl</kbd>+<kbd>W</kbd></td></tr>
+              <tr><td>Inviare il messaggio</td><td><kbd>Invio</kbd></td></tr>
+              <tr><td>Richiamare i tuoi messaggi precedenti</td><td><kbd>↑</kbd> <kbd>↓</kbd></td></tr>
+              <tr><td>Completare un nome o un'emote (premi di nuovo per il successivo)</td><td><kbd>Tab</kbd></td></tr>
+              <tr><td>Completare solo i nomi utente</td><td>Inizia con <code>@</code>, poi <kbd>Tab</kbd></td></tr>
+              <tr><td>Copiare testo dalla chat</td><td>Selezionalo con il mouse, poi <kbd>Ctrl</kbd>+<kbd>C</kbd></td></tr>
+              <tr><td>Chiudere un menu o un pannello</td><td><kbd>Esc</kbd></td></tr>
+            </tbody>
+          </table></div>
+        </div>
+        <div class="blk">
+          <h3>Clic nella chat <span class="d-app c">Chat</span></h3>
+          <div class="d-tbl"><table>
+            <thead><tr><th>Dove</th><th>Clic</th><th>Cosa fa</th></tr></thead>
+            <tbody>
+              <tr><td>Un nome utente, o un <code>@nome</code> in un messaggio</td><td>Sinistro</td><td><em>Menziona</em> (se hai effettuato l'accesso), <em>Copia il nome</em>, <em>Apri la chat di …</em>, <em>Vedi il canale</em></td></tr>
+              <tr><td>Un messaggio</td><td>Destro</td><td><em>Copia il messaggio</em>, <em>Copia il nome</em></td></tr>
+              <tr><td>Un link</td><td>Sinistro</td><td>Lo apre nel browser</td></tr>
+              <tr><td>Una scheda</td><td>Destro</td><td><em>Guarda con Streamlink</em>, <em>Apri nel browser</em>, <em>Riconnetti</em>, <em>Chiudi la chat</em></td></tr>
+              <tr><td>Una scheda</td><td>Centrale</td><td>Chiude la chat</td></tr>
+              <tr><td><em>Nuovi messaggi</em></td><td>Sinistro</td><td>Torna in fondo. Scorrere verso l'alto nella chat mette in pausa lo scorrimento automatico.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- 07 -->
+      <section class="doc" id="preferiti">
+        <header><small>07 · Ogni giorno</small><h2>Come gestisco cronologia e preferiti?</h2></header>
+        <div class="blk">
+          <h3>Aggiungere un preferito <span class="d-app l">Launcher</span></h3>
+          <ol>
+            <li>Scegli la piattaforma con il suo pulsante (Twitch, Kick…) e scrivi il nome del canale.</li>
+            <li>Fai clic sulla scheda <em>Aggiungi ai preferiti</em> nella schermata principale.</li>
+          </ol>
+          <p>La schermata principale mostra i preferiti della piattaforma selezionata, prima quelli in diretta. <em>Mostra tutto</em> apre l'elenco completo.</p>
+        </div>
+        <div class="blk">
+          <h3>Avviare, modificare o rimuovere un preferito <span class="d-app l">Launcher</span></h3>
+          <ul>
+            <li><b>Avviare</b>: fai clic sulla sua scheda.</li>
+            <li><b>Altre opzioni</b>: clic destro sulla scheda, poi <em>Avvia</em>, <em>Compila il campo</em> o <em>Rimuovi dai preferiti</em>.</li>
+            <li><b>Nel pannello Preferiti</b>: un clic su una riga compila il campo, ▶ avvia, il cestino rimuove.</li>
+          </ul>
+        </div>
+        <div class="blk">
+          <h3>Chi è in diretta? <span class="d-app l">Launcher</span></h3>
+          <p>Con <em>Impostazioni › In diretta › Controlla chi è in diretta</em>, il launcher controlla i tuoi preferiti di Twitch e Kick finché è aperto, ogni 2, 5, 10, 15 o 30 minuti (5 come predefinito). <em>Anteprima delle dirette</em> aggiunge miniatura, titolo e numero di spettatori dei preferiti Twitch in diretta, e <em>Notifica di Windows</em> ti avvisa quando un preferito va in diretta: fai clic sulla notifica per guardarlo.</p>
+        </div>
+        <div class="blk">
+          <h3>Cronologia <span class="d-app l">Launcher</span></h3>
+          <ul>
+            <li>Vengono conservati gli ultimi 200 avvii. I più recenti compaiono in <em>Recenti</em>; ▶ li riavvia direttamente.</li>
+            <li><em>Cronologia completa</em> apre il pannello: un clic compila il campo, ▶ riavvia, il cestino elimina una voce, <em>Cancella tutto</em> svuota la cronologia.</li>
+            <li>I suggerimenti del campo di inserimento vengono dai tuoi preferiti, poi dalla cronologia: usa <kbd>↓</kbd> <kbd>↑</kbd>, poi <kbd>Invio</kbd>.</li>
+          </ul>
+        </div>
+        <div class="blk">
+          <h3>Fare un backup o passare a un altro PC <span class="d-app l">Launcher</span></h3>
+          <p><em>Impostazioni › Backup › Esporta…</em> salva impostazioni e preferiti in un unico file. <em>Importa…</em> li ripristina e ti lascia scegliere: <b>Sì</b> aggiunge i preferiti importati ai tuoi, <b>No</b> sostituisce i tuoi preferiti, <b>Annulla</b> non cambia nulla. I percorsi specifici del computer (Streamlink, lettore, script) non sono inclusi, e nemmeno la cronologia.</p>
+        </div>
+        <div class="blk">
+          <h3>E nella chat? <span class="d-app c">Chat</span></h3>
+          <p>Streamlink Chat non ha preferiti: le chat aperte tornano da sole al prossimo avvio. Chiudi una chat con <kbd>Ctrl</kbd>+<kbd>W</kbd> o con un clic centrale sulla sua scheda. Per aprire sempre le stesse chat in un colpo solo, vedi la ricetta <a href="#ricetta-collegamento">Aprire le tue chat da un collegamento</a>.</p>
+        </div>
+        <div class="blk">
+          <h3>Dove sono i file?</h3>
+          <div class="d-tbl"><table>
+            <thead><tr><th>App</th><th>File</th><th>Cartella</th></tr></thead>
+            <tbody>
+              <tr><td><span class="d-app l">Launcher</span></td><td><code>streams/favorites.json</code>, <code>streams/history.json</code>, <code>config.json</code>, <code>platforms.json</code>, <code>launcher.log</code></td><td>Accanto al <code>.exe</code>; altrimenti <span class="path">%APPDATA%\Streamlink Launcher</span> o <span class="path">~/.config/streamlink-launcher</span> (sempre per l'AppImage)</td></tr>
+              <tr><td><span class="d-app c">Chat</span></td><td><code>chat.json</code> (chat aperte, impostazioni, account), <code>cache/emotes/</code>, <code>chat.log</code></td><td>Accanto al <code>.exe</code>; altrimenti <span class="path">%APPDATA%\Streamlink Chat</span> o <span class="path">~/.config/streamlink-chat</span> (sempre per l'AppImage)</td></tr>
+            </tbody>
+          </table></div>
+          <p>Ogni file ha una copia <code>.bak</code> della versione precedente: se un file si danneggia, l'app lo recupera. Nel <span class="d-app l">Launcher</span>, <em>Impostazioni › Informazioni › Apri la cartella dei dati</em> apre la cartella giusta.</p>
+        </div>
+      </section>
+
+      <!-- 08 -->
+      <section class="doc" id="scrivere">
+        <header><small>08 · Account</small><h2>Scrivere in chat</h2></header>
+        <p class="lead">Per leggere non serve un account. Per scrivere ti serve una tua applicazione gratuita su ogni piattaforma: così nessun segreto viene distribuito con il programma. Lo fai una volta sola.</p>
+        <div class="blk">
+          <div class="d-tabs" role="tablist" aria-label="Piattaforma" data-group="acct">
+            <button type="button" role="tab" aria-selected="true" data-tab="twitch">Twitch</button>
+            <button type="button" role="tab" aria-selected="false" data-tab="kick">Kick</button>
+            <button type="button" role="tab" aria-selected="false" data-tab="steam">Steam TV</button>
+          </div>
+        </div>
+        <div class="pane on blk" data-group="acct" data-pane="twitch">
+          <h3>Collegare Twitch <span class="d-app c">Chat</span></h3>
+          <ol class="d-steps">
+            <li>Apri <a href="https://dev.twitch.tv/console/apps/create" target="_blank" rel="noopener">dev.twitch.tv/console/apps/create</a> e accedi con il tuo account Twitch. Twitch potrebbe chiederti di attivare l'autenticazione a due fattori per usare la console.</li>
+            <li>Dai un nome all'applicazione, aggiungi l'URL di reindirizzamento <code>http://localhost</code>, scegli la categoria <em>Chat Bot</em> e il tipo di client <b>Public</b>, poi creala.</li>
+            <li>Copia il suo <b>Client ID</b> e incollalo in <em>Impostazioni › Account (per scrivere)</em>.</li>
+            <li>Fai clic su <em>Accedi a Twitch</em>. Si apre una pagina <code>twitch.tv/activate</code>: inserisci il codice mostrato dall'app e autorizzala.</li>
+            <li>L'intestazione delle chat di Twitch passa a <em>Connesso</em>. La connessione si rinnova da sola.</li>
+          </ol>
+          <p>L'app chiede solo due autorizzazioni: leggere e scrivere in chat (<code>chat:read</code>, <code>chat:edit</code>).</p>
+        </div>
+        <div class="pane blk" data-group="acct" data-pane="kick">
+          <h3>Collegare Kick <span class="d-app c">Chat</span></h3>
+          <ol class="d-steps">
+            <li>Apri le <a href="https://kick.com/settings/developer" target="_blank" rel="noopener">impostazioni sviluppatore di Kick</a> e crea un'applicazione.</li>
+            <li>Dichiara l'URL di reindirizzamento <code>http://localhost:48125/callback</code> e spunta i permessi <em>read user info</em> e <em>write to chat</em>.</li>
+            <li>Incolla il suo <b>Client ID</b> e il suo <b>Client Secret</b> in <em>Impostazioni › Account (per scrivere)</em>.</li>
+            <li>Fai clic su <em>Accedi a Kick</em>: il browser si apre su Kick, autorizza l'applicazione. Kick ti rimanda a <code>localhost:48125</code>, dove l'app attende la risposta.</li>
+          </ol>
+          <p class="note"><b>La porta 48125 deve essere libera</b> durante l'accesso. Se un altro programma la usa, chiudilo mentre ti colleghi.</p>
+        </div>
+        <div class="pane blk" data-group="acct" data-pane="steam">
+          <h3>Steam TV <span class="d-app c">Chat</span></h3>
+          <p>Steam non permette di scrivere nella chat di una trasmissione da un altro programma: Steam TV resta in sola lettura, senza account.</p>
+        </div>
+        <div class="blk">
+          <h3>Dove vengono conservati i token? <span class="d-app c">Chat</span></h3>
+          <ul>
+            <li>In <code>chat.json</code>. Su Windows sono cifrati con DPAPI: solo il tuo account Windows, su questo PC, può rileggerli.</li>
+            <li>Su Linux sono salvati in chiaro nella tua cartella personale. Non condividere questo file.</li>
+            <li>Se copi <code>chat.json</code> su un altro PC, lì i token non potranno essere letti: accedi di nuovo.</li>
+          </ul>
+        </div>
+        <div class="blk">
+          <h3>Disconnettersi e revocare l'accesso <span class="d-app c">Chat</span></h3>
+          <ul>
+            <li><em>Disconnetti</em>, in <em>Impostazioni › Account</em>, elimina i token dal tuo PC.</li>
+            <li>Per revocare l'accesso anche dal lato di Twitch, apri <a href="https://www.twitch.tv/settings/connections" target="_blank" rel="noopener">Impostazioni › Connessioni</a> su Twitch e scollega la tua applicazione.</li>
+            <li>Dal lato di Kick, elimina l'applicazione nelle impostazioni sviluppatore.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 09 -->
+      <section class="doc" id="piattaforme">
+        <header><small>09 · Sotto il cofano</small><h2>Emote e piattaforme</h2></header>
+        <div class="blk">
+          <h3>Da dove vengono le emote? <span class="d-app c">Chat</span></h3>
+          <div class="d-tbl"><table>
+            <thead><tr><th>Fonte</th><th>Twitch</th><th>Kick</th><th>Steam TV</th></tr></thead>
+            <tbody>
+              <tr><td>Emote della piattaforma</td><td>Sì</td><td>Sì</td><td>Emoticon di Steam</td></tr>
+              <tr><td>BetterTTV</td><td>Globali e del canale</td><td>No</td><td>No</td></tr>
+              <tr><td>FrankerFaceZ</td><td>Globali e del canale</td><td>No</td><td>No</td></tr>
+              <tr><td>7TV</td><td>Globali e del canale</td><td>Del canale</td><td>No</td></tr>
+            </tbody>
+          </table></div>
+          <p>Ogni fornitore si può attivare o disattivare in <em>Impostazioni › Emote</em>. Gli elenchi vengono caricati dai loro server all'apertura di una chat.</p>
+        </div>
+        <div class="blk">
+          <h3>Formati, animazioni e cache <span class="d-app c">Chat</span></h3>
+          <ul>
+            <li>Tk, la libreria grafica, mostra solo PNG e GIF: un'emote offerta solo in WebP o AVIF resta come testo.</li>
+            <li>Le emote animate si muovono solo nella chat visualizzata, con al massimo 40 fotogrammi ciascuna. <em>Impostazioni › Visualizzazione › Emote animate</em> le blocca tutte.</li>
+            <li>Le immagini scaricate vengono conservate in <code>cache/emotes/</code> per non scaricarle di nuovo. Questa cartella non viene mai svuotata automaticamente: puoi eliminarla a chat chiusa, viene ricostruita quando serve.</li>
+          </ul>
+        </div>
+        <div class="blk">
+          <h3>Come viene letta ogni piattaforma</h3>
+          <div class="d-tbl"><table>
+            <thead><tr><th>Piattaforma</th><th>Chat: lettura</th><th>Chat: scrittura</th><th>Launcher: chi è in diretta</th></tr></thead>
+            <tbody>
+              <tr><td>Twitch</td><td>IRC su WebSocket, senza account</td><td>IRC con il tuo token</td><td>Accesso web pubblico di Twitch (non ufficiale)</td></tr>
+              <tr><td>Kick</td><td>Chat in tempo reale di Kick (Centrifugo), con la vecchia connessione Pusher come riserva. <b>Sperimentale</b></td><td>API ufficiale di Kick</td><td>Streamlink (<code>streamlink --json</code>)</td></tr>
+              <tr><td>Steam TV</td><td>API web delle trasmissioni di Steam, non documentata</td><td>Non possibile</td><td>No</td></tr>
+              <tr><td>YouTube, Dailymotion, link diretto</td><td>—</td><td>—</td><td>No</td></tr>
+            </tbody>
+          </table></div>
+          <p>Questi canali non ufficiali possono cambiare senza preavviso. Quando succede, lo stato della diretta resta sconosciuto o la chat va in errore finché l'app non viene aggiornata.</p>
+        </div>
+        <div class="blk">
+          <h3>Cosa mostra la chat <span class="d-app c">Chat</span></h3>
+          <ul>
+            <li>Badge (streamer, moderatore, VIP, abbonato…) e colori dei nomi adattati per restare leggibili sul tema.</li>
+            <li>Risposte, abbonamenti e altri eventi. I messaggi eliminati e quelli degli utenti bannati appaiono barrati.</li>
+            <li>I messaggi che citano il tuo nome o una parola di <em>Impostazioni › Menzioni</em> vengono evidenziati, e la loro scheda lo segnala.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 10 -->
+      <section class="doc" id="ricette">
+        <header><small>10 · Ricette</small><h2>Ricette per fare prima</h2></header>
+        <div class="blk" id="ricetta-lettore">
+          <h3>Scegliere il lettore del pulsante ▶ <span class="d-app c">Chat</span></h3>
+          <p>La chat avvia Streamlink senza alcuna opzione per il lettore, quindi Streamlink usa quello del suo file di configurazione, VLC come predefinito. Per passare a mpv, crea questo file (senza estensione) e aggiungi:</p>
+          <div class="d-term"><span class="fn">config</span>player=mpv
+player-args=--force-window=immediate</div>
+          <div class="d-tbl"><table>
+            <thead><tr><th>Sistema</th><th>File di configurazione di Streamlink</th></tr></thead>
+            <tbody>
+              <tr><td>Windows</td><td><span class="path">%APPDATA%\streamlink\config</span></td></tr>
+              <tr><td>Linux</td><td><span class="path">~/.config/streamlink/config</span></td></tr>
+            </tbody>
+          </table></div>
+          <p>Se mpv non è nel <code>PATH</code>, metti il suo percorso completo dopo <code>player=</code>. Il <span class="d-app l">Launcher</span> usa questo file anche quando <em>Impostazioni › Lettore video</em> è su <em>Predefinito (impostazione di Streamlink)</em>.</p>
+        </div>
+        <div class="blk">
+          <h3>Guardare con meno ritardo</h3>
+          <p>Streamlink ha una modalità a bassa latenza per Twitch e Kick. Il modo più semplice è attivarla per una sola piattaforma, con un file di configurazione per il suo plugin, accanto al file <code>config</code>:</p>
+          <div class="d-term"><span class="fn">config.twitch</span>twitch-low-latency</div>
+          <div class="d-term"><span class="fn">config.kick</span>kick-low-latency</div>
+          <p>Funziona con entrambe le app. Il guadagno dipende dallo streamer, che deve aver attivato la bassa latenza; la riproduzione potrebbe andare in buffering un po' più spesso.</p>
+        </div>
+        <div class="blk">
+          <h3>Registrare uno stream mentre lo guardi</h3>
+          <p>In un terminale, <code>--record</code> scrive lo stream in un file mentre lo guardi:</p>
+          <div class="d-term"><span class="d-pr">$ </span>streamlink --record "{author}-{time:%Y%m%d-%H%M}.ts" https://www.twitch.tv/eslcs best</div>
+          <p><code>{author}</code> diventa il nome del canale e <code>{time:…}</code> la data e l'ora. Apri il file <code>.ts</code> con VLC o mpv.</p>
+          <p><span class="d-app l">Launcher</span> Per farlo dal launcher, aggiungi una piattaforma dedicata in <code>platforms.json</code> (il link <em>Modifica platforms.json</em> in fondo alle impostazioni), con un percorso completo verso la tua cartella dei video:</p>
+          <div class="d-term"><span class="fn">platforms.json (una voce in più nell'elenco "platforms")</span>{
+  "id": "twitch-rec",
+  "name": "Twitch REC",
+  "input": "channel",
+  "url": "https://www.twitch.tv/{arg}",
+  "hosts": [],
+  "args": ["--record", "C:\\Users\\tu\\Videos\\{author}-{time:%Y%m%d-%H%M}.ts"],
+  "qualities": ["best", "1080p60", "720p60", "480p"],
+  "color": "#E91916",
+  "text_color": "#FFFFFF",
+  "live_check": "none"
+}</div>
+          <p>Riavvia il launcher: compare un pulsante <em>Twitch REC</em>. <code>hosts</code> resta vuoto perché i link di Twitch incollati continuino ad andare al normale pulsante Twitch. In JSON, ogni <code>\</code> di un percorso Windows si scrive <code>\\</code>.</p>
+        </div>
+        <div class="blk">
+          <h3>Mai più «qualità non trovata»</h3>
+          <p>Non tutti i canali offrono tutte le qualità. <span class="d-app l">Launcher</span> Nell'elenco delle qualità, scegli <em>Personalizzata…</em> e inserisci un elenco di riserva come <code>720p60,720p,best</code>: Streamlink prende la prima che esiste e il launcher la ricorda per questa piattaforma. <span class="d-app c">Chat</span> La qualità del pulsante ▶ si sceglie da un elenco fisso; tieni <code>best</code> se guardi canali molto diversi.</p>
+        </div>
+        <div class="blk" id="ricetta-collegamento">
+          <h3>Aprire le tue chat da un collegamento <span class="d-app c">Chat</span></h3>
+          <p>Streamlink Chat accetta le chat come argomenti. Crea un collegamento di Windows (clic destro sul desktop › <em>Nuovo › Collegamento</em>) con una destinazione come:</p>
+          <div class="d-term">"C:\Users\tu\Documents\Streamlink\StreamlinkChat.exe" --open twitch:eslcs --open kick:lunaria</div>
+          <p>Se la chat è già aperta, queste chat vengono aggiunte alla finestra esistente. Anche un link di canale funziona come argomento.</p>
+          <p class="tip"><b>Suggerimento:</b> prima rinomina l'eseguibile senza numero di versione, per esempio <code>StreamlinkChat.exe</code>. Un file che porta la sua versione nel nome cambia nome a ogni aggiornamento e il collegamento non lo troverebbe più. Un nome senza versione viene mantenuto.</p>
+        </div>
+        <div class="blk">
+          <h3>Avviare il launcher ridotto a icona <span class="d-app l">Launcher</span></h3>
+          <p><em>Impostazioni › Finestra e scorciatoia › Avvia con Windows</em> lo avvia nell'area di notifica. Puoi fare lo stesso con un tuo collegamento aggiungendo <code>--tray</code> dopo il percorso dell'eseguibile.</p>
+        </div>
+        <div class="blk">
+          <h3>Tenere i tuoi vecchi script <code>.bat</code> <span class="d-app l">Launcher</span></h3>
+          <p>Se prima avviavi gli stream con degli script, attiva <em>Impostazioni › Avanzate › Mostra gli script .bat</em> e scegli la <em>Cartella degli script</em>. Un pulsante <em>Script</em> elenca i file <code>.bat</code>, <code>.cmd</code>, <code>.ps1</code>, <code>.exe</code>, <code>.py</code> e <code>.lnk</code> di quella cartella. Il campo permette di passare un argomento allo script (solo lettere, cifre, <code>.</code>, <code>_</code> e <code>-</code>).</p>
+        </div>
+      </section>
+
+      <!-- 11 -->
+      <section class="doc" id="aggiornamenti">
+        <header><small>11 · Aggiornamenti</small><h2>Come aggiorno l'app?</h2></header>
+        <div class="blk">
+          <h3>Il launcher <span class="d-app l">Launcher</span></h3>
+          <ol>
+            <li>Apri <em>Impostazioni › Informazioni</em>: la scheda mostra la tua versione e l'ultima pubblicata su GitHub.</li>
+            <li>Se esiste una versione più recente, fai clic su <em>Aggiorna</em>. Il launcher scarica il nuovo <code>.exe</code>, ne verifica dimensione e impronta SHA-256, lo mette al posto del vecchio e si riavvia.</li>
+          </ol>
+          <ul>
+            <li><em>Cerca aggiornamenti all'avvio</em> fa il controllo da solo.</li>
+            <li><em>Aggiorna il launcher automaticamente</em> installa anche la nuova versione all'avvio, mai durante uno stream.</li>
+            <li>Un file che porta la sua versione nel nome (<code>StreamlinkLauncher-1.4.2.exe</code>) prende il nuovo numero; l'avvio con Windows segue il nuovo nome.</li>
+          </ul>
+        </div>
+        <div class="blk">
+          <h3>La chat <span class="d-app c">Chat</span></h3>
+          <p>Stessa idea in <em>Impostazioni › Aggiornamenti</em>: <em>Verifica</em>, poi <em>Aggiorna</em>. La chat si riavvia con le tue chat aperte. Un punto sul pulsante delle impostazioni segnala una nuova versione, e <em>Aggiornamenti automatici</em> (disattivato come predefinito) fa tutto da solo all'avvio.</p>
+        </div>
+        <p class="note"><b>AppImage o codice sorgente:</b> l'aggiornamento con un clic vale solo per il <code>.exe</code> di Windows messo in una cartella scrivibile (non <span class="path">C:\Program Files</span>). Con l'AppImage, <em>Aggiorna</em> apre la pagina della versione: scarica la nuova AppImage e sostituisci la vecchia. Dal codice sorgente, esegui <code>git pull</code>.</p>
+        <div class="blk">
+          <h3>Aggiornare Streamlink stesso</h3>
+          <p>Il launcher confronta la tua versione di Streamlink con l'ultima pubblicata. Se la tua è più vecchia, la scheda <em>Impostazioni › Streamlink</em> propone <em>Aggiorna</em>: con il programma di installazione di Windows apre la pagina di download, con pip copia il comando <code>pip install -U streamlink</code>. Con winget, Chocolatey, Scoop o la tua distribuzione Linux, usa il loro solito comando di aggiornamento (<code>winget upgrade streamlink</code>, per esempio).</p>
+        </div>
+        <div class="blk">
+          <h3>Cosa c'è di nuovo?</h3>
+          <div class="d-tbl"><table>
+            <thead><tr><th>App</th><th>Ultima versione</th><th>In breve</th></tr></thead>
+            <tbody>
+              <tr><td><span class="d-app l">Launcher</span></td><td>1.5.1 (24 ottobre 2026)</td><td>Codice di condotta, commenti in inglese nel codice. Nessun cambiamento di comportamento.</td></tr>
+              <tr><td><span class="d-app c">Chat</span></td><td>0.2.1 (24 ottobre 2026)</td><td>Pulsanti delle piattaforme nel campo di aggiunta, molta meno memoria con le emote animate, 500 messaggi conservati come predefinito, file delle impostazioni leggibile solo da te (Linux), messaggio chiaro quando la porta di accesso a Kick è occupata.</td></tr>
+            </tbody>
+          </table></div>
+          <p>I dettagli di ogni versione sono nel registro delle modifiche, in inglese e francese: <a href="https://github.com/Bulls64/Streamlink-Launcher/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Chat</a>. I download sono nelle pagine delle versioni: <a href="https://github.com/Bulls64/Streamlink-Launcher/releases" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/releases" target="_blank" rel="noopener">Chat</a>.</p>
+        </div>
+      </section>
+
+      <!-- 12 -->
+      <section class="doc" id="impostazioni">
+        <header><small>12 · Impostazioni</small><h2>Altre domande sulle impostazioni</h2></header>
+        <div class="faqs">
+          <details class="faq"><summary>Come scelgo il lettore video? <span class="d-app l">Launcher</span></summary><div class="a">
+            <p><em>Impostazioni › Lettore video</em>: scegli VLC, mpv, PotPlayer o un altro programma e indica il suo percorso se non viene trovato. <em>Argomenti del lettore</em> aggiunge opzioni, per esempio <code>--fullscreen</code>. <em>Predefinito (impostazione di Streamlink)</em> lascia decidere a Streamlink (vedi <a href="#ricetta-lettore">la ricetta</a>).</p></div></details>
+          <details class="faq"><summary>Come cambio la qualità predefinita? <span class="d-app l">Launcher</span> <span class="d-app c">Chat</span></summary><div class="a">
+            <p>Nel launcher, l'elenco accanto al campo ricorda la qualità <b>per piattaforma</b>; <em>Personalizzata…</em> accetta una qualità precisa o un elenco di riserva. Nella chat è <em>Impostazioni › Guarda › Qualità</em>, usata dal pulsante ▶.</p></div></details>
+          <details class="faq"><summary>Come cambio la scorciatoia della modalità mini? <span class="d-app l">Launcher</span></summary><div class="a">
+            <p><em>Impostazioni › Finestra e scorciatoia</em>: attiva o disattiva <em>Scorciatoia globale</em> e scegli una combinazione diversa da <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd>. Lì viene mostrato anche lo stato della scorciatoia.</p></div></details>
+          <details class="faq"><summary>Il launcher può restare attivo in background? <span class="d-app l">Launcher</span></summary><div class="a">
+            <p>Sì: con <em>Riduci a icona nell'area di notifica</em>, chiudere la finestra lascia il launcher accanto all'orologio, con i tuoi stream e il controllo delle dirette. Clic destro sull'icona per riaprire la finestra, aprire la modalità mini, avviare un preferito in diretta o <em>Esci</em>. <em>Avvia con Windows</em> lo avvia ridotto a icona.</p></div></details>
+          <details class="faq"><summary>Come disattivo il rilevamento dei link copiati? <span class="d-app l">Launcher</span></summary><div class="a">
+            <p>Togli la spunta da <em>Rileva i link copiati</em> in <em>Impostazioni › Streamlink</em>. Gli appunti vengono letti solo sul tuo computer; nulla viene salvato o inviato.</p></div></details>
+          <details class="faq"><summary>Posso togliere i colori delle piattaforme? <span class="d-app l">Launcher</span> <span class="d-app c">Chat</span></summary><div class="a">
+            <p>Sì: <em>Colori per piattaforma</em> in <em>Impostazioni › Generale</em> (Launcher) o <em>Impostazioni › Visualizzazione</em> (Chat).</p></div></details>
+          <details class="faq"><summary>Come aggiungo una piattaforma? <span class="d-app l">Launcher</span></summary><div class="a">
+            <p>Il link <em>Modifica platforms.json</em>, in fondo al pannello delle impostazioni, apre il file. Ogni voce indica:</p>
+            <ul>
+              <li><code>id</code> e <code>name</code>: un identificatore unico e il nome del pulsante;</li>
+              <li><code>input</code>: <code>channel</code>, <code>youtube</code>, <code>video</code>, <code>url</code> (qualsiasi link) o <code>none</code> (niente da scrivere);</li>
+              <li><code>url</code>: il modello dell'indirizzo, dove <code>{arg}</code> viene sostituito da ciò che scrivi;</li>
+              <li><code>hosts</code>: i domini che selezionano questo pulsante quando incolli un link;</li>
+              <li><code>args</code>: opzioni aggiuntive di Streamlink;</li>
+              <li><code>qualities</code>, <code>color</code>, <code>text_color</code>;</li>
+              <li><code>live_check</code>: <code>twitch</code>, <code>streamlink</code> o <code>none</code>.</li>
+            </ul>
+            <p>Salva, poi riavvia il launcher per vedere il nuovo pulsante. Un esempio completo si trova nella ricetta <em>Registrare uno stream</em>.</p></div></details>
+          <details class="faq"><summary>Come scrivo in una chat? <span class="d-app c">Chat</span></summary><div class="a">
+            <p>Collega il tuo account Twitch o Kick in <em>Impostazioni › Account (per scrivere)</em>. I passaggi sono spiegati in <a href="#scrivere">Scrivere in chat</a>.</p></div></details>
+          <details class="faq"><summary>Quali opzioni di visualizzazione offre la chat? <span class="d-app c">Chat</span></summary><div class="a">
+            <p><em>Impostazioni › Visualizzazione</em>: lingua, tema, dimensione del testo, ora dei messaggi, badge, emote animate, colori per piattaforma e numero di messaggi conservati per chat (500, 1000, 2000 o 5000). <em>Emote</em> attiva o disattiva BetterTTV, FrankerFaceZ e 7TV. <em>Menzioni</em> evidenzia i messaggi che citano il tuo nome o parole a tua scelta, separate da virgole.</p></div></details>
+        </div>
+      </section>
+
+      <!-- 13 -->
+      <section class="doc" id="riservatezza">
+        <header><small>13 · Privacy</small><h2>Dati e privacy</h2></header>
+        <p class="lead">Nessuna delle due app raccoglie dati o invia statistiche. Ecco tutto ciò che contattano, e perché.</p>
+        <div class="blk">
+          <h3>Cosa contatta il launcher <span class="d-app l">Launcher</span></h3>
+          <div class="d-tbl"><table>
+            <thead><tr><th>Quando</th><th>Dove</th><th>Disattivabile</th></tr></thead>
+            <tbody>
+              <tr><td>Stato della diretta dei preferiti Twitch</td><td>Accesso web pubblico di Twitch; immagini di anteprima dal server di immagini di Twitch</td><td>Sì (<em>In diretta</em>)</td></tr>
+              <tr><td>Stato della diretta dei preferiti Kick</td><td>Kick, tramite <code>streamlink --json</code></td><td>Sì (<em>In diretta</em>)</td></tr>
+              <tr><td>Ricerca di aggiornamenti</td><td>PyPI (versione di Streamlink) e <code>api.github.com</code> (versione del launcher)</td><td>Sì</td></tr>
+              <tr><td>Installazione di un aggiornamento</td><td><code>github.com</code>, solo quando fai clic su <em>Aggiorna</em> (o con gli aggiornamenti automatici)</td><td>Sì</td></tr>
+              <tr><td>Guardare uno stream</td><td>Streamlink contatta la piattaforma dello stream</td><td>—</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+        <div class="blk">
+          <h3>Cosa contatta la chat <span class="d-app c">Chat</span></h3>
+          <div class="d-tbl"><table>
+            <thead><tr><th>Quando</th><th>Dove</th><th>Disattivabile</th></tr></thead>
+            <tbody>
+              <tr><td>Leggere una chat</td><td>IRC di Twitch, <code>kick.com</code> / <code>web.kick.com</code> e il server in tempo reale di Kick, <code>steamcommunity.com</code></td><td>—</td></tr>
+              <tr><td>Mostrare le emote</td><td>Twitch, Kick, Steam, BetterTTV, FrankerFaceZ, 7TV</td><td>Sì, per fornitore</td></tr>
+              <tr><td>Scrivere</td><td>Le API ufficiali di accesso e di chat di Twitch e Kick</td><td>Non accedere</td></tr>
+              <tr><td>Aggiornamenti</td><td><code>api.github.com</code>, poi <code>github.com</code> per il download</td><td>Sì</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+        <div class="blk">
+          <h3>Cosa resta sul tuo PC</h3>
+          <ul>
+            <li><b>Impostazioni, preferiti, cronologia, chat aperte</b>: nei file descritti in <a href="#preferiti">Dove sono i file</a>, da nessun'altra parte.</li>
+            <li><b>Token di accesso</b> (Chat): cifrati con DPAPI su Windows, in chiaro nella tua cartella personale su Linux.</li>
+            <li><b>Appunti</b> (Launcher): letti solo per riconoscere un link di stream; né salvati né inviati.</li>
+            <li><b>Log</b>: <code>launcher.log</code> e <code>chat.log</code> annotano gli errori (due file da 512 KB al massimo ciascuno). Restano sul tuo PC, a meno che tu non li alleghi a una segnalazione.</li>
+            <li><b>Registro di Windows</b> (Launcher): un solo valore, <code>StreamlinkLauncher</code> in <span class="path">HKCU\Software\Microsoft\Windows\CurrentVersion\Run</span>, e solo se <em>Avvia con Windows</em> è attivo.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 14 -->
+      <section class="doc" id="risoluzione-problemi">
+        <header><small>14 · Risoluzione dei problemi</small><h2>Risoluzione dei problemi (FAQ)</h2></header>
+        <div class="faqs">
+          <details class="faq"><summary>«Streamlink non trovato» <span class="d-app l">Launcher</span> <span class="d-app c">Chat</span></summary><div class="a">
+            <p>Installa Streamlink (vedi <a href="#installare">Installare Streamlink</a>), poi riavvia l'app. Se è installato altrove, indica il percorso di <code>streamlink.exe</code> nelle impostazioni. Verifica in un terminale che <code>streamlink --version</code> risponda.</p></div></details>
+          <details class="faq"><summary>Lo stream non parte <span class="d-app l">Launcher</span></summary><div class="a">
+            <p>Apri il pannello del registro in fondo alla finestra: lì compare il messaggio di errore di Streamlink. Le cause più comuni:</p>
+            <ul>
+              <li><code>No playable streams found</code>: il canale è offline, o il nome è scritto male.</li>
+              <li>La qualità richiesta non esiste per questo stream: scegli <code>best</code> o un <a href="#streamlink">elenco di riserva</a> con <em>Personalizzata…</em>.</li>
+              <li>Il lettore video non viene trovato: indica il suo percorso in <em>Impostazioni › Lettore video</em>.</li>
+            </ul></div></details>
+          <details class="faq"><summary>Lo stream scatta o si interrompe <span class="d-app l">Launcher</span> <span class="d-app c">Chat</span></summary><div class="a">
+            <p>Prova una qualità più bassa (<code>720p</code>, <code>480p</code>): richiede meno banda. Se hai attivato la bassa latenza, toglila. I messaggi del registro dicono se Streamlink sta aspettando dati.</p></div></details>
+          <details class="faq"><summary>C'è l'audio, ma non il video <span class="d-app l">Launcher</span></summary><div class="a">
+            <p>Verifica che la qualità scelta non sia <code>audio_only</code>. Altrimenti aggiorna il lettore; con mpv, l'opzione <code>--force-window=immediate</code> apre subito la finestra.</p></div></details>
+          <details class="faq"><summary>Windows mostra «Windows ha protetto il PC» <span class="d-app l">Launcher</span> <span class="d-app c">Chat</span></summary><div class="a">
+            <p>Gli eseguibili non hanno ancora una firma del codice, quindi SmartScreen avvisa al primo avvio. Non è un rilevamento.</p>
+            <ol>
+              <li>Verifica il file: in PowerShell, <code>Get-FileHash .\StreamlinkLauncher-1.5.1.exe</code>, e confronta con il <code>SHA256SUMS.txt</code> della versione.</li>
+              <li>Fai clic su <em>Ulteriori informazioni</em>, poi su <em>Esegui comunque</em>.</li>
+              <li>Se con il doppio clic non succede nulla: clic destro › <em>Proprietà</em> › spunta <em>Annulla blocco</em>, oppure <code>Unblock-File .\StreamlinkLauncher-1.5.1.exe</code>.</li>
+            </ol></div></details>
+          <details class="faq"><summary>Il mio antivirus blocca o elimina l'exe <span class="d-app l">Launcher</span> <span class="d-app c">Chat</span></summary><div class="a">
+            <p>I programmi creati con PyInstaller vengono talvolta segnalati per errore. Verifica lo SHA-256, ripristina il file dalla quarantena, aggiungi la sua cartella alle esclusioni e segnala il falso positivo (Microsoft Defender: <a href="https://www.microsoft.com/wdsi/filesubmission" target="_blank" rel="noopener">invia un file</a>, categoria <em>Incorrectly detected as malware</em>). Puoi anche avviare l'app dal codice sorgente.</p></div></details>
+          <details class="faq"><summary><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd> non fa nulla <span class="d-app l">Launcher</span></summary><div class="a">
+            <p>Probabilmente un'altra applicazione usa questa scorciatoia. Il launcher ti avvisa all'avvio; scegline un'altra in <em>Impostazioni › Finestra e scorciatoia</em>. Ogni pressione ricevuta viene annotata nel registro. La scorciatoia globale esiste solo su Windows.</p></div></details>
+          <details class="faq"><summary>L'app non si apre una seconda volta <span class="d-app l">Launcher</span> <span class="d-app c">Chat</span></summary><div class="a">
+            <p>È voluto: di ogni app gira una sola copia alla volta. Il launcher è probabilmente nell'area di notifica, accanto all'orologio. Per la chat, riaprirla invia le sue chat alla finestra già aperta.</p></div></details>
+          <details class="faq"><summary>«La cartella del launcher è protetta da scrittura» <span class="d-app l">Launcher</span></summary><div class="a">
+            <p>Il launcher non può scrivere accanto al suo <code>.exe</code> (per esempio in <span class="path">C:\Program Files</span>). Salva allora i suoi dati in <span class="path">%APPDATA%\Streamlink Launcher</span>. Tutto funziona, ma l'aggiornamento integrato non potrà sostituire il file: spostalo in una cartella tua.</p></div></details>
+          <details class="faq"><summary>L'AppImage non si avvia <span class="d-app l">Launcher</span> <span class="d-app c">Chat</span></summary><div class="a">
+            <ul>
+              <li>Rendila eseguibile: <code>chmod +x</code> seguito dal nome del file.</li>
+              <li>Messaggio su FUSE: installa <code>libfuse2</code>, oppure avviala con <code>--appimage-extract-and-run</code>.</li>
+              <li>Errore su <code>GLIBC</code>: il tuo sistema è troppo vecchio (glibc 2.35 come minimo). Avvia l'app dal codice sorgente.</li>
+            </ul></div></details>
+          <details class="faq"><summary>Una chat di Kick resta in errore <span class="d-app c">Chat</span></summary><div class="a">
+            <p>Kick ha cambiato il suo sistema di chat il 13 ottobre 2026 e non lo documenta: il supporto è sperimentale, e la protezione anti-bot di Kick può bloccare alcune richieste (<em>Kick blocca la richiesta</em>). Clic destro sulla scheda › <em>Riconnetti</em>, oppure chiudi e riapri la chat. Se l'errore persiste, <a href="https://github.com/Bulls64/Streamlink-Chat/issues" target="_blank" rel="noopener">apri una segnalazione</a> con <code>chat.log</code>.</p></div></details>
+          <details class="faq"><summary>«Canale non trovato» <span class="d-app c">Chat</span></summary><div class="a">
+            <p>Controlla l'ortografia e la piattaforma selezionata: un nome scritto da solo va al pulsante selezionato. Incolla piuttosto il link del canale, che seleziona la piattaforma da solo.</p></div></details>
+          <details class="faq"><summary>La chat di Steam TV resta vuota <span class="d-app c">Chat</span></summary><div class="a">
+            <p>La chat esiste solo durante una trasmissione. Finché è offline, Streamlink Chat ricontrolla ogni 30 secondi e mostra i messaggi appena inizia la trasmissione.</p></div></details>
+          <details class="faq"><summary>Non riesco a scrivere in chat <span class="d-app c">Chat</span></summary><div class="a">
+            <p>Devi collegare il tuo account (vedi <a href="#scrivere">Scrivere in chat</a>). Steam TV resta in sola lettura. Su Twitch, verifica anche di non essere bannato dalla chat e che la stanza non sia riservata agli abbonati.</p></div></details>
+          <details class="faq"><summary>L'accesso a Kick non si completa <span class="d-app c">Chat</span></summary><div class="a">
+            <ul>
+              <li>Verifica che l'URL di reindirizzamento della tua applicazione Kick sia esattamente <code>http://localhost:48125/callback</code>.</li>
+              <li>Verifica Client ID e Client Secret (senza spazi in più).</li>
+              <li>La porta 48125 deve essere libera e il firewall non deve bloccare le connessioni locali.</li>
+            </ul></div></details>
+          <details class="faq"><summary>Devo accedere di nuovo dopo aver cambiato PC <span class="d-app c">Chat</span></summary><div class="a">
+            <p>È normale: su Windows i token sono cifrati per il tuo account su questo PC. Copiati altrove, non possono essere letti. Accedi di nuovo in <em>Impostazioni › Account</em>.</p></div></details>
+          <details class="faq"><summary>Alcune emote compaiono come testo <span class="d-app c">Chat</span></summary><div class="a">
+            <p>Tk mostra solo PNG e GIF. Un'emote offerta solo in WebP o AVIF resta come testo. Verifica anche che il suo fornitore (BetterTTV, FrankerFaceZ, 7TV) sia attivo in <em>Impostazioni › Emote</em> e che sia disponibile per questa piattaforma (vedi <a href="#piattaforme">Emote e piattaforme</a>).</p></div></details>
+          <details class="faq"><summary>La chat usa molta memoria <span class="d-app c">Chat</span></summary><div class="a">
+            <p>Le emote animate sono le più pesanti. Dalla 0.2.1 si animano solo nella chat visualizzata e la cache è limitata. Puoi ridurre ancora la memoria disattivando <em>Emote animate</em> o conservando 500 messaggi per chat (<em>Impostazioni › Visualizzazione</em>).</p></div></details>
+          <details class="faq"><summary>L'aggiornamento integrato non riesce <span class="d-app l">Launcher</span> <span class="d-app c">Chat</span></summary><div class="a">
+            <p>L'app deve poter sostituire il proprio file: metti il <code>.exe</code> in una cartella tua (per esempio <span class="path">Documents\Streamlink</span>), non in <span class="path">C:\Program Files</span>. In caso di errore viene ripristinata la vecchia versione; puoi sempre scaricare la nuova dalla pagina delle versioni.</p></div></details>
+          <details class="faq"><summary>Un file di impostazioni è danneggiato <span class="d-app l">Launcher</span> <span class="d-app c">Chat</span></summary><div class="a">
+            <p>All'avvio l'app prova la sua copia <code>.bak</code> e, per il launcher, mette da parte il file danneggiato come <code>.corrupt</code> e ti avvisa. Per ripartire da zero, chiudi l'app e rinomina il file in questione: verrà ricreato con le impostazioni predefinite.</p></div></details>
+        </div>
+        <p class="empty" id="empty" hidden>Nessun risultato. Prova un'altra parola o <a href="https://github.com/Bulls64/Streamlink-Launcher/issues" target="_blank" rel="noopener">fai la tua domanda su GitHub</a>.</p>
+      </section>
+
+      <!-- 15 -->
+      <section class="doc" id="disinstallare">
+        <header><small>15 · Disinstallazione</small><h2>Disinstallare senza lasciare tracce</h2></header>
+        <p class="lead">Le app non installano nulla: basta eliminare i loro file. Qualche precauzione evita residui.</p>
+        <div class="blk">
+          <h3>Il launcher su Windows <span class="d-app l">Launcher</span></h3>
+          <ol class="d-steps">
+            <li>Se <em>Avvia con Windows</em> è attivo, disattivalo prima in <em>Impostazioni › Finestra e scorciatoia</em>.</li>
+            <li>Annota dove sono i tuoi dati: <em>Impostazioni › Informazioni › Apri la cartella dei dati</em>. Se vuoi tenere i preferiti, fai un <em>Esporta…</em>.</li>
+            <li>Chiudi il launcher: clic destro sulla sua icona accanto all'orologio › <em>Esci</em>.</li>
+            <li>Elimina il <code>.exe</code>, poi la cartella dei dati (<code>config.json</code>, <code>platforms.json</code>, <code>streams/</code>, <code>launcher.log</code> e i file <code>.bak</code>), accanto al <code>.exe</code> o in <span class="path">%APPDATA%\Streamlink Launcher</span>.</li>
+          </ol>
+          <p class="tip"><b>Già eliminato senza disattivare l'avvio?</b> Disattiva la voce in Gestione attività › <em>App di avvio</em>, oppure elimina il valore <code>StreamlinkLauncher</code> da <span class="path">HKCU\Software\Microsoft\Windows\CurrentVersion\Run</span>.</p>
+        </div>
+        <div class="blk">
+          <h3>La chat su Windows <span class="d-app c">Chat</span></h3>
+          <ol class="d-steps">
+            <li>In <em>Impostazioni › Account</em>, fai clic su <em>Disconnetti</em> per ogni account, poi revoca l'accesso dal lato di Twitch o Kick se vuoi (vedi <a href="#scrivere">Scrivere in chat</a>).</li>
+            <li>Chiudi la chat.</li>
+            <li>Elimina il <code>.exe</code>, <code>chat.json</code> e il suo <code>.bak</code>, la cartella <code>cache/</code> e <code>chat.log</code>, accanto al <code>.exe</code> o in <span class="path">%APPDATA%\Streamlink Chat</span>.</li>
+          </ol>
+        </div>
+        <div class="blk">
+          <h3>Su Linux <span class="d-app l">Launcher</span> <span class="d-app c">Chat</span></h3>
+          <p>Elimina l'AppImage, poi le cartelle dei dati:</p>
+          <div class="d-term"><span class="d-pr">$ </span>rm -r ~/.config/streamlink-launcher ~/.config/streamlink-chat</div>
+          <p>Se hai creato una voce di menu con Gear Lever o AppImageLauncher, rimuovila da quello strumento.</p>
+        </div>
+        <div class="blk">
+          <h3>E Streamlink?</h3>
+          <p>Si disinstalla a parte, nello stesso modo in cui l'hai installato: <em>Impostazioni di Windows › App</em> per il programma di installazione, <code>winget uninstall streamlink</code>, <code>pip uninstall streamlink</code> o il gestore di pacchetti della tua distribuzione. Il suo file di configurazione si trova in <span class="path">%APPDATA%\streamlink</span> o <span class="path">~/.config/streamlink</span>.</p>
+        </div>
+      </section>
+
+      <!-- 16 -->
+      <section class="doc" id="segnalare">
+        <header><small>16 · Comunità</small><h2>Segnalare un bug e contribuire</h2></header>
+        <div class="blk">
+          <h3>Prima di aprire una segnalazione</h3>
+          <ul>
+            <li>Aggiorna l'app: solo l'ultima versione riceve correzioni.</li>
+            <li>Cerca tra le segnalazioni esistenti (<a href="https://github.com/Bulls64/Streamlink-Launcher/issues?q=is%3Aissue" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/issues?q=is%3Aissue" target="_blank" rel="noopener">Chat</a>): il problema potrebbe essere già noto.</li>
+            <li>Rileggi la <a href="#risoluzione-problemi">Risoluzione dei problemi</a>.</li>
+          </ul>
+        </div>
+        <div class="blk">
+          <h3>Cosa includere</h3>
+          <ul>
+            <li>L'app e la sua versione (<em>Impostazioni › Informazioni</em> o <em>Impostazioni › Aggiornamenti</em>).</li>
+            <li>Il tuo sistema (Windows 11, Ubuntu 24.04…) e il tipo di installazione: <code>.exe</code>, AppImage o codice sorgente.</li>
+            <li>La versione di Streamlink: <code>streamlink --version</code>.</li>
+            <li>Cosa hai fatto, cosa ti aspettavi e cosa è successo. Per una chat, la piattaforma e il canale.</li>
+            <li>Il log: <code>launcher.log</code> o <code>chat.log</code> (e <code>.log.1</code> se esiste), nella cartella dei dati. Per uno stream che non parte, copia anche il testo del pannello del registro.</li>
+          </ul>
+          <p class="tip"><b>Leggi il log prima di inviarlo.</b> Può contenere nomi di canali o percorsi del tuo PC; togli tutto ciò che non vuoi rendere pubblico.</p>
+          <p>Poi apri una segnalazione: <a href="https://github.com/Bulls64/Streamlink-Launcher/issues/new" target="_blank" rel="noopener">Launcher</a> o <a href="https://github.com/Bulls64/Streamlink-Chat/issues/new" target="_blank" rel="noopener">Chat</a>.</p>
+        </div>
+        <div class="blk">
+          <h3>Una vulnerabilità di sicurezza?</h3>
+          <p><b>Non</b> aprire una segnalazione pubblica. Usa il modulo privato di GitHub (<a href="https://github.com/Bulls64/Streamlink-Launcher/security/advisories/new" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/security/advisories/new" target="_blank" rel="noopener">Chat</a>) con la versione, i passaggi per riprodurla e l'impatto. Riceverai una risposta entro una settimana circa.</p>
+        </div>
+        <div class="blk">
+          <h3>Contribuire</h3>
+          <p>Segnalazioni di bug, traduzioni e pull request sono benvenute.</p>
+          <ol>
+            <li>Per qualsiasi cosa più grande di una piccola correzione, apri prima una segnalazione per parlarne.</li>
+            <li>Ti basta Python 3.10 o successivo, senza dipendenze di terze parti. Tkinter è necessario per l'interfaccia.</li>
+            <li>Esegui i controlli prima della pull request:</li>
+          </ol>
+          <div class="d-term"><span class="d-pr">$ </span>python -m unittest discover -s tests -v
+<span class="d-pr">$ </span>python -m pip install ruff &amp;&amp; python -m ruff check .
+<span class="d-pr">$ </span>xvfb-run -a python -m unittest tests.test_gui</div>
+          <ul>
+            <li>Aggiungi una riga sotto <em>Unreleased</em> in <code>CHANGELOG.md</code>, in inglese e in francese.</li>
+            <li>Le versioni vengono pubblicate dal manutentore.</li>
+          </ul>
+        </div>
+        <div class="blk">
+          <h3>Tradurre le app</h3>
+          <p>I testi si trovano in <code>lang/*.json</code>, un file per lingua (<code>fr</code>, <code>en</code>, <code>es</code>, <code>de</code>, <code>it</code>). Ogni lingua deve avere esattamente le stesse chiavi: un test lo verifica. Per una nuova lingua, copia <code>en.json</code>, traduci i valori senza toccare le chiavi né le <code>{variabili}</code> e tieni i testi brevi, soprattutto nel launcher.</p>
+        </div>
+      </section>
+
+      <!-- 17 -->
+      <section class="doc" id="glossario">
+        <header><small>17 · Vocabolario</small><h2>Glossario</h2></header>
+        <nav class="letters" aria-label="Lettere"><a href="#gl-num">#</a><a href="#gl-a">A</a><a href="#gl-b">B</a><a href="#gl-c">C</a><a href="#gl-d">D</a><a href="#gl-e">E</a><a href="#gl-f">F</a><a href="#gl-g">G</a><a href="#gl-h">H</a><a href="#gl-i">I</a><a href="#gl-l">L</a><a href="#gl-m">M</a><a href="#gl-o">O</a><a href="#gl-p">P</a><a href="#gl-q">Q</a><a href="#gl-r">R</a><a href="#gl-s">S</a><a href="#gl-t">T</a><a href="#gl-w">W</a></nav>
+        <dl class="gl-list">
+          <div class="gl" id="gl-num"><dt>7TV</dt><dd>Servizio di emote di terze parti, spesso animate, per Twitch e Kick.</dd></div>
+          <div class="gl"><dt>.bak</dt><dd>Copia della versione precedente di un file di impostazioni, usata per recuperarlo se si danneggia.</dd></div>
+          <div class="gl" id="gl-a"><dt>AppImage</dt><dd>Formato di applicazione Linux in un unico file, senza nulla da installare. Le AppImage delle app includono il proprio Python.</dd></div>
+          <div class="gl"><dt>Area di notifica</dt><dd>Le icone accanto all'orologio di Windows. Il launcher può restare attivo lì con la finestra chiusa.</dd></div>
+          <div class="gl" id="gl-b"><dt>Badge</dt><dd>Piccola icona davanti a un nome utente: streamer, moderatore, VIP, abbonato…</dd></div>
+          <div class="gl"><dt>BetterTTV (BTTV)</dt><dd>Estensione popolare che aggiunge emote alle chat di Twitch.</dd></div>
+          <div class="gl" id="gl-c"><dt>Centrifugo</dt><dd>Sistema di messaggistica in tempo reale usato dalla chat di Kick da ottobre 2026.</dd></div>
+          <div class="gl"><dt>Client ID, Client Secret</dt><dd>Identificatore (pubblico) e password (segreta) dell'applicazione che crei su Twitch o Kick per scrivere in chat.</dd></div>
+          <div class="gl"><dt>Codice dispositivo</dt><dd>Metodo di accesso di Twitch: l'app mostra un codice, tu lo inserisci su <code>twitch.tv/activate</code>.</dd></div>
+          <div class="gl" id="gl-d"><dt>DPAPI</dt><dd>Funzione di cifratura di Windows: solo il tuo account, sul tuo PC, può rileggere ciò che protegge. Protegge i token della chat.</dd></div>
+          <div class="gl" id="gl-e"><dt>Elenco di riserva</dt><dd>Più qualità separate da virgole: Streamlink prende la prima disponibile.</dd></div>
+          <div class="gl"><dt>Emote</dt><dd>Piccola immagine usata come una parola in chat, per esempio <code>KEKW</code>.</dd></div>
+          <div class="gl" id="gl-f"><dt>Falso positivo</dt><dd>Un file sicuro segnalato per errore da un antivirus.</dd></div>
+          <div class="gl"><dt>FrankerFaceZ (FFZ)</dt><dd>Un'altra estensione di emote per Twitch.</dd></div>
+          <div class="gl"><dt>FUSE</dt><dd>Componente Linux che permette di avviare un'AppImage senza estrarla. Pacchetto <code>libfuse2</code>.</dd></div>
+          <div class="gl" id="gl-g"><dt>glibc</dt><dd>Libreria di base dei sistemi Linux. Le AppImage richiedono la versione 2.35 o successiva.</dd></div>
+          <div class="gl" id="gl-h"><dt>HLS</dt><dd>Formato di streaming diviso in piccoli segmenti, usato da Twitch e Kick.</dd></div>
+          <div class="gl" id="gl-i"><dt>IRC</dt><dd>Vecchio protocollo di chat su cui si basa la chat di Twitch.</dd></div>
+          <div class="gl" id="gl-l"><dt>Latenza</dt><dd>Ritardo tra ciò che accade dal lato dello streamer e ciò che vedi.</dd></div>
+          <div class="gl"><dt>Lettore</dt><dd>Programma che mostra il video inviato da Streamlink: VLC, mpv, PotPlayer…</dd></div>
+          <div class="gl"><dt>Link diretto</dt><dd>Pulsante del launcher che accetta qualsiasi link supportato da Streamlink.</dd></div>
+          <div class="gl" id="gl-m"><dt>Menzione</dt><dd>Messaggio che cita il tuo nome utente o una parola che hai scelto. Viene evidenziato.</dd></div>
+          <div class="gl"><dt>Modalità mini</dt><dd>La barra mobile del launcher, aperta da una scorciatoia globale, per avviare uno stream senza aprire la finestra.</dd></div>
+          <div class="gl" id="gl-o"><dt>OAuth</dt><dd>Metodo standard per permettere a un'app di agire a tuo nome senza darle la tua password.</dd></div>
+          <div class="gl" id="gl-p"><dt>PATH</dt><dd>Elenco delle cartelle in cui il sistema cerca i programmi. Il programma di installazione di Streamlink lo aggiunge lì.</dd></div>
+          <div class="gl"><dt>platforms.json</dt><dd>File del launcher che descrive le piattaforme: indirizzo, opzioni, qualità, colore, stato della diretta.</dd></div>
+          <div class="gl"><dt>Plugin</dt><dd>Parte di Streamlink che sa leggere un determinato sito (<code>twitch</code>, <code>kick</code>, <code>steam</code>…).</dd></div>
+          <div class="gl"><dt>Portabile</dt><dd>Un'app che salva le impostazioni accanto al suo file: puoi spostarla o copiarla su una chiavetta USB.</dd></div>
+          <div class="gl"><dt>Preferito</dt><dd>Canale salvato nel launcher, avviabile con un clic, con il suo stato della diretta.</dd></div>
+          <div class="gl"><dt>Pusher</dt><dd>Vecchio sistema in tempo reale della chat di Kick, mantenuto come riserva.</dd></div>
+          <div class="gl"><dt>PyInstaller</dt><dd>Strumento che trasforma un programma Python in un unico <code>.exe</code>.</dd></div>
+          <div class="gl" id="gl-q"><dt>Qualità</dt><dd>Risoluzione dello stream richiesta a Streamlink: <code>best</code>, <code>1080p60</code>, <code>audio_only</code>…</dd></div>
+          <div class="gl" id="gl-r"><dt>Registro</dt><dd>Il pannello in fondo al launcher, e i file <code>launcher.log</code> e <code>chat.log</code> che annotano gli errori.</dd></div>
+          <div class="gl"><dt>Release</dt><dd>Versione pubblicata su GitHub, con i suoi file da scaricare e <code>SHA256SUMS.txt</code>.</dd></div>
+          <div class="gl" id="gl-s"><dt>SHA-256</dt><dd>L'impronta di un file. Se corrisponde a quella della release, il file non è stato alterato.</dd></div>
+          <div class="gl"><dt>SmartScreen</dt><dd>Protezione di Windows che avvisa al primo avvio di un programma recente o non firmato.</dd></div>
+          <div class="gl"><dt>Sola lettura</dt><dd>Una chat che puoi leggere ma in cui non puoi scrivere: senza account collegato, o sempre su Steam TV.</dd></div>
+          <div class="gl"><dt>Streamlink</dt><dd>Programma libero che recupera uno stream e lo invia al tuo lettore. Le due app si basano su di esso.</dd></div>
+          <div class="gl" id="gl-t"><dt>Token</dt><dd>Chiave temporanea che Twitch o Kick dà all'app dopo l'accesso. Sostituisce la tua password, che l'app non vede mai.</dd></div>
+          <div class="gl" id="gl-w"><dt>WebSocket</dt><dd>Connessione che resta aperta tra l'app e il server per ricevere i messaggi man mano che arrivano.</dd></div>
+        </dl>
+      </section>
+    </article>
+  </div>
+</div>
+</main>
+<dialog class="lb" id="lb"><button type="button">×</button><img alt=""><p></p></dialog>
+</div>
+
+<footer>
+<div class="wrap">
+<span data-i18n="foot1">Streamlink Launcher e Streamlink Chat, di <a href="https://github.com/Bulls64" rel="noopener" target="_blank">Bulls64</a>. Licenza MIT.</span>
+<span data-i18n="foot2">Progetti indipendenti, senza legami con Streamlink, Twitch, Kick, YouTube, Dailymotion o Valve.</span>
+</div>
+</footer>
+<script>window.SL_PAGES={alt:{fr:"../../docs/",en:"../../en/docs/",es:"../../es/docs/",de:"../../de/docs/",it:"../../it/docs/"},ids:{about:{fr:"apps",en:"about",es:"acerca",de:"ueberblick",it:"panoramica"},ueberblick:{fr:"apps",en:"about",es:"acerca",de:"ueberblick",it:"panoramica"},apps:{fr:"apps",en:"about",es:"acerca",de:"ueberblick",it:"panoramica"},acerca:{fr:"apps",en:"about",es:"acerca",de:"ueberblick",it:"panoramica"},panoramica:{fr:"apps",en:"about",es:"acerca",de:"ueberblick",it:"panoramica"},tour:{fr:"visite",en:"tour",es:"recorrido",de:"rundgang",it:"tour-immagini"},rundgang:{fr:"visite",en:"tour",es:"recorrido",de:"rundgang",it:"tour-immagini"},recorrido:{fr:"visite",en:"tour",es:"recorrido",de:"rundgang",it:"tour-immagini"},visite:{fr:"visite",en:"tour",es:"recorrido",de:"rundgang",it:"tour-immagini"},"tour-immagini":{fr:"visite",en:"tour",es:"recorrido",de:"rundgang",it:"tour-immagini"},streamlink:{fr:"streamlink",en:"streamlink",es:"streamlink",de:"streamlink",it:"streamlink"},install:{fr:"installer",en:"install",es:"instalar",de:"installation",it:"installare"},installation:{fr:"installer",en:"install",es:"instalar",de:"installation",it:"installare"},installer:{fr:"installer",en:"install",es:"instalar",de:"installation",it:"installare"},installare:{fr:"installer",en:"install",es:"instalar",de:"installation",it:"installare"},instalar:{fr:"installer",en:"install",es:"instalar",de:"installation",it:"installare"},"erste-schritte":{fr:"premiers-pas",en:"getting-started",es:"primeros-pasos",de:"erste-schritte",it:"primi-passi"},"getting-started":{fr:"premiers-pas",en:"getting-started",es:"primeros-pasos",de:"erste-schritte",it:"primi-passi"},"primeros-pasos":{fr:"premiers-pas",en:"getting-started",es:"primeros-pasos",de:"erste-schritte",it:"primi-passi"},"premiers-pas":{fr:"premiers-pas",en:"getting-started",es:"primeros-pasos",de:"erste-schritte",it:"primi-passi"},"primi-passi":{fr:"premiers-pas",en:"getting-started",es:"primeros-pasos",de:"erste-schritte",it:"primi-passi"},atajos:{fr:"raccourcis",en:"shortcuts",es:"atajos",de:"tastenkuerzel",it:"scorciatoie"},tastenkuerzel:{fr:"raccourcis",en:"shortcuts",es:"atajos",de:"tastenkuerzel",it:"scorciatoie"},shortcuts:{fr:"raccourcis",en:"shortcuts",es:"atajos",de:"tastenkuerzel",it:"scorciatoie"},raccourcis:{fr:"raccourcis",en:"shortcuts",es:"atajos",de:"tastenkuerzel",it:"scorciatoie"},scorciatoie:{fr:"raccourcis",en:"shortcuts",es:"atajos",de:"tastenkuerzel",it:"scorciatoie"},favoris:{fr:"favoris",en:"favorites",es:"favoritos",de:"favoriten",it:"preferiti"},preferiti:{fr:"favoris",en:"favorites",es:"favoritos",de:"favoriten",it:"preferiti"},favorites:{fr:"favoris",en:"favorites",es:"favoritos",de:"favoriten",it:"preferiti"},favoriten:{fr:"favoris",en:"favorites",es:"favoritos",de:"favoriten",it:"preferiti"},favoritos:{fr:"favoris",en:"favorites",es:"favoritos",de:"favoriten",it:"preferiti"},escribir:{fr:"ecrire",en:"writing",es:"escribir",de:"schreiben",it:"scrivere"},writing:{fr:"ecrire",en:"writing",es:"escribir",de:"schreiben",it:"scrivere"},ecrire:{fr:"ecrire",en:"writing",es:"escribir",de:"schreiben",it:"scrivere"},schreiben:{fr:"ecrire",en:"writing",es:"escribir",de:"schreiben",it:"scrivere"},scrivere:{fr:"ecrire",en:"writing",es:"escribir",de:"schreiben",it:"scrivere"},plattformen:{fr:"plateformes",en:"platforms",es:"plataformas",de:"plattformen",it:"piattaforme"},plataformas:{fr:"plateformes",en:"platforms",es:"plataformas",de:"plattformen",it:"piattaforme"},piattaforme:{fr:"plateformes",en:"platforms",es:"plataformas",de:"plattformen",it:"piattaforme"},platforms:{fr:"plateformes",en:"platforms",es:"plataformas",de:"plattformen",it:"piattaforme"},plateformes:{fr:"plateformes",en:"platforms",es:"plataformas",de:"plattformen",it:"piattaforme"},recipes:{fr:"recettes",en:"recipes",es:"recetas",de:"rezepte",it:"ricette"},recettes:{fr:"recettes",en:"recipes",es:"recetas",de:"rezepte",it:"ricette"},rezepte:{fr:"recettes",en:"recipes",es:"recetas",de:"rezepte",it:"ricette"},ricette:{fr:"recettes",en:"recipes",es:"recetas",de:"rezepte",it:"ricette"},recetas:{fr:"recettes",en:"recipes",es:"recetas",de:"rezepte",it:"ricette"},updates:{fr:"maj",en:"updates",es:"actualizaciones",de:"aktualisierung",it:"aggiornamenti"},aktualisierung:{fr:"maj",en:"updates",es:"actualizaciones",de:"aktualisierung",it:"aggiornamenti"},actualizaciones:{fr:"maj",en:"updates",es:"actualizaciones",de:"aktualisierung",it:"aggiornamenti"},maj:{fr:"maj",en:"updates",es:"actualizaciones",de:"aktualisierung",it:"aggiornamenti"},aggiornamenti:{fr:"maj",en:"updates",es:"actualizaciones",de:"aktualisierung",it:"aggiornamenti"},settings:{fr:"reglages",en:"settings",es:"ajustes",de:"einstellungen",it:"impostazioni"},impostazioni:{fr:"reglages",en:"settings",es:"ajustes",de:"einstellungen",it:"impostazioni"},reglages:{fr:"reglages",en:"settings",es:"ajustes",de:"einstellungen",it:"impostazioni"},ajustes:{fr:"reglages",en:"settings",es:"ajustes",de:"einstellungen",it:"impostazioni"},einstellungen:{fr:"reglages",en:"settings",es:"ajustes",de:"einstellungen",it:"impostazioni"},"vie-privee":{fr:"vie-privee",en:"privacy",es:"privacidad",de:"datenschutz",it:"riservatezza"},riservatezza:{fr:"vie-privee",en:"privacy",es:"privacidad",de:"datenschutz",it:"riservatezza"},datenschutz:{fr:"vie-privee",en:"privacy",es:"privacidad",de:"datenschutz",it:"riservatezza"},privacidad:{fr:"vie-privee",en:"privacy",es:"privacidad",de:"datenschutz",it:"riservatezza"},privacy:{fr:"vie-privee",en:"privacy",es:"privacidad",de:"datenschutz",it:"riservatezza"},"risoluzione-problemi":{fr:"faq",en:"troubleshooting",es:"solucion-problemas",de:"fehlerbehebung",it:"risoluzione-problemi"},fehlerbehebung:{fr:"faq",en:"troubleshooting",es:"solucion-problemas",de:"fehlerbehebung",it:"risoluzione-problemi"},troubleshooting:{fr:"faq",en:"troubleshooting",es:"solucion-problemas",de:"fehlerbehebung",it:"risoluzione-problemi"},faq:{fr:"faq",en:"troubleshooting",es:"solucion-problemas",de:"fehlerbehebung",it:"risoluzione-problemi"},"solucion-problemas":{fr:"faq",en:"troubleshooting",es:"solucion-problemas",de:"fehlerbehebung",it:"risoluzione-problemi"},deinstallieren:{fr:"desinstaller",en:"uninstall",es:"desinstalar",de:"deinstallieren",it:"disinstallare"},desinstaller:{fr:"desinstaller",en:"uninstall",es:"desinstalar",de:"deinstallieren",it:"disinstallare"},desinstalar:{fr:"desinstaller",en:"uninstall",es:"desinstalar",de:"deinstallieren",it:"disinstallare"},disinstallare:{fr:"desinstaller",en:"uninstall",es:"desinstalar",de:"deinstallieren",it:"disinstallare"},uninstall:{fr:"desinstaller",en:"uninstall",es:"desinstalar",de:"deinstallieren",it:"disinstallare"},report:{fr:"bug",en:"report",es:"reportar",de:"melden",it:"segnalare"},melden:{fr:"bug",en:"report",es:"reportar",de:"melden",it:"segnalare"},reportar:{fr:"bug",en:"report",es:"reportar",de:"melden",it:"segnalare"},segnalare:{fr:"bug",en:"report",es:"reportar",de:"melden",it:"segnalare"},bug:{fr:"bug",en:"report",es:"reportar",de:"melden",it:"segnalare"},glossary:{fr:"glossaire",en:"glossary",es:"glosario",de:"glossar",it:"glossario"},glossario:{fr:"glossaire",en:"glossary",es:"glosario",de:"glossar",it:"glossario"},glosario:{fr:"glossaire",en:"glossary",es:"glosario",de:"glossar",it:"glossario"},glossar:{fr:"glossaire",en:"glossary",es:"glosario",de:"glossar",it:"glossario"},glossaire:{fr:"glossaire",en:"glossary",es:"glosario",de:"glossar",it:"glossario"}}};function slGoLang(r){try{localStorage.setItem("slSiteLang",r)}catch{}let e="";try{e=decodeURIComponent(location.hash.slice(1))}catch{}const i=SL_PAGES.ids[e]&&SL_PAGES.ids[e][r]||(e&&document.getElementById(e)&&!Object.keys(SL_PAGES.ids).length?e:"");location.href=SL_PAGES.alt[r]+(i?"#"+i:"")}</script>
+<script>window.SLDocs=(()=>{const w=document.getElementById("docs"),c=document.getElementById("docroot"),x=()=>!w.hidden,u={it:{copy:"Copia",copied:"Copiato",sel:"Ctrl+C",res:t=>`${t} risultat${t===1?"o":"i"}`,syn:"Ricerca estesa a: ",lb:"Screenshot ingrandito",close:"Chiudi"}},I={it:[["errore","bug","crash","si chiude","non funziona","problema"],["aggiornare","aggiornamento","update","nuova versione"],["disinstallare","eliminare","rimuovere","uninstall"],["lettore","player","VLC","mpv","PotPlayer"],["scorciatoia","tastiera","tasto","shortcut"],["accesso","accedere","account","login","token","password"],["emote","emoji","emoticon","faccina"],["registrare","registrazione","record"],["pubblicit\xE0","annunci","ads"],["antivirus","Defender","virus","quarantena","SmartScreen"],["memoria","RAM","lento","lag"],["latenza","ritardo","delay"],["privacy","riservatezza","dati","tracciamento","telemetria"]]};let f="fr",h,y=[],l=[],p=[],g,A,S,v;const m=t=>t.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();function L(t,o){c.querySelectorAll(`.d-tabs[data-group="${t}"] [data-tab]`).forEach(n=>n.setAttribute("aria-selected",String(n.dataset.tab===o))),c.querySelectorAll(`.pane[data-group="${t}"]`).forEach(n=>n.classList.toggle("on",n.dataset.pane===o))}const d=document.getElementById("lb");d.addEventListener("click",t=>{(t.target===d||t.target.tagName==="BUTTON")&&d.close()});function C(){let t=l[0];for(const o of l)!o.classList.contains("hidden-by-search")&&o.getBoundingClientRect().top<140&&(t=o);return t}let q=!1,k=null;function N(){q||(q=!0,requestAnimationFrame(()=>{q=!1,b()}))}function b(){if(!l.length||!x())return;const t=C();t===k&&y.some(o=>o.classList.contains("on"))||(k=t,y.forEach(o=>{const n=o.getAttribute("href")==="#"+t.id;n&&!o.classList.contains("on")&&innerWidth<=880&&(h.scrollLeft=o.offsetLeft-h.offsetLeft-(h.clientWidth-o.offsetWidth)/2),o.classList.toggle("on",n)}))}addEventListener("scroll",N,{passive:!0});function B(t){if(t.length<3)return{terms:[t],extra:[]};const o=I[f].find(s=>s.some(e=>{const r=m(e);return r===t||t.length>=4&&r.startsWith(t)}));if(!o)return{terms:[t],extra:[]};const n=o.filter(s=>m(s)!==t);return{terms:[t,...n.map(m)],extra:n}}function R(){c.querySelectorAll("mark").forEach(t=>t.replaceWith(...t.childNodes)),c.querySelectorAll("section.doc").forEach(t=>t.normalize())}function W(t,o){const n=document.createTreeWalker(t,NodeFilter.SHOW_TEXT),s=[];for(;n.nextNode();){const e=n.currentNode;if(e.parentElement.closest("button, mark"))continue;const r=m(e.data);for(const i of o){const a=r.indexOf(i);if(a>=0){s.push([e,a,i.length]);break}}}s.forEach(([e,r,i])=>{const a=document.createRange();a.setStart(e,r),a.setEnd(e,r+i);const E=document.createElement("mark");try{a.surroundContents(E)}catch{}})}function T(){R();const t=m(g.value.trim()),o=t?B(t):{terms:[],extra:[]},n=o.terms;let s=0;p.forEach(e=>{const r=!t||n.some(i=>e.dataset.text.includes(i));e.classList.toggle("hidden-by-search",!r),r&&t&&(s++,W(e,n),e.tagName==="DETAILS"&&(e.open=!0)),!t&&e.tagName==="DETAILS"&&(e.open=!1)}),c.querySelectorAll("section.doc").forEach(e=>{const r=!t||p.some(a=>e.contains(a)&&!a.classList.contains("hidden-by-search"));e.classList.toggle("hidden-by-search",!r);const i=y.find(a=>a.getAttribute("href")==="#"+e.id);i&&i.classList.toggle("dim",!r)}),c.querySelectorAll(".pane").forEach(e=>{t&&e.classList.toggle("on",!!e.querySelector(".blk:not(.hidden-by-search)")||e.classList.contains("blk")&&!e.classList.contains("hidden-by-search"))}),t||c.querySelectorAll(".d-tabs[data-group]").forEach(e=>L(e.dataset.group,e.querySelector('[aria-selected="true"]').dataset.tab)),c.querySelectorAll(".d-tabs[data-group]").forEach(e=>e.closest(".blk").classList.toggle("hidden-by-search",!!t)),A.textContent=t?u[f].res(s):"",v.textContent=o.extra.length?u[f].syn+o.extra.join(", "):"",S.hidden=!(t&&!s),t&&!s&&S.closest("section.doc").classList.remove("hidden-by-search"),b()}function z(){c.querySelectorAll(".d-tabs[data-group]").forEach(n=>n.addEventListener("click",s=>{const e=s.target.closest("[data-tab]");e&&L(n.dataset.group,e.dataset.tab)}));const t=navigator.userAgent||"";/Linux/.test(t)&&!/Android/.test(t)&&L("os","linux"),c.querySelectorAll("figure .zoom").forEach(n=>n.addEventListener("click",()=>{const s=n.querySelector("img");d.querySelector("img").src=s.src,d.querySelector("img").alt=s.alt,d.querySelector("p").textContent=n.closest("figure").querySelector("figcaption").textContent,d.showModal&&d.showModal()})),c.querySelectorAll(".d-term").forEach(n=>{const s=[...n.childNodes].filter(r=>!(r.classList&&r.classList.contains("fn"))).map(r=>r.textContent).join("").split(`
+`).filter(r=>!r.trim().startsWith("# ")).map(r=>r.replace(/^\s*[$>]\s/,"")).join(`
+`).trim(),e=document.createElement("button");e.type="button",e.textContent=u[f].copy,e.addEventListener("click",()=>{const r=()=>{e.textContent=u[f].copied,setTimeout(()=>{e.textContent=u[f].copy},1500)},i=()=>{const a=document.createRange();a.selectNodeContents(n);const E=getSelection();E.removeAllRanges(),E.addRange(a),e.textContent=u[f].sel};try{navigator.clipboard.writeText(s).then(r,i)}catch{i()}}),n.appendChild(e)}),h=document.getElementById("toc"),y=[...h.querySelectorAll("a")],l=y.map(n=>document.querySelector(n.getAttribute("href"))),g=document.getElementById("dq"),A=document.getElementById("count"),S=document.getElementById("empty"),v=document.getElementById("syn"),p=[...c.querySelectorAll("section.doc .blk, section.doc .faq, section.doc > .note, section.doc > .tip, section.doc > .lead, section.doc .gl")].filter(n=>!n.parentElement.closest(".blk, .faq")),p.forEach(n=>{n.dataset.text=m(n.textContent)});let o;g.addEventListener("input",()=>{clearTimeout(o),o=setTimeout(T,120)}),b()}function D(t,o){o=o&&x();const n=o&&l.length&&l[0].getBoundingClientRect().top<140?l.indexOf(C()):-1,s=g?g.value:"";f=t,d.setAttribute("aria-label",u[t].lb),d.querySelector("button").setAttribute("aria-label",u[t].close),z(),s&&(g.value=s,T()),n>=0&&l[n]?(l[n].scrollIntoView({behavior:"instant"}),history.replaceState(null,"","#"+l[n].id)):o&&location.hash&&history.replaceState(null,"","#docs")}return{setLang:D,refresh:b}})();</script>
+<script>(()=>{const t=document.documentElement,o=t.lang,r="slSiteTheme",a=document.getElementById("theme"),i=document.getElementById("themeLabel"),h={fr:{light:"Mode clair",dark:"Mode sombre"},en:{light:"Light mode",dark:"Dark mode"},es:{light:"Modo claro",dark:"Modo oscuro"},de:{light:"Heller Modus",dark:"Dunkler Modus"},it:{light:"Modalit\xE0 chiara",dark:"Modalit\xE0 scura"}},c=matchMedia("(prefers-color-scheme: dark)");function s(){return t.dataset.theme?t.dataset.theme==="dark":c.matches}function n(){const e=s()?"light":"dark",l=h[o][e];i.textContent=l,a.setAttribute("aria-label",l),a.title=l,a.querySelector("use").setAttribute("href",e==="dark"?"#i-moon":"#i-sun")}try{const e=localStorage.getItem(r);(e==="light"||e==="dark")&&(t.dataset.theme=e)}catch{}a.addEventListener("click",()=>{const e=s()?"light":"dark";t.dataset.theme=e;try{localStorage.setItem(r,e)}catch{}n()}),c.addEventListener("change",n),n();const d=document.getElementById("lang");if(d.value=o,d.addEventListener("change",()=>slGoLang(d.value)),SLDocs.setLang(o,!1),location.hash){const e=document.getElementById(decodeURIComponent(location.hash.slice(1)));e&&e.scrollIntoView({behavior:"instant"})}})();</script>
+</body>
+</html>
