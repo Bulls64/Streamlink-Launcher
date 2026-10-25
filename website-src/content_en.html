@@ -1,6 +1,6 @@
 <div class="wrap">
   <div class="intro">
-    <div class="tag"><span class="num">DOCS</span><span>Launcher v1.5.1 · Chat v0.2.2</span></div>
+    <div class="tag"><span class="num">DOCS</span><span>Launcher v1.5.2 · Chat v0.2.2</span></div>
     <h1>Documentation</h1>
     <p>Everything you need to install Streamlink, use both apps and fix common problems. The <span class="app l">Launcher</span> and <span class="app c">Chat</span> labels show which app a passage applies to.</p>
     <label class="search" for="q">
@@ -550,7 +550,7 @@ player-args=--force-window=immediate</div>
           <div class="tbl"><table>
             <thead><tr><th>App</th><th>Latest version</th><th>In short</th></tr></thead>
             <tbody>
-              <tr><td><span class="app l">Launcher</span></td><td>1.5.1 (October 24, 2026)</td><td>Code of conduct, English comments in the code. No change in behavior.</td></tr>
+              <tr><td><span class="app l">Launcher</span></td><td>1.5.2 (October 24, 2026)</td><td>Code reorganized internally. No change in behavior.</td></tr>
               <tr><td><span class="app c">Chat</span></td><td>0.2.2 (October 25, 2026)</td><td>Code reorganized internally. No change in behavior.</td></tr>
             </tbody>
           </table></div>
@@ -654,9 +654,9 @@ player-args=--force-window=immediate</div>
           <details class="faq"><summary>Windows shows “Windows protected your PC” <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
             <p>The executables aren't code-signed yet, so SmartScreen warns on first launch. This is not a detection.</p>
             <ol>
-              <li>Check the file: in PowerShell, <code>Get-FileHash .\StreamlinkLauncher-1.5.1.exe</code>, and compare with the release's <code>SHA256SUMS.txt</code>.</li>
+              <li>Check the file: in PowerShell, <code>Get-FileHash .\StreamlinkLauncher-1.5.2.exe</code>, and compare with the release's <code>SHA256SUMS.txt</code>.</li>
               <li>Click <em>More info</em>, then <em>Run anyway</em>.</li>
-              <li>If nothing happens on double-click: right-click › <em>Properties</em> › tick <em>Unblock</em>, or <code>Unblock-File .\StreamlinkLauncher-1.5.1.exe</code>.</li>
+              <li>If nothing happens on double-click: right-click › <em>Properties</em> › tick <em>Unblock</em>, or <code>Unblock-File .\StreamlinkLauncher-1.5.2.exe</code>.</li>
             </ol></div></details>
           <details class="faq"><summary>My antivirus blocks or deletes the exe <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
             <p>Programs built with PyInstaller are sometimes flagged by mistake. Check the SHA-256, restore the file from quarantine, add its folder to the exclusions, and report the false positive (Microsoft Defender: <a href="https://www.microsoft.com/wdsi/filesubmission" target="_blank" rel="noopener">submit a file</a>, category <em>Incorrectly detected as malware</em>). You can also run the app from source.</p></div></details>
