@@ -1,4 +1,3 @@
-<script>
 /* Section Docs : vit dans #docs, la langue est pilotée par le site (window.SLDocs). */
 window.SLDocs = (() => {
   const view = document.getElementById("docs");
@@ -244,4 +243,3 @@ window.SLDocs = (() => {
   }
   return { setLang: apply, langFor, refresh: spy };
 })();
-</script>

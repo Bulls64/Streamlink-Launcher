@@ -1,15 +1,17 @@
 """gh_build.py : version GitHub Pages du site (référencement compris).
 
-Mêmes sources que l'artefact (site_head/body/script.html, content_fr/en.html, docs_script.html),
+Mêmes sources que l'artefact (site_body.html, site.css, site.js, content_*.html, docs.css, docs.js),
 mais une vraie page par langue et par rubrique, pré-rendue, pour que les moteurs indexent tout :
 
     /            accueil en français        /en/ /es/ /de/ /it/          accueil dans les autres langues
     /docs/       documentation en français  /en/docs/ /es/docs/ …       documentation dans les autres langues
 
+Le CSS et le JavaScript sont dans des fichiers à part (assets/css/, assets/js/), jamais dans le HTML.
+
 Sortie : ../website/  (publié par .github/workflows/pages.yml)
 Usage :  python3 gh_build.py [URL_DU_SITE] [--no-minify]
 """
-import json, re, shutil, subprocess, sys, datetime
+import hashlib, json, re, shutil, subprocess, sys, datetime
 from pathlib import Path
 from bs4 import BeautifulSoup
 import docs_embed
@@ -63,7 +65,7 @@ IMG_DIR = {l: ("fr" if l == "fr" else "en") for l in LANGS}      # es, de, it : 
 LOCALE = {"fr": "fr_FR", "en": "en_US", "es": "es_ES", "de": "de_DE", "it": "it_IT"}
 
 # ---------------------------------------------------------------- textes anglais du script du site
-SCRIPT = read("site_script.html")
+SCRIPT = read("site.js")
 def js_object(name):
     i = SCRIPT.index(f"const {name} = ") + len(f"const {name} = ")
     j = SCRIPT.index("\n  };", i) + 4
@@ -74,8 +76,7 @@ DICT = {"en": EN, **{l: {**EN, **HOME_TR[l]} for l in HOME_TR}}          # texte
 TT = {"en": T["en"], **{l: {**T["en"], **T_TR[l]} for l in T_TR}}        # textes produits par le script (placeholders, alt…)
 
 # ---------------------------------------------------------------- morceaux de page
-HEAD = read("site_head.html")
-CSS = HEAD[HEAD.index("<style>") + 7:HEAD.index("</style>")]
+CSS = read("site.css")
 BODY = read("site_body.html")
 SVG_DEFS = BODY[:BODY.index('<div class="boot"')].strip()
 HEADER = BODY[BODY.index('<header class="top">'):BODY.index("</header>") + 9]
@@ -88,10 +89,11 @@ FONT_FACES = ([("Big Shoulders Display", "big-shoulders-display", w, "normal") f
               + [("IBM Plex Mono", "ibm-plex-mono", w, "normal") for w in (400, 500)])
 FONT_FILES = {f"{slug}-latin-{w}-{st}.woff2" for _, slug, w, st in FONT_FACES}
 
-def font_css(prefix):
+def font_css(fonts):
+    """Les @font-face, avec l'adresse du dossier des polices vue depuis le fichier CSS."""
     faces = FONT_FACES
     return "".join(f'@font-face {{ font-family: "{fam}"; font-style: {st}; font-weight: {w}; font-display: swap; '
-                   f'src: url("{prefix}assets/fonts/{slug}-latin-{w}-{st}.woff2") format("woff2"); }}\n' for fam, slug, w, st in faces)
+                   f'src: url("{fonts}{slug}-latin-{w}-{st}.woff2") format("woff2"); }}\n' for fam, slug, w, st in faces)
 
 def translate(html, lang):
     """Pré-rend un morceau de page dans la langue voulue (attributs data-i18n du site)."""
@@ -196,6 +198,8 @@ def head(cur, kind, lang, extra_css="", content=None):
     alt_locales = "".join(f'<meta property="og:locale:alternate" content="{LOCALE[l]}">\n' for l in LANGS if l != lang)
     hreflangs = "".join(f'<link rel="alternate" hreflang="{l}" href="{absu(kind, l)}">\n' for l in LANGS)
     p = up(cur)
+    styles = f'<link rel="stylesheet" href="{p}{asset("css/site.css", font_css("../fonts/") + CSS)}">'
+    if extra_css: styles += f'\n<link rel="stylesheet" href="{p}{asset("css/docs.css", extra_css)}">'
     esc = lambda s: s.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;")
     return f"""<!doctype html>
 <html lang="{lang}"{' class="nointro static"' if kind == "docs" else ''}>
@@ -232,8 +236,7 @@ def head(cur, kind, lang, extra_css="", content=None):
 <link rel="preload" href="{p}assets/fonts/instrument-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="{p}assets/fonts/big-shoulders-display-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin>
 {jsonld(kind, lang, content)}
-<style>
-{font_css(p)}{CSS.replace("{{DOCS_CSS}}", extra_css)}</style>
+{styles}
 </head>
 <body>
 """
@@ -251,13 +254,13 @@ def lang_switch_js(cur, kind):
             for a in set(same.values()):
                 assert idmap.get(a, same) == same, f"ancre ambiguë : {a}"
                 idmap[a] = same
-    return ("<script>\nwindow.SL_PAGES = " + json.dumps({"alt": alt, "ids": idmap}, ensure_ascii=False) + ";\n"
+    return ("window.SL_PAGES = " + json.dumps({"alt": alt, "ids": idmap}, ensure_ascii=False) + ";\n"
             "function slGoLang(l) {\n"
             "  try { localStorage.setItem(\"slSiteLang\", l); } catch {}\n"
             "  let id = \"\"; try { id = decodeURIComponent(location.hash.slice(1)); } catch {}\n"
             "  const target = (SL_PAGES.ids[id] && SL_PAGES.ids[id][l]) || (id && document.getElementById(id) && !Object.keys(SL_PAGES.ids).length ? id : \"\");\n"
             "  location.href = SL_PAGES.alt[l] + (target ? \"#\" + target : \"\");\n"
-            "}\n</script>\n")
+            "}\n")
 
 def home_script(cur, lang):
     s = SCRIPT
@@ -315,7 +318,7 @@ def lang_block(s, start, lang):
     return s[a:b].split(": ", 1)[1].strip().rstrip(",")
 
 def docs_script(lang):
-    s = read("docs_script.html")
+    s = read("docs.js")
     # une seule langue par page : pas de copie du contenu pour changer de langue sur place
     for a, b in [('  const HTML = { fr: root.innerHTML, en: document.getElementById("doc-en").innerHTML };\n  let shownLang = "fr";\n', ""),
                  ('    if (l !== shownLang) { root.innerHTML = HTML[l]; shownLang = l; }\n', ""),
@@ -327,7 +330,7 @@ def docs_script(lang):
     s = keep_lang(s, "  const STR = {", lang, "{")
     s = keep_lang(s, "  const SYN = {", lang, "[")
     theme = SCRIPT[SCRIPT.index("  /* ---------- thème clair / sombre"):SCRIPT.index("  /* ---------- onglet Docs")]
-    return s + f"""<script>
+    return s + f"""
 (() => {{
   const root = document.documentElement, lang = root.lang;
 {theme}  drawTheme();
@@ -337,7 +340,6 @@ def docs_script(lang):
   SLDocs.setLang(lang, false);
   if (location.hash) {{ const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) t.scrollIntoView({{ behavior: "instant" }}); }}
 }})();
-</script>
 """
 
 # ---------------------------------------------------------------- pages
@@ -347,7 +349,7 @@ def build_home(lang):
     main = re.sub(r"\{\{img:(\w+):(\w+)\}\}", lambda m: imgs[lang][m.group(2)], MAIN)
     main = main.replace('<figure><img data-img=', '<figure><img loading="lazy" decoding="async" data-img=')
     body = SVG_DEFS + "\n\n" + BOOT + header(cur, "home", lang) + "\n\n" + translate(main, lang) + "\n" + translate(FOOTER, lang) + "\n"
-    return head(cur, "home", lang) + body + lang_switch_js(cur, "home") + js + "</body>\n</html>\n"
+    return head(cur, "home", lang) + body + script_tag(cur, f"js/home.{lang}.js", lang_switch_js(cur, "home") + js) + "</body>\n</html>\n"
 
 def build_docs(lang):
     cur = PATHS[("docs", lang)]
@@ -356,25 +358,36 @@ def build_docs(lang):
     view = ('<div id="docs" class="docs-view">\n<main id="docroot">\n' + content + '</main>\n'
             '<dialog class="lb" id="lb"><button type="button">×</button><img alt=""><p></p></dialog>\n</div>\n')
     body = SVG_DEFS + "\n\n" + header(cur, "docs", lang) + "\n\n" + view + "\n" + translate(FOOTER, lang) + "\n"
-    return head(cur, "docs", lang, docs_embed.css(), content) + body + lang_switch_js(cur, "docs") + docs_script(lang) + "</body>\n</html>\n"
+    return head(cur, "docs", lang, docs_embed.css(), content) + body + script_tag(cur, f"js/docs.{lang}.js", lang_switch_js(cur, "docs") + docs_script(lang)) + "</body>\n</html>\n"
 
 MINIFY = "--no-minify" not in sys.argv
 ESBUILD = here / "node_modules" / ".bin" / "esbuild"
 
-def minify(html):
-    """Minifie chaque <script> de la page (pas les données structurées). Sources lisibles : website-src/."""
-    if not MINIFY: return html
-    def one(m):
-        r = subprocess.run([str(ESBUILD), "--minify", "--target=es2020", "--loader=js", "--log-level=warning"],
-                           input=m.group(1), capture_output=True, text=True, check=True)
-        return "<script>" + r.stdout.strip() + "</script>"
-    return re.sub(r"<script>(.*?)</script>", one, html, flags=re.S)
+def minify_js(js):
+    """Minifie un fichier JavaScript du site. Sources lisibles : website-src/."""
+    if not MINIFY: return js
+    r = subprocess.run([str(ESBUILD), "--minify", "--target=es2020", "--loader=js", "--log-level=warning"],
+                       input=js, capture_output=True, text=True, check=True)
+    return r.stdout
+
+ASSETS = {}                                      # fichiers CSS et JS à écrire : chemin sous assets/ -> contenu
+
+def asset(name, text):
+    """Enregistre un fichier CSS ou JS et renvoie son adresse, avec une empreinte du contenu (?v=…)
+    pour que les navigateurs prennent la nouvelle version après chaque publication."""
+    assert ASSETS.get(name, text) == text, f"{name} : deux contenus différents"
+    ASSETS[name] = text
+    return f"assets/{name}?v={hashlib.sha256(text.encode()).hexdigest()[:10]}"
+
+def script_tag(cur, name, js):
+    return f'<script src="{up(cur)}{asset(name, minify_js(js))}"></script>\n'
+
 
 def build():
     if OUT.exists(): shutil.rmtree(OUT)          # dossier généré : reconstruit à chaque fois
     for (kind, lang), path in PATHS.items():
         f = OUT / path / "index.html"; f.parent.mkdir(parents=True, exist_ok=True)
-        f.write_text(minify(build_home(lang) if kind == "home" else build_docs(lang)), encoding="utf-8")
+        f.write_text(build_home(lang) if kind == "home" else build_docs(lang), encoding="utf-8")
     # images
     shutil.copytree(here / "img" / "site", OUT / "assets/img/site")
     (OUT / "assets/img/docs/en").mkdir(parents=True)
@@ -408,10 +421,29 @@ def build():
                   {"src": "assets/icons/icon.svg", "sizes": "any", "type": "image/svg+xml"}]}, ensure_ascii=False, indent=1), encoding="utf-8")
     (OUT / ".nojekyll").write_text("", encoding="utf-8")
     (OUT / "404.html").write_text(page_404(), encoding="utf-8")
+    for name, text in ASSETS.items():               # CSS et JS, à part du HTML
+        f = OUT / "assets" / name; f.parent.mkdir(parents=True, exist_ok=True); f.write_text(text, encoding="utf-8")
     print("ok", BASE, sum(f.stat().st_size for f in OUT.rglob("*") if f.is_file()) // 1024, "Ko")
+
+CSS_404 = """@font-face { font-family: "Big Shoulders Display"; font-weight: 900; font-display: swap; src: url("../fonts/big-shoulders-display-latin-900-normal.woff2") format("woff2"); }
+@font-face { font-family: "Instrument Sans"; font-weight: 400; font-display: swap; src: url("../fonts/instrument-sans-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Instrument Sans"; font-weight: 600; font-display: swap; src: url("../fonts/instrument-sans-latin-600-normal.woff2") format("woff2"); }
+:root { --bg: #E9ECF1; --surface: #F7F8FA; --ink: #13151B; --muted: #586071; --line: #CDD2DB; --accent: #6E2BD9; }
+@media (prefers-color-scheme: dark) { :root { --bg: #0F1116; --surface: #161920; --ink: #ECEEF3; --muted: #959CAD; --line: #2A2F3A; --accent: #B794FF; color-scheme: dark; } }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--bg); color: var(--ink); font-family: "Instrument Sans", "Segoe UI", system-ui, sans-serif; line-height: 1.6; padding: 24px 16px; }
+main { max-width: 560px; display: grid; gap: 14px; }
+.code { font-family: "IBM Plex Mono", Consolas, monospace; font-size: .8rem; letter-spacing: .2em; color: var(--muted); }
+h1 { font-family: "Big Shoulders Display", Impact, sans-serif; font-weight: 900; text-transform: uppercase; font-size: clamp(2.6rem, 11vw, 4.6rem); line-height: .9; margin: 0; }
+p { margin: 0; color: var(--muted); }
+nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+nav a { color: var(--ink); text-decoration: none; font-weight: 600; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; }
+nav a:hover { border-color: var(--accent); }
+"""
 
 def page_404():
     b = BASE_PATH
+    asset404 = asset("css/404.css", CSS_404)
     return f"""<!doctype html>
 <html lang="fr">
 <head>
@@ -421,22 +453,7 @@ def page_404():
 <meta name="robots" content="noindex">
 <link rel="icon" href="{b}favicon.ico" sizes="32x32">
 <link rel="icon" href="{b}assets/icons/icon.svg" type="image/svg+xml">
-<style>
-@font-face {{ font-family: "Big Shoulders Display"; font-weight: 900; font-display: swap; src: url("{b}assets/fonts/big-shoulders-display-latin-900-normal.woff2") format("woff2"); }}
-@font-face {{ font-family: "Instrument Sans"; font-weight: 400; font-display: swap; src: url("{b}assets/fonts/instrument-sans-latin-400-normal.woff2") format("woff2"); }}
-@font-face {{ font-family: "Instrument Sans"; font-weight: 600; font-display: swap; src: url("{b}assets/fonts/instrument-sans-latin-600-normal.woff2") format("woff2"); }}
-:root {{ --bg: #E9ECF1; --surface: #F7F8FA; --ink: #13151B; --muted: #586071; --line: #CDD2DB; --accent: #6E2BD9; }}
-@media (prefers-color-scheme: dark) {{ :root {{ --bg: #0F1116; --surface: #161920; --ink: #ECEEF3; --muted: #959CAD; --line: #2A2F3A; --accent: #B794FF; color-scheme: dark; }} }}
-* {{ box-sizing: border-box; }}
-body {{ margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--bg); color: var(--ink); font-family: "Instrument Sans", "Segoe UI", system-ui, sans-serif; line-height: 1.6; padding: 24px 16px; }}
-main {{ max-width: 560px; display: grid; gap: 14px; }}
-.code {{ font-family: "IBM Plex Mono", Consolas, monospace; font-size: .8rem; letter-spacing: .2em; color: var(--muted); }}
-h1 {{ font-family: "Big Shoulders Display", Impact, sans-serif; font-weight: 900; text-transform: uppercase; font-size: clamp(2.6rem, 11vw, 4.6rem); line-height: .9; margin: 0; }}
-p {{ margin: 0; color: var(--muted); }}
-nav {{ display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }}
-nav a {{ color: var(--ink); text-decoration: none; font-weight: 600; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; }}
-nav a:hover {{ border-color: var(--accent); }}
-</style>
+<link rel="stylesheet" href="{b}{asset404}">
 </head>
 <body>
 <main>

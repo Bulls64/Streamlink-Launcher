@@ -1,5 +1,3 @@
-
-<script>
 (() => {
   const root = document.documentElement;
   const IMG = {{IMG_JSON}};
@@ -49,9 +47,9 @@
     cf4: "<dt>Watch</dt><dd>The chat's ▶ button launches the stream with Streamlink.</dd>",
     cf5: "<dt>Protected tokens</dt><dd>On Windows, your logins are encrypted with DPAPI, readable only by your session.</dd>",
     pt_head: "<tr><th>Platform</th><th>Read</th><th>Write</th></tr>",
-    pt_body: '<tr><td><i style="background:#9146FF"></i>Twitch</td><td>No account</td><td>Once logged in</td></tr>'
-      + '<tr><td><i style="background:#53FC18"></i>Kick</td><td>No account <span class="exp">experimental</span></td><td>Once logged in</td></tr>'
-      + '<tr><td><i style="background:#2A475E"></i>Steam TV</td><td>No account</td><td>Read-only</td></tr>',
+    pt_body: '<tr><td><i class="pf-twitch"></i>Twitch</td><td>No account</td><td>Once logged in</td></tr>'
+      + '<tr><td><i class="pf-kick"></i>Kick</td><td>No account <span class="exp">experimental</span></td><td>Once logged in</td></tr>'
+      + '<tr><td><i class="pf-steamtv"></i>Steam TV</td><td>No account</td><td>Read-only</td></tr>',
     alt_ctw: "Streamlink Chat screenshot: Twitch chat tinted purple",
     alt_ckick: "Streamlink Chat screenshot: Kick chat tinted green",
     alt_clight: "Streamlink Chat screenshot in the light theme",
@@ -122,9 +120,9 @@
       cf4: "<dt>Ver</dt><dd>El botón ▶ del chat inicia el stream con Streamlink.</dd>",
       cf5: "<dt>Tokens protegidos</dt><dd>En Windows, tus inicios de sesión se cifran con DPAPI y solo tu sesión puede leerlos.</dd>",
       pt_head: "<tr><th>Plataforma</th><th>Lectura</th><th>Escritura</th></tr>",
-      pt_body: '<tr><td><i style="background:#9146FF"></i>Twitch</td><td>Sin cuenta</td><td>Tras iniciar sesión</td></tr>'
-        + '<tr><td><i style="background:#53FC18"></i>Kick</td><td>Sin cuenta <span class="exp">experimental</span></td><td>Tras iniciar sesión</td></tr>'
-        + '<tr><td><i style="background:#2A475E"></i>Steam TV</td><td>Sin cuenta</td><td>Solo lectura</td></tr>',
+      pt_body: '<tr><td><i class="pf-twitch"></i>Twitch</td><td>Sin cuenta</td><td>Tras iniciar sesión</td></tr>'
+        + '<tr><td><i class="pf-kick"></i>Kick</td><td>Sin cuenta <span class="exp">experimental</span></td><td>Tras iniciar sesión</td></tr>'
+        + '<tr><td><i class="pf-steamtv"></i>Steam TV</td><td>Sin cuenta</td><td>Solo lectura</td></tr>',
       alt_ctw: "Captura de Streamlink Chat: chat de Twitch en tono violeta",
       alt_ckick: "Captura de Streamlink Chat: chat de Kick en tono verde",
       alt_clight: "Captura de Streamlink Chat con el tema claro",
@@ -187,9 +185,9 @@
       cf4: "<dt>Ansehen</dt><dd>Die Schaltfläche ▶ im Chat startet den Stream mit Streamlink.</dd>",
       cf5: "<dt>Geschützte Tokens</dt><dd>Unter Windows sind deine Anmeldungen mit DPAPI verschlüsselt und nur von deiner Sitzung lesbar.</dd>",
       pt_head: "<tr><th>Plattform</th><th>Lesen</th><th>Schreiben</th></tr>",
-      pt_body: '<tr><td><i style="background:#9146FF"></i>Twitch</td><td>Ohne Konto</td><td>Nach der Anmeldung</td></tr>'
-        + '<tr><td><i style="background:#53FC18"></i>Kick</td><td>Ohne Konto <span class="exp">experimentell</span></td><td>Nach der Anmeldung</td></tr>'
-        + '<tr><td><i style="background:#2A475E"></i>Steam TV</td><td>Ohne Konto</td><td>Nur lesen</td></tr>',
+      pt_body: '<tr><td><i class="pf-twitch"></i>Twitch</td><td>Ohne Konto</td><td>Nach der Anmeldung</td></tr>'
+        + '<tr><td><i class="pf-kick"></i>Kick</td><td>Ohne Konto <span class="exp">experimentell</span></td><td>Nach der Anmeldung</td></tr>'
+        + '<tr><td><i class="pf-steamtv"></i>Steam TV</td><td>Ohne Konto</td><td>Nur lesen</td></tr>',
       alt_ctw: "Screenshot von Streamlink Chat: Twitch-Chat in Violett",
       alt_ckick: "Screenshot von Streamlink Chat: Kick-Chat in Grün",
       alt_clight: "Screenshot von Streamlink Chat im hellen Design",
@@ -252,9 +250,9 @@
       cf4: "<dt>Guardare</dt><dd>Il pulsante ▶ della chat avvia lo stream con Streamlink.</dd>",
       cf5: "<dt>Token protetti</dt><dd>Su Windows, i tuoi accessi sono cifrati con DPAPI e leggibili solo dalla tua sessione.</dd>",
       pt_head: "<tr><th>Piattaforma</th><th>Lettura</th><th>Scrittura</th></tr>",
-      pt_body: '<tr><td><i style="background:#9146FF"></i>Twitch</td><td>Senza account</td><td>Dopo l\'accesso</td></tr>'
-        + '<tr><td><i style="background:#53FC18"></i>Kick</td><td>Senza account <span class="exp">sperimentale</span></td><td>Dopo l\'accesso</td></tr>'
-        + '<tr><td><i style="background:#2A475E"></i>Steam TV</td><td>Senza account</td><td>Sola lettura</td></tr>',
+      pt_body: '<tr><td><i class="pf-twitch"></i>Twitch</td><td>Senza account</td><td>Dopo l\'accesso</td></tr>'
+        + '<tr><td><i class="pf-kick"></i>Kick</td><td>Senza account <span class="exp">sperimentale</span></td><td>Dopo l\'accesso</td></tr>'
+        + '<tr><td><i class="pf-steamtv"></i>Steam TV</td><td>Senza account</td><td>Sola lettura</td></tr>',
       alt_ctw: "Screenshot di Streamlink Chat: chat di Twitch in viola",
       alt_ckick: "Screenshot di Streamlink Chat: chat di Kick in verde",
       alt_clight: "Screenshot di Streamlink Chat con il tema chiaro",
@@ -530,7 +528,7 @@
   function drawStatus() {
     if (!running.length) { statusEl.classList.remove("running"); statusText.textContent = t().idle; return; }
     statusEl.classList.add("running");
-    statusText.innerHTML = `<strong>${t().run(running.length)}</strong> · ${running.map(esc).join(", ")} <span style="opacity:.7">${t().demo}</span>`;
+    statusText.innerHTML = `<strong>${t().run(running.length)}</strong> · ${running.map(esc).join(", ")} <span class="demo-note">${t().demo}</span>`;
   }
   function launch() {
     const r = update();
@@ -600,7 +598,7 @@
   function clock() { minute = (minute + (Math.random() < .35 ? 1 : 0)) % 1440; return `${String(Math.floor(minute / 60)).padStart(2, "0")}:${String(minute % 60).padStart(2, "0")}`; }
   function render(text) {
     return esc(text)
-      .replace(/https?:\/\/\S+/g, m => `<a href="${m}" target="_blank" rel="noopener" style="color:#8FB8FF">${m}</a>`)
+      .replace(/https?:\/\/\S+/g, m => `<a href="${m}" target="_blank" rel="noopener" class="lnk">${m}</a>`)
       .replace(/@(\w+)/g, '<b>@$1</b>')
       .replace(/\[e\]/g, '<svg class="emo" aria-label="emote"><use href="#emo"/></svg>')
       .replace(/\[e2\]/g, '<svg class="emo" aria-label="emote"><use href="#emo2"/></svg>');
@@ -803,4 +801,3 @@
     }, 1500);
   }
 })();
-</script>
