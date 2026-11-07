@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Website: Streamlink Chat 0.2.2** (download links, version shown, "What's new" table in the five languages).
 - **Website: Streamlink Launcher 1.5.2** (download links, version shown, "What's new" table in the five languages).
 - **Website sources tidied**: the unused `site_head.html` and `shell_head.html` are removed, and the build now gives the same output on every run.
+- **Website: Streamlink Chat 0.2.3** (download links, version shown, "What's new" table in the five languages).
 
 ### Planned
 - Viewing statistics (time per channel, peak hours).
@@ -262,6 +263,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - **Site : Streamlink Chat 0.2.2** (liens de téléchargement, version affichée, tableau « Nouveautés » dans les cinq langues).
 - **Site : Streamlink Launcher 1.5.2** (liens de téléchargement, version affichée, tableau « Nouveautés » dans les cinq langues).
 - **Sources du site nettoyées** : les fichiers inutilisés `site_head.html` et `shell_head.html` sont supprimés, et la construction donne le même résultat à chaque fois.
+- **Site : Streamlink Chat 0.2.3** (liens de téléchargement, version affichée, tableau « Nouveautés » dans les cinq langues).
 
 ### Prévu
 - Statistiques de visionnage (temps par chaîne, heures de pointe).
