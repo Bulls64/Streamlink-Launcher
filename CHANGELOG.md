@@ -11,6 +11,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+- **Website: Streamlink Launcher 1.6.0** (download links, version shown, "What's new" table and *Open the chat* in the documentation, in the five languages).
+
 ### Planned
 - Viewing statistics (time per channel, peak hours).
 
@@ -259,6 +262,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## Français
 
 ## [Non publié]
+
+### Ajouté
+- **Site : Streamlink Launcher 1.6.0** (liens de téléchargement, version affichée, tableau « Nouveautés » et *Ouvrir le chat* dans la documentation, dans les cinq langues).
 
 ### Prévu
 - Statistiques de visionnage (temps par chaîne, heures de pointe).

@@ -1,6 +1,6 @@
 <div class="wrap">
   <div class="intro">
-    <div class="tag"><span class="num">DOCS</span><span>Launcher v1.5.2 · Chat v0.2.3</span></div>
+    <div class="tag"><span class="num">DOCS</span><span>Launcher v1.6.0 · Chat v0.2.3</span></div>
     <h1>Documentación</h1>
     <p>Todo lo necesario para instalar Streamlink, usar las dos aplicaciones y resolver los problemas habituales. Las etiquetas <span class="app l">Launcher</span> y <span class="app c">Chat</span> indican a qué aplicación se refiere cada pasaje.</p>
     <label class="search" for="q">
@@ -252,7 +252,7 @@
               <tr><td>Recorrer las sugerencias (favoritos y luego historial)</td><td><kbd>↓</kbd> <kbd>↑</kbd></td></tr>
               <tr><td>Abrir los ajustes</td><td><kbd>Ctrl</kbd>+<kbd>,</kbd></td></tr>
               <tr><td>Cerrar un menú o un panel</td><td><kbd>Esc</kbd></td></tr>
-              <tr><td>Opciones de un favorito (iniciar, rellenar el campo, quitar)</td><td>Clic derecho en su tarjeta</td></tr>
+              <tr><td>Opciones de un favorito (iniciar, rellenar el campo, abrir el chat, quitar)</td><td>Clic derecho en su tarjeta</td></tr>
               <tr><td>Abrir el modo mini, desde cualquier lugar (Windows)</td><td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd></td></tr>
             </tbody>
           </table></div>
@@ -318,7 +318,7 @@
           <h3>Iniciar, editar o quitar un favorito <span class="app l">Launcher</span></h3>
           <ul>
             <li><b>Iniciar</b>: haz clic en su tarjeta.</li>
-            <li><b>Más opciones</b>: clic derecho en la tarjeta y luego <em>Iniciar</em>, <em>Rellenar el campo</em> o <em>Quitar de favoritos</em>.</li>
+            <li><b>Más opciones</b>: clic derecho en la tarjeta y luego <em>Iniciar</em>, <em>Rellenar el campo</em>, <em>Abrir el chat</em> (Twitch y Kick, en Streamlink Chat) o <em>Quitar de favoritos</em>.</li>
             <li><b>En el panel Favoritos</b>: un clic en una fila rellena el campo, ▶ inicia y la papelera quita.</li>
           </ul>
         </div>
@@ -550,7 +550,7 @@ player-args=--force-window=immediate</div>
           <div class="tbl"><table>
             <thead><tr><th>Aplicación</th><th>Última versión</th><th>En resumen</th></tr></thead>
             <tbody>
-              <tr><td><span class="app l">Launcher</span></td><td>1.5.2 (24 de octubre de 2026)</td><td>Código reorganizado internamente. Sin cambios de comportamiento.</td></tr>
+              <tr><td><span class="app l">Launcher</span></td><td>1.6.0 (7 de noviembre de 2026)</td><td>Abre el chat de un favorito de Twitch o Kick en Streamlink Chat (clic derecho), o con el stream.</td></tr>
               <tr><td><span class="app c">Chat</span></td><td>0.2.3 (7 de noviembre de 2026)</td><td>Los enlaces fuera de Twitch, Kick y Steam muestran su sitio antes de abrirse; aviso cuando Kick o Steam TV fallan una y otra vez.</td></tr>
             </tbody>
           </table></div>
@@ -654,9 +654,9 @@ player-args=--force-window=immediate</div>
           <details class="faq"><summary>Windows muestra «Windows protegió su PC» <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
             <p>Los ejecutables todavía no tienen firma de código, así que SmartScreen avisa en el primer inicio. No es una detección.</p>
             <ol>
-              <li>Comprueba el archivo: en PowerShell, <code>Get-FileHash .\StreamlinkLauncher-1.5.2.exe</code>, y compáralo con el <code>SHA256SUMS.txt</code> de la versión.</li>
+              <li>Comprueba el archivo: en PowerShell, <code>Get-FileHash .\StreamlinkLauncher-1.6.0.exe</code>, y compáralo con el <code>SHA256SUMS.txt</code> de la versión.</li>
               <li>Haz clic en <em>Más información</em> y luego en <em>Ejecutar de todas formas</em>.</li>
-              <li>Si no pasa nada al hacer doble clic: clic derecho › <em>Propiedades</em> › marca <em>Desbloquear</em>, o <code>Unblock-File .\StreamlinkLauncher-1.5.2.exe</code>.</li>
+              <li>Si no pasa nada al hacer doble clic: clic derecho › <em>Propiedades</em> › marca <em>Desbloquear</em>, o <code>Unblock-File .\StreamlinkLauncher-1.6.0.exe</code>.</li>
             </ol></div></details>
           <details class="faq"><summary>Mi antivirus bloquea o borra el exe <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
             <p>Los programas creados con PyInstaller a veces se marcan por error. Comprueba el SHA-256, restaura el archivo desde la cuarentena, añade su carpeta a las exclusiones y notifica el falso positivo (Microsoft Defender: <a href="https://www.microsoft.com/wdsi/filesubmission" target="_blank" rel="noopener">enviar un archivo</a>, categoría <em>Incorrectly detected as malware</em>). También puedes ejecutar la aplicación desde el código fuente.</p></div></details>
