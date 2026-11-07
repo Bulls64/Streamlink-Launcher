@@ -86,12 +86,45 @@ class LaunchMixin:
             self.log(t("log_error", error=e), "err")
             return False
         self.log(t("log_launching", label=f"{pname} / {name}", quality=quality))
+        if self.cfg["chat_with_stream"] and p["id"] in core.CHAT_PLATFORMS:
+            self.open_chat(p["id"], display, quiet=True)
         self.store.add_history({"channel": display, "platform": p["id"]})
         self.toast(t("toast_launching", name=name, platform=pname), "ok")
         self.build_recents()
         self._refresh_panel("history")
         self.refresh_drawer()
         self.start_polling()
+        return True
+
+    def open_chat(self, platform, channel, report=None, quiet=False):
+        """Ouvre le chat d'une chaîne Twitch ou Kick dans Streamlink Chat.
+
+        quiet : appelé en lançant un stream, sans notification de réussite (celle du lancement suffit).
+
+        Opens a Twitch or Kick channel's chat in Streamlink Chat.
+
+        quiet: called when starting a stream, without a success notification (the launch one is enough)."""
+        t = self.t
+        report = report or self.toast
+        path = core.find_chat(self.cfg["chat_path"])
+        command = core.chat_command(path, platform, channel) if path else None
+        if not command:
+            report(t("toast_no_chat"), "warn", action=(t("action_download"), lambda: self.open_url(
+                core.CHAT_RELEASES_URL)))
+            self.log(t("log_no_chat", url=core.CHAT_RELEASES_URL), "warn")
+            return False
+        flags = getattr(subprocess, "CREATE_NO_WINDOW", 0) if path.lower().endswith(".py") else 0
+        try:
+            subprocess.Popen(command, cwd=os.path.dirname(path) or None, stdin=subprocess.DEVNULL,
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=flags,
+                             start_new_session=os.name != "nt")
+        except OSError as e:
+            report(t("toast_chat_failed"), "error", action=(t("action_show_log"), self.show_log))
+            self.log(t("log_error", error=e), "err")
+            return False
+        self.log(t("log_chat_opened", name=channel, path=path))
+        if not quiet:
+            report(t("toast_chat_opened", name=channel), "ok")
         return True
 
     def launch_script(self, script_name, raw, report=None):

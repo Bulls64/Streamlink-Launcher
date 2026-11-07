@@ -79,6 +79,10 @@ FAV_FILE = DATA_FOLDER / "favorites.json"
 
 SCRIPT_EXTENSIONS = (".bat", ".cmd", ".ps1", ".exe", ".py", ".lnk")
 STREAMLINK_INSTALL_URL = "https://streamlink.github.io/install.html"
+CHAT_RELEASES_URL = "https://github.com/Bulls64/Streamlink-Chat/releases/latest"
+# Plateformes que Streamlink Chat sait ouvrir depuis un nom de chaîne (Steam TV n'a pas de chaîne dans le lanceur)
+# Platforms Streamlink Chat can open from a channel name (Steam TV has no channel in the launcher)
+CHAT_PLATFORMS = ("twitch", "kick")
 HISTORY_LIMIT = 200
 
 DEFAULT_CONFIG = {
@@ -118,6 +122,10 @@ DEFAULT_CONFIG = {
                                # install the launcher update by itself at start-up (Windows executable)
     "clipboard_watch": True,   # proposer un lien de stream copié dans le presse-papiers
                                # offer a stream link copied to the clipboard
+    "chat_path": "",           # Streamlink Chat (exe, AppImage ou slink_chat.py) ; vide = détection automatique
+                               # Streamlink Chat (exe, AppImage or slink_chat.py); empty = automatic detection
+    "chat_with_stream": False, # ouvrir aussi le chat en lançant un stream Twitch ou Kick
+                               # also open the chat when starting a Twitch or Kick stream
 }
 
 LIVE_INTERVALS = [2, 5, 10, 15, 30]
@@ -544,6 +552,48 @@ def find_streamlink(configured=""):
     if configured:
         return configured if os.path.isfile(configured) or shutil.which(configured) else None
     return find_executable(STREAMLINK_CANDIDATES)
+
+
+# ---------------------
+# Streamlink Chat
+# ---------------------
+def _chat_dirs():
+    """Dossiers où chercher Streamlink Chat : celui du lanceur (ou de son AppImage), un dépôt voisin, ~/Applications.
+
+    Folders where Streamlink Chat is looked for: the launcher's (or its AppImage's), a sibling repository,
+    ~/Applications."""
+    base = Path(os.environ["APPIMAGE"]).resolve().parent if APPIMAGE else BASE_DIR
+    dirs = [base, base.parent / "Streamlink-Chat", base.parent / "streamlink-chat", Path.home() / "Applications"]
+    return [d for d in dirs if d.is_dir()]
+
+
+def find_chat(configured=""):
+    """Chemin de Streamlink Chat, ou None. Sans réglage : le fichier le plus récent parmi les exe (Windows),
+    AppImage (Linux) et slink_chat.py trouvés dans les dossiers habituels.
+
+    Path of Streamlink Chat, or None. Without a setting: the most recent file among the exe (Windows),
+    AppImage (Linux) and slink_chat.py found in the usual folders."""
+    if configured:
+        return configured if os.path.isfile(configured) else None
+    patterns = ["Streamlink Chat.exe", "StreamlinkChat*.exe"] if os.name == "nt" else ["StreamlinkChat*.AppImage"]
+    found = [f for d in _chat_dirs() for pat in [*patterns, "slink_chat.py"] for f in d.glob(pat) if f.is_file()]
+    if not found:
+        return None
+    return str(max(found, key=lambda f: (f.suffix != ".py", f.stat().st_mtime)))
+
+
+def chat_command(path, platform, channel):
+    """Commande qui ouvre le chat d'une chaîne dans Streamlink Chat (une seule fenêtre : si le chat est déjà ouvert,
+    il reçoit la chaîne en nouvel onglet). None si slink_chat.py n'a pas de Python pour le lancer.
+
+    Command that opens a channel's chat in Streamlink Chat (a single window: if the chat is already open,
+    it gets the channel as a new tab). None if slink_chat.py has no Python to run it."""
+    target = ["--open", f"{platform}:{channel}"]
+    if path.lower().endswith(".py"):
+        python = sys.executable if not FROZEN else (shutil.which("pythonw") or shutil.which("python")
+                                                     or shutil.which("python3"))
+        return [python, path, *target] if python else None
+    return [path, *target]
 
 
 def find_player(player):

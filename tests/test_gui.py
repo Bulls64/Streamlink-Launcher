@@ -67,5 +67,63 @@ class TestGuiSmoke(TempData):
             self.assertEqual(self.app.mode, theme)
 
 
+    def test_open_chat_from_favorite_and_with_stream(self):
+        from launcher import app_launch
+        app, core = self.app, app_launch.core
+        app.toast = mock.Mock()
+        with mock.patch.object(core, "find_chat", return_value=None):
+            self.assertFalse(app.open_chat("twitch", "eslcs"))
+        self.assertEqual(app.toast.call_args[0][:2], (app.t("toast_no_chat"), "warn"))
+        with mock.patch.object(core, "find_chat", return_value="/opt/StreamlinkChat.AppImage"), \
+                mock.patch.object(app_launch.subprocess, "Popen") as popen:
+            self.assertTrue(app.open_chat("kick", "xqc"))
+            self.assertEqual(popen.call_args[0][0], ["/opt/StreamlinkChat.AppImage", "--open", "kick:xqc"])
+            app.toast.assert_called_with(app.t("toast_chat_opened", name="xqc"), "ok")
+            # Lancer un stream Twitch avec l'option : le chat s'ouvre aussi
+            # Starting a Twitch stream with the option: the chat opens too
+            app.cfg["chat_with_stream"] = True
+            p = app.platform_by_id("twitch")
+            with mock.patch.object(core, "find_streamlink", return_value="/usr/bin/streamlink"), \
+                    mock.patch.object(app.streams, "start"):
+                self.assertTrue(app.launch_platform(p, "eslcs"))
+            self.assertEqual(popen.call_args[0][0][-2:], ["--open", "twitch:eslcs"])
+            popen.reset_mock()
+            yt = app.platform_by_id("youtube")
+            with mock.patch.object(core, "find_streamlink", return_value="/usr/bin/streamlink"), \
+                    mock.patch.object(app.streams, "start"):
+                app.launch_platform(yt, "dQw4w9WgXcQ")
+            popen.assert_not_called()                               # YouTube : pas de chat / no chat
+
+    def test_favorite_menu_offers_the_chat(self):
+        app = self.app
+        entries = []
+
+        class FakeMenu:
+            def __init__(self, *a, **k):
+                pass
+
+            def add_command(self, label, command):
+                entries.append(label)
+
+            def add_separator(self):
+                pass
+
+            def tk_popup(self, x, y):
+                pass
+
+            def grab_release(self):
+                pass
+        from types import SimpleNamespace
+        event = SimpleNamespace(x_root=10, y_root=10)
+        with mock.patch("tkinter.Menu", FakeMenu):
+            app.favorite_menu(event, {"platform": "twitch", "channel": "eslcs"})
+            self.assertIn(app.t("menu_open_chat"), entries)
+            entries.clear()
+            app.favorite_menu(event, {"platform": "youtube", "channel": "dQw4w9WgXcQ"})
+            self.assertNotIn(app.t("menu_open_chat"), entries)
+            entries.clear()
+            app.favorite_menu(event, {"channel": "old"})                # ancien favori : Twitch / old favorite
+            self.assertIn(app.t("menu_open_chat"), entries)
+
 if __name__ == "__main__":
     unittest.main()

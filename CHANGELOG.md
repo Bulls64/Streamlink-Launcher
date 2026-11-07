@@ -11,16 +11,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Planned
+- Viewing statistics (time per channel, peak hours).
+
+## [1.6.0] - 2026-11-07
+
 ### Added
+- **Open the chat from the launcher, in Streamlink Chat.** Right-click a Twitch or Kick favorite › *Open the chat*; with *Settings › Streamlink Chat › Open the chat with the stream*, starting a Twitch or Kick stream opens its chat too. Streamlink Chat is found next to the launcher (or its AppImage), in a neighboring `Streamlink-Chat` folder or in `~/Applications`, or at the location set in the settings; if it is missing, a message offers to download it. A chat already open receives the channel as a new tab.
 - **Website and documentation in Spanish, German and Italian**, next to French and English (10 pages, with `hreflang` links and an updated sitemap). The language menu now offers all five.
 - **Website: CSS and JavaScript in separate files** (`assets/css/`, `assets/js/`) instead of inside each page, with a content fingerprint (`?v=…`) so browsers pick up new versions. Pages are lighter and the styles are cached from one page to the next. Same look and behavior.
 - **Website: Streamlink Chat 0.2.2** (download links, version shown, "What's new" table in the five languages).
 - **Website: Streamlink Launcher 1.5.2** (download links, version shown, "What's new" table in the five languages).
 - **Website sources tidied**: the unused `site_head.html` and `shell_head.html` are removed, and the build now gives the same output on every run.
 - **Website: Streamlink Chat 0.2.3** (download links, version shown, "What's new" table in the five languages).
-
-### Planned
-- Viewing statistics (time per channel, peak hours).
 
 ## [1.5.2] - 2026-10-24
 
@@ -257,16 +260,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Non publié]
 
+### Prévu
+- Statistiques de visionnage (temps par chaîne, heures de pointe).
+
+## [1.6.0] - 2026-11-07
+
 ### Ajouté
+- **Ouvrir le chat depuis le lanceur, dans Streamlink Chat.** Clic droit sur un favori Twitch ou Kick › *Ouvrir le chat* ; avec *Paramètres › Streamlink Chat › Ouvrir le chat avec le stream*, lancer un stream Twitch ou Kick ouvre aussi son chat. Streamlink Chat est cherché à côté du lanceur (ou de son AppImage), dans un dossier `Streamlink-Chat` voisin ou dans `~/Applications`, ou à l'emplacement réglé dans les paramètres ; s'il manque, un message propose de le télécharger. Un chat déjà ouvert reçoit la chaîne en nouvel onglet.
 - **Site et documentation en espagnol, allemand et italien**, en plus du français et de l'anglais (10 pages, avec liens `hreflang` et plan du site mis à jour). Le menu de langue en propose maintenant cinq.
 - **Site : CSS et JavaScript dans des fichiers à part** (`assets/css/`, `assets/js/`) au lieu d'être dans chaque page, avec une empreinte du contenu (`?v=…`) pour que les navigateurs prennent les nouvelles versions. Pages plus légères, styles gardés en cache d'une page à l'autre. Même apparence, même fonctionnement.
 - **Site : Streamlink Chat 0.2.2** (liens de téléchargement, version affichée, tableau « Nouveautés » dans les cinq langues).
 - **Site : Streamlink Launcher 1.5.2** (liens de téléchargement, version affichée, tableau « Nouveautés » dans les cinq langues).
 - **Sources du site nettoyées** : les fichiers inutilisés `site_head.html` et `shell_head.html` sont supprimés, et la construction donne le même résultat à chaque fois.
 - **Site : Streamlink Chat 0.2.3** (liens de téléchargement, version affichée, tableau « Nouveautés » dans les cinq langues).
-
-### Prévu
-- Statistiques de visionnage (temps par chaîne, heures de pointe).
 
 ## [1.5.2] - 2026-10-24
 
@@ -497,11 +503,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 > Les versions 0.1.0 à 1.0.0 n'ont jamais été publiées sur GitHub ; la 1.0.1 est la première release. La date de la 0.1.0 est la plus ancienne date trouvée dans les données de l'application.
 
-[Unreleased]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.5.1...HEAD
+[Unreleased]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.5.2...v1.6.0
+[1.5.2]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.5.0
 [1.4.3]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.3
-[Non publié]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.5.1...HEAD
+[Non publié]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.6.0...HEAD
 [1.4.2]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.2
 [1.4.1]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.1
 [1.4.0]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.0
