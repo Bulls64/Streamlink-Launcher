@@ -261,5 +261,17 @@
   "toast_app_auto_update": "Updating automatically to {latest}…",
   "log_app_auto_update": "Automatic launcher update: {installed} → {latest}",
   "label_platform_colors": "Platform colors",
-  "hint_platform_colors": "Tints favorite cards with their platform’s color (Twitch purple, Kick green…)."
+  "hint_platform_colors": "Tints favorite cards with their platform’s color (Twitch purple, Kick green…).",
+
+  "menu_open_chat": "Open the chat",
+  "toast_no_chat": "Streamlink Chat was not found",
+  "action_download": "Download",
+  "log_no_chat": "Streamlink Chat not found: put it next to the launcher or set its location in the settings. Download: {url}",
+  "toast_chat_failed": "Couldn't open Streamlink Chat",
+  "log_chat_opened": "💬 {name}'s chat opened ({path})",
+  "toast_chat_opened": "{name}'s chat opened",
+  "label_chat_with_stream": "Open the chat with the stream",
+  "hint_chat_with_stream": "When starting a Twitch or Kick stream, also opens its chat in Streamlink Chat.",
+  "label_chat_path": "Streamlink Chat location",
+  "hint_chat_path": "Empty: looked for next to the launcher, in a neighboring Streamlink-Chat folder and in ~/Applications. Right-click a Twitch or Kick favorite › Open the chat."
 }

@@ -284,6 +284,65 @@ class TestLinks(unittest.TestCase):
         self.assertTrue(core.DEFAULT_CONFIG["clipboard_watch"])
 
 
+class TestChat(unittest.TestCase):
+    """Streamlink Chat : où le trouver et comment lui demander d'ouvrir un chat.
+
+    Streamlink Chat: where to find it and how to ask it to open a chat."""
+
+    def setUp(self):
+        self.root = Path(tempfile.mkdtemp())
+        self.base = self.root / "Streamlink Launcher"
+        self.base.mkdir()
+        self.patches = [mock.patch.object(core, "BASE_DIR", self.base), mock.patch.object(core, "APPIMAGE", False),
+                        mock.patch.object(Path, "home", lambda: self.root / "home")]
+        for p in self.patches:
+            p.start()
+
+    def tearDown(self):
+        for p in self.patches:
+            p.stop()
+
+    def touch(self, path, mtime):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("x", encoding="utf-8")
+        os.utime(path, (mtime, mtime))
+        return str(path)
+
+    def test_configured_path(self):
+        f = self.touch(self.root / "chat.exe", 1)
+        self.assertEqual(core.find_chat(f), f)
+        self.assertIsNone(core.find_chat(str(self.root / "missing.exe")))
+
+    def test_auto_detect(self):
+        self.assertIsNone(core.find_chat())
+        ext = ".exe" if os.name == "nt" else ".AppImage"
+        arch = "" if os.name == "nt" else "-x86_64"
+        old = self.touch(self.base / f"StreamlinkChat-0.2.2{arch}{ext}", 1000)
+        self.assertEqual(core.find_chat(), old)
+        new = self.touch(self.base / f"StreamlinkChat-0.2.3{arch}{ext}", 2000)
+        self.assertEqual(core.find_chat(), new)                  # le plus récent / the most recent
+        script = self.touch(self.root / "Streamlink-Chat" / "slink_chat.py", 3000)
+        self.assertEqual(core.find_chat(), new)                  # l'exe passe avant les sources / exe before sources
+        os.remove(old)
+        os.remove(new)
+        self.assertEqual(core.find_chat(), script)               # dépôt voisin / sibling repository
+
+    def test_command(self):
+        self.assertEqual(core.chat_command("C:/Chat/StreamlinkChat-0.2.3.exe", "kick", "xqc"),
+                         ["C:/Chat/StreamlinkChat-0.2.3.exe", "--open", "kick:xqc"])
+        cmd = core.chat_command("/src/slink_chat.py", "twitch", "eslcs")
+        self.assertEqual(cmd[1:], ["/src/slink_chat.py", "--open", "twitch:eslcs"])
+        with mock.patch.object(core, "FROZEN", True), mock.patch.object(core.shutil, "which", return_value=None):
+            self.assertIsNone(core.chat_command("/src/slink_chat.py", "twitch", "eslcs"))
+
+    def test_chat_understands_the_command(self):
+        """Le format --open plateforme:chaîne est celui que Streamlink Chat lit (chat/config.py, targets_from_argv).
+
+        The --open platform:channel format is the one Streamlink Chat reads (chat/config.py, targets_from_argv)."""
+        self.assertEqual(core.chat_command("x.exe", "twitch", "eslcs")[1:], ["--open", "twitch:eslcs"])
+        self.assertEqual(core.CHAT_PLATFORMS, ("twitch", "kick"))
+
+
 class TestBackup(TempData):
     LANGS = {"fr": "Français", "en": "English"}
     KEYS = ("ctrl+alt+s", "alt+shift+s")

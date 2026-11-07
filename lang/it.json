@@ -261,5 +261,17 @@
   "toast_app_auto_update": "Aggiornamento automatico a {latest}…",
   "log_app_auto_update": "Aggiornamento automatico del launcher: {installed} → {latest}",
   "label_platform_colors": "Colori per piattaforma",
-  "hint_platform_colors": "Colora le schede dei preferiti con il colore della piattaforma (viola Twitch, verde Kick…)."
+  "hint_platform_colors": "Colora le schede dei preferiti con il colore della piattaforma (viola Twitch, verde Kick…).",
+
+  "menu_open_chat": "Apri la chat",
+  "toast_no_chat": "Streamlink Chat non trovato",
+  "action_download": "Scarica",
+  "log_no_chat": "Streamlink Chat non trovato: mettilo accanto al launcher o indica la sua posizione nelle impostazioni. Download: {url}",
+  "toast_chat_failed": "Impossibile aprire Streamlink Chat",
+  "log_chat_opened": "💬 Chat di {name} aperta ({path})",
+  "toast_chat_opened": "Chat di {name} aperta",
+  "label_chat_with_stream": "Apri la chat con lo stream",
+  "hint_chat_with_stream": "Quando avvii uno stream Twitch o Kick, apre anche la sua chat in Streamlink Chat.",
+  "label_chat_path": "Posizione di Streamlink Chat",
+  "hint_chat_path": "Vuoto: viene cercato accanto al launcher, in una cartella Streamlink-Chat vicina e in ~/Applications. Clic destro su un preferito Twitch o Kick › Apri la chat."
 }

@@ -120,12 +120,19 @@ class PanelsMixin:
                                                              "live_check", "live_interval", "live_notify",
                                                              "live_previews", "platform_colors",
                                                              "tray", "hotkey", "autostart", "update_check",
-                                                             "clipboard_watch", "hotkey_combo", "auto_update")}
+                                                             "clipboard_watch", "hotkey_combo", "auto_update",
+                                                             "chat_with_stream")}
         self.v_player_path = tk.StringVar(value=self.cfg["player_path"])
         self.v_player_args = tk.StringVar(value=self.cfg["player_args"])
         self.v_streamlink = tk.StringVar(value=self.cfg["streamlink_path"])
         self.v_folder = tk.StringVar(value=self.cfg["scripts_folder"])
+        self.v_chat = tk.StringVar(value=self.cfg["chat_path"])
         langs = core.available_languages()
+
+        def chat_badge():
+            if core.find_chat(self.v_chat.get().strip()):
+                return t("badge_found"), c.ok, "check"
+            return t("badge_not_found"), c.warn, "warning"
 
         def player_badge():
             path = self.v_player_path.get().strip()
@@ -210,6 +217,15 @@ class PanelsMixin:
             Field(sec, self, self.v_streamlink, placeholder=t("ph_auto_detect"), height=40, font=self.fonts.small,
                   action_icon="folder", action_command=lambda: self._browse_file(self.v_streamlink)).pack(fill="x")
 
+            sec = self._section(b, "Streamlink Chat")
+            self._switch_row(sec, t("label_chat_with_stream"), t("hint_chat_with_stream"), s["chat_with_stream"],
+                             lambda v: s.update(chat_with_stream=v))
+            self._label(sec, t("label_chat_path"))
+            Field(sec, self, self.v_chat, placeholder=t("ph_auto_detect"), height=40, font=self.fonts.small,
+                  action_icon="folder", action_command=lambda: self._browse_file(self.v_chat),
+                  badge=chat_badge).pack(fill="x")
+            self._hint(sec, t("hint_chat_path"))
+
             sec = self._section(b, t("settings_advanced"))
             self._switch_row(sec, t("label_show_scripts"), t("hint_show_scripts"), s["show_scripts"],
                              lambda v: s.update(show_scripts=v))
@@ -263,6 +279,7 @@ class PanelsMixin:
                         tray=bool(s["tray"]), hotkey=bool(s["hotkey"]),
                         update_check=bool(s["update_check"]), auto_update=bool(s["auto_update"]),
                         clipboard_watch=bool(s["clipboard_watch"]),
+                        chat_path=self.v_chat.get().strip(), chat_with_stream=bool(s["chat_with_stream"]),
                         hotkey_combo=s["hotkey_combo"])
         if self.sl_update and self.sl_update.get("path") != core.find_streamlink(self.cfg["streamlink_path"]):
             self.sl_update = None  # autre Streamlink choisi : l'ancien résultat ne vaut plus

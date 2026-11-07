@@ -7,7 +7,7 @@ Mixin of App (see app.py): these methods use self as the main window."""
 import base64
 import tkinter as tk
 
-from . import inputs, live, thumb, winnotify
+from . import core, inputs, live, thumb, winnotify
 from .app_common import FAV_SLOTS
 from .widgets import (
     Card,
@@ -205,6 +205,9 @@ class FavoritesMixin:
                        activeforeground=c.text, bd=0, font=self.fonts.small)
         menu.add_command(label=t("menu_launch"), command=lambda: self.launch_favorite(fav))
         menu.add_command(label=t("menu_fill"), command=lambda: self.fill_from_entry(fav))
+        platform = fav.get("platform") or (None if fav.get("script") else "twitch")  # anciens favoris : Twitch
+        if platform in core.CHAT_PLATFORMS and fav.get("channel"):                    # old favorites: Twitch
+            menu.add_command(label=t("menu_open_chat"), command=lambda: self.open_chat(platform, fav["channel"]))
         menu.add_separator()
         menu.add_command(label=t("menu_remove_favorite"), command=lambda: self.remove_favorite(fav))
         try:
