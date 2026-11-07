@@ -1,6 +1,6 @@
 <div class="wrap">
   <div class="intro">
-    <div class="tag"><span class="num">DOCS</span><span>Launcher v1.6.0 · Chat v0.2.3</span></div>
+    <div class="tag"><span class="num">DOCS</span><span>Launcher v1.6.0 · Chat v0.3.0</span></div>
     <h1>Dokumentation</h1>
     <p>Alles, was du brauchst, um Streamlink zu installieren, beide Apps zu nutzen und häufige Probleme zu lösen. Die Kennzeichnungen <span class="app l">Launcher</span> und <span class="app c">Chat</span> zeigen, für welche App ein Abschnitt gilt.</p>
     <label class="search" for="q">
@@ -369,13 +369,11 @@
         <div class="pane on blk" data-group="acct" data-pane="twitch">
           <h3>Twitch verbinden <span class="app c">Chat</span></h3>
           <ol class="steps">
-            <li>Öffne <a href="https://dev.twitch.tv/console/apps/create" target="_blank" rel="noopener">dev.twitch.tv/console/apps/create</a> und melde dich mit deinem Twitch-Konto an. Twitch verlangt eventuell, dass du die Zwei-Faktor-Authentifizierung aktivierst, um die Konsole zu nutzen.</li>
-            <li>Gib der Anwendung einen Namen, füge die Weiterleitungs-URL <code>http://localhost</code> hinzu, wähle die Kategorie <em>Chat Bot</em> und den Clienttyp <b>Public</b> und erstelle sie.</li>
-            <li>Kopiere ihre <b>Client ID</b> und füge sie unter <em>Einstellungen › Konten (zum Schreiben)</em> ein.</li>
-            <li>Klicke auf <em>Bei Twitch anmelden</em>. Eine Seite <code>twitch.tv/activate</code> öffnet sich: Gib den Code ein, den die App anzeigt, und autorisiere sie.</li>
-            <li>Die Kopfzeile der Twitch-Chats wechselt zu <em>Verbunden</em>. Die Verbindung erneuert sich von selbst.</li>
+            <li>Öffne <em>Einstellungen › Konten (zum Schreiben)</em> und klicke auf <em>Bei Twitch anmelden</em>: Du musst nichts anlegen, die Twitch-Anwendung von Streamlink Chat wird verwendet (seit 0.3.0).</li>
+            <li>Eine Seite <code>twitch.tv/activate</code> öffnet sich: Gib den von der App angezeigten Code ein und erlaube den Zugriff.</li>
+            <li>Die Kopfzeile der Twitch-Chats wechselt zu <em>Verbunden</em>. Die Anmeldung erneuert sich von selbst.</li>
           </ol>
-          <p>Die App fragt nur zwei Berechtigungen an: im Chat lesen und schreiben (<code>chat:read</code>, <code>chat:edit</code>).</p>
+          <p>Lieber eine eigene Anwendung? Lege sie auf <a href="https://dev.twitch.tv/console/apps/create" target="_blank" rel="noopener">dev.twitch.tv/console/apps/create</a> an (Weiterleitungs-URL <code>http://localhost</code>, Kategorie <em>Chat Bot</em>, Client-Typ <b>Public</b>) und füge ihre <b>Client ID</b> vor der Anmeldung ein. Die App fragt nur zwei Berechtigungen an: im Chat lesen und schreiben (<code>chat:read</code>, <code>chat:edit</code>).</p>
         </div>
         <div class="pane blk" data-group="acct" data-pane="kick">
           <h3>Kick verbinden <span class="app c">Chat</span></h3>
@@ -551,7 +549,7 @@ player-args=--force-window=immediate</div>
             <thead><tr><th>App</th><th>Neueste Version</th><th>Kurz gesagt</th></tr></thead>
             <tbody>
               <tr><td><span class="app l">Launcher</span></td><td>1.6.0 (7. November 2026)</td><td>Öffnet den Chat eines Twitch- oder Kick-Favoriten in Streamlink Chat (Rechtsklick) oder mit dem Stream.</td></tr>
-              <tr><td><span class="app c">Chat</span></td><td>0.2.3 (7. November 2026)</td><td>Links außerhalb von Twitch, Kick und Steam zeigen vor dem Öffnen ihre Website; Warnung, wenn Kick oder Steam TV ständig scheitern.</td></tr>
+              <tr><td><span class="app c">Chat</span></td><td>0.3.0 (7. November 2026)</td><td>Twitch-Anmeldung ohne eigene Anwendung; öffnet sich aus einem Favoriten von Launcher 1.6.0.</td></tr>
             </tbody>
           </table></div>
           <p>Die Details jeder Version stehen im Änderungsprotokoll, auf Englisch und Französisch: <a href="https://github.com/Bulls64/Streamlink-Launcher/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Chat</a>. Die Downloads findest du auf den Versionsseiten: <a href="https://github.com/Bulls64/Streamlink-Launcher/releases" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/releases" target="_blank" rel="noopener">Chat</a>.</p>

@@ -1,6 +1,6 @@
 <div class="wrap">
   <div class="intro">
-    <div class="tag"><span class="num">DOCS</span><span>Launcher v1.6.0 · Chat v0.2.3</span></div>
+    <div class="tag"><span class="num">DOCS</span><span>Launcher v1.6.0 · Chat v0.3.0</span></div>
     <h1>Documentation</h1>
     <p>Tout ce qu'il faut pour installer Streamlink, utiliser les deux applis et régler les problèmes courants. Les étiquettes <span class="app l">Launcher</span> et <span class="app c">Chat</span> indiquent à quelle appli s'applique un passage.</p>
     <label class="search" for="q">
@@ -369,13 +369,11 @@
         <div class="pane on blk" data-group="acct" data-pane="twitch">
           <h3>Connecter Twitch <span class="app c">Chat</span></h3>
           <ol class="steps">
-            <li>Ouvre <a href="https://dev.twitch.tv/console/apps/create" target="_blank" rel="noopener">dev.twitch.tv/console/apps/create</a> et connecte-toi avec ton compte Twitch. Twitch peut te demander d'activer la double authentification pour accéder à la console.</li>
-            <li>Donne un nom à l'application, ajoute l'URL de redirection <code>http://localhost</code>, choisis la catégorie <em>Chat Bot</em> et le type de client <b>Public</b>, puis crée-la.</li>
-            <li>Copie son <b>Client ID</b> et colle-le dans <em>Paramètres › Comptes (pour écrire)</em>.</li>
-            <li>Clique sur <em>Se connecter à Twitch</em>. Une page <code>twitch.tv/activate</code> s'ouvre : saisis le code affiché par l'appli et autorise-la.</li>
+            <li>Ouvre <em>Paramètres › Comptes (pour écrire)</em> et clique sur <em>Se connecter à Twitch</em> : rien à créer, l'application Twitch de Streamlink Chat est utilisée (depuis la 0.3.0).</li>
+            <li>Une page <code>twitch.tv/activate</code> s'ouvre : saisis le code affiché par l'appli et autorise-la.</li>
             <li>L'en-tête des chats Twitch passe à <em>Connecté</em>. La connexion se renouvelle toute seule.</li>
           </ol>
-          <p>L'appli ne demande que deux autorisations : lire et écrire dans le chat (<code>chat:read</code>, <code>chat:edit</code>).</p>
+          <p>Tu préfères ta propre application ? Crée-la sur <a href="https://dev.twitch.tv/console/apps/create" target="_blank" rel="noopener">dev.twitch.tv/console/apps/create</a> (URL de redirection <code>http://localhost</code>, catégorie <em>Chat Bot</em>, type de client <b>Public</b>) et colle son <b>Client ID</b> avant de te connecter. L'appli ne demande que deux autorisations : lire et écrire dans le chat (<code>chat:read</code>, <code>chat:edit</code>).</p>
         </div>
         <div class="pane blk" data-group="acct" data-pane="kick">
           <h3>Connecter Kick <span class="app c">Chat</span></h3>
@@ -551,7 +549,7 @@ player-args=--force-window=immediate</div>
             <thead><tr><th>Appli</th><th>Dernière version</th><th>En bref</th></tr></thead>
             <tbody>
               <tr><td><span class="app l">Launcher</span></td><td>1.6.0 (7 novembre 2026)</td><td>Ouvre le chat d'un favori Twitch ou Kick dans Streamlink Chat (clic droit), ou avec le stream.</td></tr>
-              <tr><td><span class="app c">Chat</span></td><td>0.2.3 (7 novembre 2026)</td><td>Les liens hors Twitch, Kick et Steam montrent leur site avant de s'ouvrir ; avertissement quand Kick ou Steam TV échouent sans arrêt.</td></tr>
+              <tr><td><span class="app c">Chat</span></td><td>0.3.0 (7 novembre 2026)</td><td>Connexion à Twitch sans créer d'application ; s'ouvre depuis un favori de Launcher 1.6.0.</td></tr>
             </tbody>
           </table></div>
           <p>Le détail de chaque version est dans le journal des modifications, en anglais et en français : <a href="https://github.com/Bulls64/Streamlink-Launcher/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Chat</a>. Les fichiers à télécharger sont sur les pages des releases : <a href="https://github.com/Bulls64/Streamlink-Launcher/releases" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/releases" target="_blank" rel="noopener">Chat</a>.</p>
