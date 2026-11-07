@@ -1,6 +1,6 @@
 <div class="wrap">
   <div class="intro">
-    <div class="tag"><span class="num">DOCS</span><span>Launcher v1.5.2 · Chat v0.2.3</span></div>
+    <div class="tag"><span class="num">DOCS</span><span>Launcher v1.6.0 · Chat v0.3.0</span></div>
     <h1>Documentation</h1>
     <p>Tout ce qu'il faut pour installer Streamlink, utiliser les deux applis et régler les problèmes courants. Les étiquettes <span class="app l">Launcher</span> et <span class="app c">Chat</span> indiquent à quelle appli s'applique un passage.</p>
     <label class="search" for="q">
@@ -252,7 +252,7 @@
               <tr><td>Parcourir les suggestions (favoris puis historique)</td><td><kbd>↓</kbd> <kbd>↑</kbd></td></tr>
               <tr><td>Ouvrir les paramètres</td><td><kbd>Ctrl</kbd>+<kbd>,</kbd></td></tr>
               <tr><td>Fermer un menu ou un panneau</td><td><kbd>Échap</kbd></td></tr>
-              <tr><td>Options d'un favori (lancer, remplir le champ, retirer)</td><td>Clic droit sur sa carte</td></tr>
+              <tr><td>Options d'un favori (lancer, remplir le champ, ouvrir le chat, retirer)</td><td>Clic droit sur sa carte</td></tr>
               <tr><td>Ouvrir le mode mini, depuis n'importe où (Windows)</td><td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd></td></tr>
             </tbody>
           </table></div>
@@ -318,7 +318,7 @@
           <h3>Lancer, modifier ou retirer un favori <span class="app l">Launcher</span></h3>
           <ul>
             <li><b>Lancer</b> : clique sur sa carte.</li>
-            <li><b>Plus d'options</b> : clic droit sur la carte, puis <em>Lancer</em>, <em>Remplir le champ</em> ou <em>Retirer des favoris</em>.</li>
+            <li><b>Plus d'options</b> : clic droit sur la carte, puis <em>Lancer</em>, <em>Remplir le champ</em>, <em>Ouvrir le chat</em> (Twitch et Kick, dans Streamlink Chat) ou <em>Retirer des favoris</em>.</li>
             <li><b>Dans le panneau Favoris</b> : un clic sur une ligne remplit le champ, ▶ lance, la corbeille retire.</li>
           </ul>
         </div>
@@ -369,13 +369,11 @@
         <div class="pane on blk" data-group="acct" data-pane="twitch">
           <h3>Connecter Twitch <span class="app c">Chat</span></h3>
           <ol class="steps">
-            <li>Ouvre <a href="https://dev.twitch.tv/console/apps/create" target="_blank" rel="noopener">dev.twitch.tv/console/apps/create</a> et connecte-toi avec ton compte Twitch. Twitch peut te demander d'activer la double authentification pour accéder à la console.</li>
-            <li>Donne un nom à l'application, ajoute l'URL de redirection <code>http://localhost</code>, choisis la catégorie <em>Chat Bot</em> et le type de client <b>Public</b>, puis crée-la.</li>
-            <li>Copie son <b>Client ID</b> et colle-le dans <em>Paramètres › Comptes (pour écrire)</em>.</li>
-            <li>Clique sur <em>Se connecter à Twitch</em>. Une page <code>twitch.tv/activate</code> s'ouvre : saisis le code affiché par l'appli et autorise-la.</li>
+            <li>Ouvre <em>Paramètres › Comptes (pour écrire)</em> et clique sur <em>Se connecter à Twitch</em> : rien à créer, l'application Twitch de Streamlink Chat est utilisée (depuis la 0.3.0).</li>
+            <li>Une page <code>twitch.tv/activate</code> s'ouvre : saisis le code affiché par l'appli et autorise-la.</li>
             <li>L'en-tête des chats Twitch passe à <em>Connecté</em>. La connexion se renouvelle toute seule.</li>
           </ol>
-          <p>L'appli ne demande que deux autorisations : lire et écrire dans le chat (<code>chat:read</code>, <code>chat:edit</code>).</p>
+          <p>Tu préfères ta propre application ? Crée-la sur <a href="https://dev.twitch.tv/console/apps/create" target="_blank" rel="noopener">dev.twitch.tv/console/apps/create</a> (URL de redirection <code>http://localhost</code>, catégorie <em>Chat Bot</em>, type de client <b>Public</b>) et colle son <b>Client ID</b> avant de te connecter. L'appli ne demande que deux autorisations : lire et écrire dans le chat (<code>chat:read</code>, <code>chat:edit</code>).</p>
         </div>
         <div class="pane blk" data-group="acct" data-pane="kick">
           <h3>Connecter Kick <span class="app c">Chat</span></h3>
@@ -550,8 +548,8 @@ player-args=--force-window=immediate</div>
           <div class="tbl"><table>
             <thead><tr><th>Appli</th><th>Dernière version</th><th>En bref</th></tr></thead>
             <tbody>
-              <tr><td><span class="app l">Launcher</span></td><td>1.5.2 (24 octobre 2026)</td><td>Code réorganisé en interne. Aucun changement de comportement.</td></tr>
-              <tr><td><span class="app c">Chat</span></td><td>0.2.3 (7 novembre 2026)</td><td>Les liens hors Twitch, Kick et Steam montrent leur site avant de s'ouvrir ; avertissement quand Kick ou Steam TV échouent sans arrêt.</td></tr>
+              <tr><td><span class="app l">Launcher</span></td><td>1.6.0 (7 novembre 2026)</td><td>Ouvre le chat d'un favori Twitch ou Kick dans Streamlink Chat (clic droit), ou avec le stream.</td></tr>
+              <tr><td><span class="app c">Chat</span></td><td>0.3.0 (7 novembre 2026)</td><td>Connexion à Twitch sans créer d'application ; s'ouvre depuis un favori de Launcher 1.6.0.</td></tr>
             </tbody>
           </table></div>
           <p>Le détail de chaque version est dans le journal des modifications, en anglais et en français : <a href="https://github.com/Bulls64/Streamlink-Launcher/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Chat</a>. Les fichiers à télécharger sont sur les pages des releases : <a href="https://github.com/Bulls64/Streamlink-Launcher/releases" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/releases" target="_blank" rel="noopener">Chat</a>.</p>
@@ -654,9 +652,9 @@ player-args=--force-window=immediate</div>
           <details class="faq"><summary>Windows affiche « Windows a protégé votre ordinateur » <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
             <p>Les exécutables ne sont pas encore signés, donc SmartScreen avertit au premier lancement. Ce n'est pas une détection.</p>
             <ol>
-              <li>Vérifie le fichier : dans PowerShell, <code>Get-FileHash .\StreamlinkLauncher-1.5.2.exe</code>, et compare avec <code>SHA256SUMS.txt</code> de la release.</li>
+              <li>Vérifie le fichier : dans PowerShell, <code>Get-FileHash .\StreamlinkLauncher-1.6.0.exe</code>, et compare avec <code>SHA256SUMS.txt</code> de la release.</li>
               <li>Clique sur <em>Informations complémentaires</em>, puis <em>Exécuter quand même</em>.</li>
-              <li>Si rien ne se passe au double-clic : clic droit › <em>Propriétés</em> › coche <em>Débloquer</em>, ou <code>Unblock-File .\StreamlinkLauncher-1.5.2.exe</code>.</li>
+              <li>Si rien ne se passe au double-clic : clic droit › <em>Propriétés</em> › coche <em>Débloquer</em>, ou <code>Unblock-File .\StreamlinkLauncher-1.6.0.exe</code>.</li>
             </ol></div></details>
           <details class="faq"><summary>Mon antivirus bloque ou supprime l'exe <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
             <p>Les programmes compilés avec PyInstaller sont parfois détectés à tort. Vérifie le SHA-256, restaure le fichier depuis la quarantaine, ajoute son dossier aux exclusions, et signale le faux positif (Microsoft Defender : <a href="https://www.microsoft.com/wdsi/filesubmission" target="_blank" rel="noopener">envoyer un fichier</a>, catégorie <em>Incorrectly detected as malware</em>). Tu peux aussi lancer l'appli depuis les sources.</p></div></details>
