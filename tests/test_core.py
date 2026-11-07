@@ -343,6 +343,61 @@ class TestChat(unittest.TestCase):
         self.assertEqual(core.CHAT_PLATFORMS, ("twitch", "kick"))
 
 
+class TestLiveCheck(unittest.TestCase):
+    """packaging/live_check.py : la vérification quotidienne du statut en direct, sans réseau ici.
+
+    packaging/live_check.py: the daily live status check, without network here."""
+
+    @classmethod
+    def setUpClass(cls):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("live_check", ROOT / "packaging" / "live_check.py")
+        cls.lc = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cls.lc)
+
+    def states(self, live_ones=()):
+        return {ch: {"live": ch in live_ones, "title": "t" if ch in live_ones else None, "game": None,
+                     "viewers": None, "preview": "https://x/p.jpg" if ch in live_ones else None}
+                for ch in self.lc.TWITCH_CHANNELS}
+
+    def test_twitch_ok(self):
+        with mock.patch.object(live, "twitch_live", return_value=self.states(["ibai"])), \
+                mock.patch.object(live, "fetch_image", return_value=b"\xff\xd8" + b"0" * 100):
+            ok, detail = self.lc.check_twitch()
+        self.assertTrue(ok, detail)
+
+    def test_twitch_nobody_live_or_no_preview(self):
+        with mock.patch.object(live, "twitch_live", return_value=self.states()):
+            self.assertFalse(self.lc.check_twitch()[0])
+        with mock.patch.object(live, "twitch_live", return_value=self.states(["ibai"])), \
+                mock.patch.object(live, "fetch_image", return_value=None):
+            self.assertFalse(self.lc.check_twitch()[0])
+        partial = dict(list(self.states(["ibai"]).items())[:3])
+        with mock.patch.object(live, "twitch_live", return_value=partial):
+            self.assertFalse(self.lc.check_twitch()[0])
+
+    def test_kick(self):
+        with mock.patch.object(core, "find_streamlink", return_value="/usr/bin/streamlink"), \
+                mock.patch.object(live, "streamlink_live", side_effect=[None, {"live": False}]):
+            ok, detail = self.lc.check_kick()
+        self.assertTrue(ok, detail)
+        with mock.patch.object(core, "find_streamlink", return_value="/usr/bin/streamlink"), \
+                mock.patch.object(live, "streamlink_live", return_value=None):
+            self.assertFalse(self.lc.check_kick()[0])
+        with mock.patch.object(core, "find_streamlink", return_value=None):
+            self.assertFalse(self.lc.check_kick()[0])
+
+    def test_summary_and_exit_code(self):
+        out = Path(tempfile.mkdtemp()) / "s.md"
+        checks = {"twitch": lambda: (True, "ok"), "kick": lambda: (_ for _ in ()).throw(OSError("down"))}
+        with mock.patch.dict(self.lc.CHECKS, checks), mock.patch("builtins.print"):
+            code = self.lc.main(["--summary", str(out)])
+        text = out.read_text(encoding="utf-8")
+        self.assertEqual(code, 1)
+        self.assertIn("| twitch | OK |", text)
+        self.assertIn("| kick | échec | exception : OSError('down') |", text)
+
+
 class TestBackup(TempData):
     LANGS = {"fr": "Français", "en": "English"}
     KEYS = ("ctrl+alt+s", "alt+shift+s")

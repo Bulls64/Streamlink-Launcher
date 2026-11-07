@@ -20,3 +20,8 @@ dist/
 CHANGELOG.pdf
 packaging/appimage/.cache/
 dist/
+
+# Mesure de couverture (coverage)
+.coverage
+.coverage.*
+htmlcov/

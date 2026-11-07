@@ -11,12 +11,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Planned
+- Viewing statistics (time per channel, peak hours).
+
+## [1.6.1] - 2026-11-07
+
 ### Added
+- **Daily check of the live status against the real services** (`packaging/live_check.py`, *Live check* workflow): Twitch's web endpoint (status, titles, previews) and `streamlink --json` on Kick with the latest Streamlink. An issue opens when a source no longer answers as expected, and closes once it works again. The Twitch endpoint is not an official API: this is how a change is noticed before users see "unknown" statuses.
 - **Website: Streamlink Launcher 1.6.0** (download links, version shown, "What's new" table and *Open the chat* in the documentation, in the five languages).
 - **Website: Streamlink Chat 0.3.0** (download links, version shown, "What's new" table, Twitch login without an application in the documentation, in the five languages).
 
-### Planned
-- Viewing statistics (time per channel, peak hours).
+### Changed
+- **Test coverage measured in the CI**, with a threshold (`.coveragerc`: 42% minimum, 46% today); the report is shown in the job summary.
+- Tests: 89 → 93.
 
 ## [1.6.0] - 2026-11-07
 
@@ -264,12 +271,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Non publié]
 
+### Prévu
+- Statistiques de visionnage (temps par chaîne, heures de pointe).
+
+## [1.6.1] - 2026-11-07
+
 ### Ajouté
+- **Vérification quotidienne du statut en direct contre les vrais services** (`packaging/live_check.py`, workflow *Live check*) : accès web de Twitch (statut, titres, aperçus) et `streamlink --json` sur Kick avec la dernière version de Streamlink. Un ticket s'ouvre quand une source ne répond plus comme prévu, et se referme quand elle remarche. L'accès de Twitch n'est pas une API officielle : c'est ainsi qu'un changement est repéré avant que les utilisateurs ne voient des statuts « inconnus ».
 - **Site : Streamlink Launcher 1.6.0** (liens de téléchargement, version affichée, tableau « Nouveautés » et *Ouvrir le chat* dans la documentation, dans les cinq langues).
 - **Site : Streamlink Chat 0.3.0** (liens de téléchargement, version affichée, tableau « Nouveautés », connexion à Twitch sans application dans la documentation, dans les cinq langues).
 
-### Prévu
-- Statistiques de visionnage (temps par chaîne, heures de pointe).
+### Modifié
+- **Couverture des tests mesurée en CI**, avec un seuil (`.coveragerc` : 42 % minimum, 46 % aujourd'hui) ; le rapport s'affiche dans le résumé du job.
+- Tests : 89 → 93.
 
 ## [1.6.0] - 2026-11-07
 
@@ -511,13 +525,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 > Les versions 0.1.0 à 1.0.0 n'ont jamais été publiées sur GitHub ; la 1.0.1 est la première release. La date de la 0.1.0 est la plus ancienne date trouvée dans les données de l'application.
 
-[Unreleased]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.6.1...HEAD
+[1.6.1]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.5.2...v1.6.0
 [1.5.2]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.5.0
 [1.4.3]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.3
-[Non publié]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.6.0...HEAD
+[Non publié]: https://github.com/Bulls64/Streamlink-Launcher/compare/v1.6.1...HEAD
 [1.4.2]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.2
 [1.4.1]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.1
 [1.4.0]: https://github.com/Bulls64/Streamlink-Launcher/releases/tag/v1.4.0

@@ -1,0 +1,11 @@
+# Mesure de couverture des tests (CI : job « Test coverage »)
+# Test coverage measurement (CI: "Test coverage" job)
+[run]
+source = launcher
+branch = true
+
+[report]
+precision = 0
+# Seuil sous lequel la CI échoue (mesure du 7 novembre 2026 : 46 %)
+# Threshold below which the CI fails (measured on 7 November 2026: 46%)
+fail_under = 42

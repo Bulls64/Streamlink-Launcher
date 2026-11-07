@@ -1,0 +1,70 @@
+name: Live check
+
+# Chaque jour, vérifie le statut en direct contre les vrais Twitch et Kick (packaging/live_check.py) :
+# accès web de Twitch et aperçus, `streamlink --json` sur Kick avec la dernière version de Streamlink.
+# En cas d'échec, ouvre un ticket (un seul à la fois) ; le ferme quand tout repasse.
+# Every day, checks the live status against the real Twitch and Kick (packaging/live_check.py):
+# Twitch's web endpoint and previews, `streamlink --json` on Kick with the latest Streamlink.
+# On failure, opens an issue (only one at a time); closes it when everything passes again.
+
+on:
+  schedule:
+    - cron: "23 6 * * *"   # 06:23 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live:
+    name: Real live status
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        with:
+          python-version: "3.12"
+      - name: Install Streamlink (latest, as users would)
+        run: python -m pip install streamlink
+      - name: Check Twitch and Kick live status
+        id: check
+        continue-on-error: true
+        run: python packaging/live_check.py --summary live-summary.md
+      - name: Job summary
+        if: always()
+        run: cat live-summary.md >> "$GITHUB_STEP_SUMMARY" || true
+      - name: Open or update the issue on failure
+        if: steps.check.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title="Live check: the live status no longer works as expected"
+          {
+            echo "The daily check could not read the live status of at least one platform ($(date -u +%F))."
+            echo
+            cat live-summary.md
+            echo
+            echo "Run: $RUN_URL"
+          } > body.md
+          number=$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number')
+          if [ -n "$number" ]; then
+            gh issue comment "$number" --body-file body.md
+          else
+            gh issue create --title "$title" --body-file body.md
+          fi
+          exit 1
+      - name: Close the issue when everything passes again
+        if: steps.check.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="Live check: the live status no longer works as expected"
+          number=$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number')
+          if [ -n "$number" ]; then
+            gh issue close "$number" --comment "The live status works again ($(date -u +%F))."
+          fi

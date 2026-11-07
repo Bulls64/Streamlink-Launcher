@@ -159,7 +159,9 @@ Le script télécharge un Python autonome ([python-build-standalone](https://git
 python -m unittest discover -s tests -v
 ```
 
-The tests use the standard library only. They run automatically on Windows and Linux at every push.
+The tests use the standard library only. They run automatically on Windows and Linux at every push, with `ruff`, interface tests under Xvfb and a coverage measurement (`.coveragerc`, minimum 42%).
+
+A separate daily check, `packaging/live_check.py` (workflow *Live check*), queries the real Twitch web endpoint (live status and previews) and runs `streamlink --json` on Kick with the latest Streamlink; it opens an issue if the live status no longer works.
 
 ### Project structure
 
@@ -363,7 +365,9 @@ Sur GitHub Actions, chaque pull request compile l'exécutable, et pousser un tag
 python -m unittest discover -s tests -v
 ```
 
-Les tests n'utilisent que la bibliothèque standard. Ils tournent automatiquement sous Windows et Linux à chaque push.
+Les tests n'utilisent que la bibliothèque standard. Ils tournent automatiquement sous Windows et Linux à chaque push, avec `ruff`, des tests de l'interface sous Xvfb et une mesure de couverture (`.coveragerc`, 42 % minimum).
+
+Une vérification quotidienne à part, `packaging/live_check.py` (workflow *Live check*), interroge le vrai accès web de Twitch (statut en direct et aperçus) et lance `streamlink --json` sur Kick avec la dernière version de Streamlink ; elle ouvre un ticket si le statut en direct ne marche plus.
 
 ### Structure du projet
 
