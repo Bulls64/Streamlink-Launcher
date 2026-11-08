@@ -11,8 +11,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-### Planned
-- Viewing statistics (time per channel, peak hours).
+## [1.7.0] - 2026-11-08
+
+### Added
+- **Viewing statistics** (*History › Statistics*): time per channel and peak hours, over the last 30 days or since the beginning. The duration of each stream started with Streamlink is recorded when it ends (one minute at least, also when quitting with a stream running) in `stats.json`, on this computer only, for one year at most; a button clears them.
+- **Open the chats of all live favorites at once** in Streamlink Chat, one tab per channel in a single window: right-click a favorite, *Favorites* panel or tray menu.
+- **Manual release checklist** (`docs/TESTING.md`) for a real Windows PC and Linux desktop, linked from the pull request template.
+
+### Changed
+- **Kick live status through Kick's web endpoint** (`kick.com/api/v2/channels/…`) instead of one `streamlink --json` process per favorite: faster, with the title, category and viewer count like Twitch. `streamlink --json` remains the fallback when Kick does not answer. A `platforms.json` that says `"live_check": "streamlink"` for Kick uses the new method too. Kick previews are not shown: Kick serves them as WebP, which the launcher cannot decode.
+- The daily *Live check* also tests Kick's web endpoint (`kick-api`).
+- **Tests: 96 → 129**, with imitations of the Windows calls: notification area (menu, events, closing to the tray, notifications), drag and drop, smart clipboard, mini mode, live notifications and previews, and the built-in update (download, signature, replacement, restart). On Windows, the CI also creates the real tray window, shortcut and drop target. Coverage: 49% → 61% (threshold 42% → 56%).
 
 ## [1.6.1] - 2026-11-07
 
@@ -271,8 +280,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Non publié]
 
-### Prévu
-- Statistiques de visionnage (temps par chaîne, heures de pointe).
+## [1.7.0] - 2026-11-08
+
+### Ajouté
+- **Statistiques de visionnage** (*Historique › Statistiques*) : temps par chaîne et heures de pointe, sur les 30 derniers jours ou depuis le début. La durée de chaque stream lancé avec Streamlink est notée quand il se termine (une minute au moins, y compris en quittant avec un stream en cours) dans `stats.json`, sur cet ordinateur uniquement, sur un an au plus ; un bouton les efface.
+- **Ouvrir d'un coup les chats de tous les favoris en direct** dans Streamlink Chat, un onglet par chaîne dans une seule fenêtre : clic droit sur un favori, panneau *Favoris* ou menu de l'icône.
+- **Liste de contrôle manuelle avant chaque release** (`docs/TESTING.md`) pour un vrai Windows et un vrai bureau Linux, citée dans le modèle de pull request.
+
+### Modifié
+- **Statut en direct de Kick par l'accès web de Kick** (`kick.com/api/v2/channels/…`) au lieu d'un processus `streamlink --json` par favori : plus rapide, avec le titre, la catégorie et le nombre de spectateurs comme pour Twitch. `streamlink --json` reste le secours quand Kick ne répond pas. Un `platforms.json` qui indique `"live_check": "streamlink"` pour Kick passe aussi par la nouvelle méthode. Pas d'aperçu pour Kick : ses images sont en WebP, que le lanceur ne sait pas décoder.
+- La vérification quotidienne *Live check* teste aussi l'accès web de Kick (`kick-api`).
+- **Tests : 96 → 129**, avec des imitations des appels Windows : zone de notification (menu, événements, réduction, notifications), glisser-déposer, presse-papiers intelligent, mode mini, notifications et aperçus des lives, et mise à jour intégrée (téléchargement, signature, remplacement, redémarrage). Sous Windows, la CI crée aussi la vraie fenêtre de l'icône, le raccourci et la cible de dépôt. Couverture : 49 % → 61 % (seuil 42 % → 56 %).
 
 ## [1.6.1] - 2026-11-07
 

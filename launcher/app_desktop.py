@@ -155,6 +155,9 @@ class DesktopMixin:
             if isinstance(viewers, int):
                 name = f"{name} · {t.viewers(viewers)}"
             items.append((100 + i, t("tray_watch", name=fav.get("channel", ""), platform=name), False))
+        chats = len(self.live_chat_targets())
+        if chats:
+            items.append((4, t("menu_open_live_chats", count=chats), False))
         if live:
             items.append(None)
         items.append((3, t("tray_quit"), False))
@@ -165,6 +168,8 @@ class DesktopMixin:
             self.mini.show()
         elif chosen == 3:
             self.on_quit()
+        elif chosen == 4:
+            self.open_live_chats()
         elif chosen >= 100 and chosen - 100 < len(live):
             self.launch_favorite(live[chosen - 100])
 

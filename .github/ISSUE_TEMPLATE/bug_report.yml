@@ -7,7 +7,7 @@ body:
     attributes:
       label: Launcher version · Version du lanceur
       description: Settings → About · Réglages → À propos
-      placeholder: "1.6.1"
+      placeholder: "1.7.0"
     validations:
       required: true
   - type: dropdown

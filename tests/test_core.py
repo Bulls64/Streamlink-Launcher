@@ -19,7 +19,7 @@ from unittest import mock
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from launcher import __version__, backup, core, inputs, live, updater  # noqa: E402
+from launcher import __version__, backup, core, inputs, live, stats, updater  # noqa: E402
 
 
 class TempData(unittest.TestCase):
@@ -343,6 +343,65 @@ class TestChat(unittest.TestCase):
         self.assertEqual(core.CHAT_PLATFORMS, ("twitch", "kick"))
 
 
+class TestWatchStats(TempData):
+    """Statistiques de visionnage : séances notées, oubliées après un an, temps par chaîne, heures de pointe.
+
+    Viewing statistics: recorded sessions, forgotten after a year, time per channel, peak hours."""
+
+    def test_record_and_reload(self):
+        from datetime import datetime, timedelta
+        w = stats.WatchStats()
+        start = datetime(2026, 11, 8, 21, 30)
+        self.assertIsNone(w.add({"channel": "eslcs", "platform": "twitch"}, start, start + timedelta(seconds=59)))
+        s = w.add({"channel": "eslcs", "platform": "twitch"}, start, start + timedelta(minutes=90))
+        self.assertEqual(s, {"channel": "eslcs", "start": "2026-11-08 21:30:00", "seconds": 5400,
+                             "platform": "twitch"})
+        self.assertEqual(stats.WatchStats().sessions, [s])  # relu depuis stats.json / read back from stats.json
+        self.assertTrue((core.DATA_FOLDER / "stats.json").exists())
+        later = start + timedelta(days=400)
+        w.add({"channel": "xqc", "platform": "kick"}, later, later + timedelta(hours=1))
+        self.assertEqual([x["channel"] for x in w.sessions], ["xqc"])  # plus d'un an : oublié / older: forgotten
+        w.clear()
+        self.assertEqual(stats.WatchStats().sessions, [])
+
+    def test_bad_file_is_cleaned(self):
+        core.DATA_FOLDER.mkdir(parents=True, exist_ok=True)
+        (core.DATA_FOLDER / "stats.json").write_text(json.dumps({"sessions": [
+            {"channel": "ok", "start": "2026-11-01 20:00:00", "seconds": 600, "platform": "twitch"},
+            {"channel": "neg", "start": "2026-11-01 20:00:00", "seconds": -5},
+            {"channel": "big", "start": "2026-11-01 20:00:00", "seconds": 10 ** 9},
+            {"channel": "date", "start": "hier", "seconds": 600},
+            {"channel": 3, "start": "2026-11-01 20:00:00", "seconds": 600}, "x"]}), encoding="utf-8")
+        self.assertEqual([x["channel"] for x in stats.WatchStats().sessions], ["ok"])
+
+    def test_summary(self):
+        from datetime import datetime
+        sessions = [
+            {"channel": "Eslcs", "platform": "twitch", "start": "2026-11-07 21:30:00", "seconds": 5400},
+            {"channel": "eslcs", "platform": "twitch", "start": "2026-11-06 22:00:00", "seconds": 1800},
+            {"channel": "xqc", "platform": "kick", "start": "2026-11-05 23:30:00", "seconds": 3600},
+            {"channel": "old", "platform": "twitch", "start": "2026-08-01 10:00:00", "seconds": 600}]
+        now = datetime(2026, 11, 8, 12, 0)
+        s = stats.summarize(sessions, days=30, now=now)
+        self.assertEqual((s["total"], s["count"]), (10800, 3))
+        self.assertEqual([(i["entry"]["channel"], i["seconds"], i["count"]) for i in s["channels"]],
+                         [("Eslcs", 7200, 2), ("xqc", 3600, 1)])
+        self.assertEqual(s["hours"][21], 1800)              # 21 h 30 → 22 h
+        self.assertEqual(s["hours"][22], 3600 + 1800)       # 22 h → 23 h, deux soirs / two evenings
+        self.assertEqual(s["hours"][23], 1800)              # 23 h 30 → minuit / midnight
+        self.assertEqual(s["hours"][0], 1800)               # après minuit / after midnight
+        self.assertEqual(sum(s["hours"]), s["total"])
+        self.assertEqual(stats.peak_hours(s["hours"], n=1), [22])
+        self.assertEqual(stats.peak_hours(s["hours"]), [22, 0, 21])  # puis par heure à égalité / then by hour on ties
+        self.assertEqual(stats.summarize(sessions, now=now)["count"], 4)
+        self.assertEqual(stats.summarize([], now=now)["channels"], [])
+
+    def test_format_duration(self):
+        t = core.I18n("fr")
+        self.assertEqual(stats.format_duration(t, 45 * 60), "45 min")
+        self.assertEqual(stats.format_duration(t, 2 * 3600 + 5 * 60), "2 h 05")
+
+
 class TestLiveCheck(unittest.TestCase):
     """packaging/live_check.py : la vérification quotidienne du statut en direct, sans réseau ici.
 
@@ -387,9 +446,20 @@ class TestLiveCheck(unittest.TestCase):
         with mock.patch.object(core, "find_streamlink", return_value=None):
             self.assertFalse(self.lc.check_kick()[0])
 
+    def test_kick_api(self):
+        with mock.patch.object(live, "kick_channel_live", side_effect=[OSError("403"), None, live._offline()]):
+            ok, detail = self.lc.check_kick_api()
+        self.assertTrue(ok, detail)
+        self.assertIn("hors ligne", detail)
+        with mock.patch.object(live, "kick_channel_live", side_effect=OSError("HTTP Error 403")):
+            ok, detail = self.lc.check_kick_api()
+        self.assertFalse(ok)
+        self.assertIn("403", detail)
+
     def test_summary_and_exit_code(self):
         out = Path(tempfile.mkdtemp()) / "s.md"
-        checks = {"twitch": lambda: (True, "ok"), "kick": lambda: (_ for _ in ()).throw(OSError("down"))}
+        checks = {"twitch": lambda: (True, "ok"), "kick-api": lambda: (True, "ok"),
+                  "kick": lambda: (_ for _ in ()).throw(OSError("down"))}
         with mock.patch.dict(self.lc.CHECKS, checks), mock.patch("builtins.print"):
             code = self.lc.main(["--summary", str(out)])
         text = out.read_text(encoding="utf-8")
@@ -507,12 +577,53 @@ class TestLivePreviews(unittest.TestCase):
         self.assertEqual(res["off"], live._offline())
         self.assertEqual(res["absent"], live._offline())
 
+    def test_kick_channel_live(self):
+        live_reply = {"id": 1, "livestream": {"is_live": True, "session_title": "Salut", "viewer_count": 1234,
+                                              "categories": [{"name": "Just Chatting"}],
+                                              "thumbnail": {"url": "https://images.kick.com/t/720.jpg"}}}
+        with mock.patch.object(live, "_http_get_json", return_value=live_reply) as get:
+            self.assertEqual(live.kick_channel_live("XQC"),
+                             {"live": True, "title": "Salut", "game": "Just Chatting", "viewers": 1234,
+                              "preview": "https://images.kick.com/t/720.jpg"})
+        self.assertEqual(get.call_args[0][0], "https://kick.com/api/v2/channels/xqc")
+        with mock.patch.object(live, "_http_get_json", return_value={"id": 1, "livestream": None}):
+            self.assertEqual(live.kick_channel_live("xqc"), live._offline())
+        for odd in ({"message": "Not found"}, [], {"livestream": "?"}):
+            with mock.patch.object(live, "_http_get_json", return_value=odd):
+                self.assertIsNone(live.kick_channel_live("xqc"))
+        with mock.patch.object(live, "_http_get_json") as get:
+            self.assertIsNone(live.kick_channel_live("../etc"))
+        get.assert_not_called()
+
+    def test_kick_falls_back_to_streamlink(self):
+        """Kick passe d'abord par l'API ; une chaîne que l'API ne décrit pas est demandée à Streamlink.
+
+        Kick goes through the API first; a channel the API does not describe is asked to Streamlink."""
+        platforms = [p for p in core.DEFAULT_PLATFORMS if p["id"] == "kick"]
+        self.assertEqual(live.live_method(platforms[0]), "kick")
+        self.assertEqual(live.live_method({"id": "kick", "live_check": "streamlink"}), "kick")  # ancien fichier
+        self.assertEqual(live.live_method({"id": "other", "live_check": "streamlink"}), "streamlink")
+
+        def api(slug, timeout=8):
+            if slug == "blocked":
+                raise OSError("HTTP Error 403")
+            return {"live": True, "title": "A", "game": None, "viewers": 1, "preview": None}
+        with mock.patch.object(live, "kick_channel_live", api), \
+                mock.patch.object(live, "find_streamlink", return_value="streamlink"), \
+                mock.patch.object(live, "streamlink_live", return_value=live._offline()) as sl:
+            res = live.check_live([("Ok", "kick"), ("blocked", "kick")], platforms)
+        self.assertEqual(res[("ok", "kick")]["title"], "A")
+        self.assertEqual(res[("blocked", "kick")], live._offline())
+        self.assertEqual(sl.call_count, 1)
+        self.assertIn("blocked", sl.call_args[0][1])
+
     def test_preview_url_is_https_only_and_refreshed(self):
         base = "https://static-cdn.jtvnw.net/previews-ttv/live_user_x-640x360.jpg"
         self.assertEqual(live.preview_url(base, now=600), base + "?t=2")
         self.assertEqual(live.preview_url(base + "?a=1", now=0), base + "?a=1&t=0")
         self.assertNotEqual(live.preview_url(base, now=0), live.preview_url(base, now=300))
-        for bad in (None, "", "http://example.com/x.jpg", "file:///c:/x.jpg", "https://" + "a" * 600):
+        for bad in (None, "", "http://example.com/x.jpg", "file:///c:/x.jpg", "https://" + "a" * 600,
+                    "https://images.kick.com/video_thumbnails/a/b/720.webp"):
             self.assertIsNone(live.preview_url(bad))
 
     def test_fetch_previews_survives_errors(self):

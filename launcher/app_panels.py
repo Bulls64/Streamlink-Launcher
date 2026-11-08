@@ -11,7 +11,7 @@ import sys
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
-from . import backup, core, updater, wintray
+from . import backup, core, stats, updater, wintray
 from .widgets import (
     Button,
     Field,
@@ -71,7 +71,7 @@ class PanelsMixin:
 
     def _refresh_panel(self, kind):
         if self.panel_kind == kind:
-            {"history": self.open_history, "favorites": self.open_favorites}[kind]()
+            {"history": self.open_history, "favorites": self.open_favorites, "stats": self.open_stats}[kind]()
 
     def _section(self, parent, title, first=False):
         c, px = self.c, self.px
@@ -433,6 +433,8 @@ class PanelsMixin:
             if self.store.history:
                 Button(fb, self, text=t("btn_clear_history"), kind="link", color=self.c.error, font=self.fonts.small,
                        pad=0, height=32, command=self._clear_history).pack(side="left")
+            Button(fb, self, text=t("btn_stats"), kind="link", font=self.fonts.small, pad=0, height=32,
+                   command=self.open_stats).pack(side="left", padx=(self.px(16) if self.store.history else 0, 0))
             tk.Label(fb, text=t("history_count", count=len(self.store.history)), font=self.fonts.tiny,
                      bg=self.c.panel, fg=self.c.faint).pack(side="right")
 
@@ -448,6 +450,86 @@ class PanelsMixin:
             self.store.clear_history()
             self.build_recents()
             self.open_history()
+
+    # --- Statistiques
+    # --- Statistics
+    def open_stats(self, days=None):
+        t, c, px = self.t, self.c, self.px
+        if days is None:
+            days = getattr(self, "_stats_days", 30)
+        self._stats_days = days
+        summary = stats.summarize(self.watch.sessions, days=days or None)
+
+        def body(b):
+            seg = tk.Frame(b, bg=c.panel)
+            seg.pack(fill="x", pady=(0, px(6)))
+            for value, key in ((30, "stats_30_days"), (0, "stats_all_time")):
+                Button(seg, self, text=t(key), kind="link", font=self.fonts.small_semi if value == days
+                       else self.fonts.small, color=None if value == days else c.faint, pad=0, height=30,
+                       command=lambda v=value: self.open_stats(v)).pack(side="left", padx=(0, px(16)))
+            if not summary["count"]:
+                self._empty(b, t("hint_no_stats"))
+                return
+            tk.Label(b, text=t("stats_total", duration=stats.format_duration(t, summary["total"]),
+                               count=summary["count"]), font=self.fonts.body_semi, bg=c.panel, fg=c.text,
+                     anchor="w").pack(anchor="w", pady=(px(4), 0))
+            sec = self._section(b, t("stats_per_channel"))
+            best = max(i["seconds"] for i in summary["channels"])
+            for item in summary["channels"]:
+                name, color = self.target_label(self.entry_target(item["entry"]))
+                row = tk.Frame(sec, bg=c.panel)
+                row.pack(fill="x", pady=(px(6), 0))
+                tk.Label(row, text=item["entry"]["channel"], font=self.fonts.small_semi, bg=c.panel, fg=c.text
+                         ).pack(side="left")
+                tk.Label(row, text=f"  {name}", font=self.fonts.tiny, bg=c.panel, fg=c.faint).pack(side="left")
+                tk.Label(row, text=stats.format_duration(t, item["seconds"]), font=self.fonts.small, bg=c.panel,
+                         fg=c.muted).pack(side="right")
+                bar = tk.Canvas(sec, height=px(6), bg=c.panel, highlightthickness=0, bd=0)
+                bar.pack(fill="x", pady=(px(3), 0))
+                share = item["seconds"] / best
+
+                def draw(ev, cv=bar, share=share, color=color):
+                    cv.delete("all")
+                    cv.create_rectangle(0, 0, ev.width, ev.height, fill=c.border, width=0)
+                    cv.create_rectangle(0, 0, max(px(3), int(ev.width * share)), ev.height, fill=color, width=0)
+                bar.bind("<Configure>", draw)
+            sec = self._section(b, t("stats_peak_hours"))
+            hours = summary["hours"]
+            chart = tk.Canvas(sec, height=px(96), bg=c.panel, highlightthickness=0, bd=0)
+            chart.pack(fill="x", pady=(px(8), 0))
+            top = max(hours) or 1
+
+            def draw_hours(ev):
+                chart.delete("all")
+                w, h = ev.width, ev.height
+                base = h - px(18)
+                step = w / 24
+                for hour, value in enumerate(hours):
+                    x0, x1 = int(hour * step + 1), int((hour + 1) * step - 1)
+                    y = base - int((base - px(4)) * value / top)
+                    chart.create_rectangle(x0, base - px(2) if not value else y, x1, base,
+                                           fill=self.accent[0] if value else c.border, width=0)
+                    if hour % 6 == 0:
+                        chart.create_text(x0, h - px(8), text=t("stats_hour", hour=hour), anchor="w",
+                                          font=self.fonts.tiny, fill=c.faint)
+            chart.bind("<Configure>", draw_hours)
+            peaks = stats.peak_hours(hours)
+            if peaks:
+                self._hint(sec, t("stats_peak_hint", hours=", ".join(t("stats_hour", hour=h) for h in peaks)))
+
+        def footer(fb):
+            if self.watch.sessions:
+                Button(fb, self, text=t("btn_clear_stats"), kind="link", color=c.error, font=self.fonts.small,
+                       pad=0, height=32, command=self._clear_stats).pack(anchor="w")
+            tk.Label(fb, text=t("hint_stats_panel"), font=self.fonts.tiny, bg=c.panel, fg=c.faint,
+                     justify="left", wraplength=px(330)).pack(anchor="w")
+
+        self.open_panel("stats", t("title_stats"), body, footer)
+
+    def _clear_stats(self):
+        if messagebox.askyesno(self.t("title_confirm"), self.t("confirm_clear_stats"), parent=self):
+            self.watch.clear()
+            self.open_stats()
 
     # --- Favoris
     # --- Favorites
@@ -473,6 +555,10 @@ class PanelsMixin:
                         on_click=lambda e=fav: (self.fill_from_entry(e), self.close_panel())).pack(fill="x")
 
         def footer(fb):
+            chats = len(self.live_chat_targets())
+            if chats:
+                Button(fb, self, text=t("menu_open_live_chats", count=chats), kind="link", font=self.fonts.small,
+                       pad=0, height=32, command=self.open_live_chats).pack(anchor="w")
             tk.Label(fb, text=t("hint_favorites_panel"), font=self.fonts.tiny, bg=self.c.panel, fg=self.c.faint,
                      justify="left", wraplength=self.px(330)).pack(anchor="w")
 

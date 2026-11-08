@@ -28,8 +28,11 @@ except Exception:  # pas de Tk ou pas d'écran
 from tests.test_core import TempData  # noqa: E402
 
 
-@unittest.skipUnless(HAVE_DISPLAY, "pas d'écran ou de Tk disponible")
-class TestGuiSmoke(TempData):
+class GuiBase(TempData):
+    """Fenêtre réelle dans un dossier de données temporaire, sans réseau ni zone de notification.
+
+    Real window in a temporary data folder, without network nor notification area."""
+
     def setUp(self):
         super().setUp()
         from launcher import app as app_module
@@ -43,12 +46,19 @@ class TestGuiSmoke(TempData):
 
     def tearDown(self):
         try:
+            # Tâches différées encore prévues (vérifications de démarrage…) : annulées avant de fermer
+            # Delayed tasks still planned (start-up checks…): cancelled before closing
+            for job in self.app.tk.splitlist(self.app.tk.call("after", "info")):
+                self.app.after_cancel(job)
             self.app.destroy()
         finally:
             for p in self.extra:
                 p.stop()
             super().tearDown()
 
+
+@unittest.skipUnless(HAVE_DISPLAY, "pas d'écran ou de Tk disponible")
+class TestGuiSmoke(GuiBase):
     def test_window_is_built(self):
         self.assertTrue(self.app.winfo_exists())
         self.assertGreater(self.app.winfo_width(), 100)
@@ -124,6 +134,50 @@ class TestGuiSmoke(TempData):
             entries.clear()
             app.favorite_menu(event, {"channel": "old"})                # ancien favori : Twitch / old favorite
             self.assertIn(app.t("menu_open_chat"), entries)
+
+    def test_open_the_chats_of_all_live_favorites(self):
+        from launcher import app_launch
+        app, core = self.app, app_launch.core
+        app.toast = mock.Mock()
+        for fav in ({"platform": "twitch", "channel": "Eslcs"}, {"platform": "kick", "channel": "xqc"},
+                    {"platform": "twitch", "channel": "off"}, {"platform": "youtube", "channel": "dQw4w9WgXcQ"}):
+            app.store.add_favorite(fav)
+        self.assertFalse(app.open_live_chats())
+        self.assertEqual(app.toast.call_args[0][:2], (app.t("toast_no_live_chats"), "warn"))
+        app.live = {("eslcs", "twitch"): {"live": True}, ("xqc", "kick"): {"live": True},
+                    ("off", "twitch"): {"live": False}}
+        # Dans l'ordre des favoris (les nouveaux en tête) / in favorites order (newest first)
+        self.assertEqual(app.live_chat_targets(), [("kick", "xqc"), ("twitch", "Eslcs")])
+        with mock.patch.object(core, "find_chat", return_value="/opt/StreamlinkChat.AppImage"), \
+                mock.patch.object(app_launch.subprocess, "Popen") as popen:
+            self.assertTrue(app.open_live_chats())
+        self.assertEqual(popen.call_count, 1)  # une seule fenêtre, un onglet par chaîne / one window, one tab each
+        self.assertEqual(popen.call_args[0][0], ["/opt/StreamlinkChat.AppImage", "--open", "kick:xqc",
+                                                 "--open", "twitch:Eslcs"])
+        app.toast.assert_called_with(app.t("toast_live_chats_opened", count=2, name="xqc"), "ok")
+        app.open_favorites()  # le panneau propose le bouton / the panel offers the button
+        app.update()
+
+    def test_watch_time_is_recorded_and_shown(self):
+        from datetime import datetime, timedelta
+        app = self.app
+        stream = {"name": "eslcs", "label": "eslcs", "watch": {"channel": "eslcs", "platform": "twitch"},
+                  "started": datetime.now() - timedelta(minutes=50)}
+        app.record_watch(stream)
+        app.record_watch(stream)  # une seule fois / only once
+        self.assertEqual(len(app.watch.sessions), 1)
+        self.assertGreaterEqual(app.watch.sessions[0]["seconds"], 50 * 60)
+        app.open_history()
+        app.update()
+        app.open_stats()
+        app.update()
+        self.assertEqual(app.panel_kind, "stats")
+        app.open_stats(0)
+        app.update()
+        app.watch.clear()
+        app.open_stats(30)
+        app.update()
+
 
 if __name__ == "__main__":
     unittest.main()

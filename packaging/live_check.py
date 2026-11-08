@@ -2,12 +2,14 @@
 
 Le statut des favoris repose sur deux sources qui peuvent changer sans prévenir :
 - Twitch : l'accès web public du site (GraphQL), qui n'est pas une API officielle, et ses images d'aperçu ;
-- Kick : `streamlink --json`, donc le plugin Kick de Streamlink.
+- Kick : l'accès web public du site (kick.com/api/v2), et `streamlink --json` (le plugin Kick de Streamlink)
+  quand il ne répond pas.
 Les tests du dépôt les imitent ; ce script, lui, interroge les vrais services, sans compte. Il sert à la
 vérification quotidienne de la CI (live-check.yml), pour savoir qu'une source a changé avant les utilisateurs.
 
 - Twitch réussit si la requête répond pour des chaînes connues et qu'au moins l'une d'elles est en direct
   avec un aperçu téléchargeable (il y a toujours quelqu'un en direct parmi elles).
+- kick-api réussit si l'accès web de Kick décrit au moins une chaîne (en direct ou hors ligne) ;
 - Kick réussit si Streamlink sait dire, pour au moins une chaîne, si elle est en direct ou hors ligne.
 Code de sortie 0 si tout va bien, 1 sinon ; le résumé est écrit en Markdown (pour le ticket ouvert par la CI).
 
@@ -15,16 +17,18 @@ Real-world check: does the launcher's live status still work?
 
 The favorites' status relies on two sources that can change without notice:
 - Twitch: the website's public web endpoint (GraphQL), which is not an official API, and its preview images;
-- Kick: `streamlink --json`, so Streamlink's Kick plugin.
+- Kick: the website's public endpoint (kick.com/api/v2), and `streamlink --json` (Streamlink's Kick plugin)
+  when it does not answer.
 The repository's tests imitate them; this script queries the real services, without an account. It is used by the
 daily CI check (live-check.yml), to know that a source has changed before users do.
 
 - Twitch passes if the request answers for well-known channels and at least one of them is live
   with a downloadable preview (someone among them is always live).
+- kick-api passes if Kick's web endpoint describes at least one channel (live or offline);
 - Kick passes if Streamlink can tell, for at least one channel, whether it is live or offline.
 Exit code 0 if all is well, 1 otherwise; the summary is written in Markdown (for the issue opened by the CI).
 
-Usage: python packaging/live_check.py [--platform twitch|kick] [--summary FILE]
+Usage: python packaging/live_check.py [--platform twitch|kick-api|kick] [--summary FILE]
 """
 import argparse
 import sys
@@ -55,6 +59,23 @@ def check_twitch():
     return False, f"{len(on_air)} en direct, mais aucun aperçu téléchargeable"
 
 
+def check_kick_api():
+    tried = []
+    for ch in KICK_CHANNELS:
+        try:
+            info = live.kick_channel_live(ch)
+        except Exception as e:  # 403 d'une protection anti-robots, délai… / 403 from an anti-bot protection, timeout…
+            tried.append(f"{ch} : {e!r}"[:160])
+            continue
+        if info is not None:
+            title = (info["title"] or "")[:60]
+            return True, f"{ch} : {'en direct' if info['live'] else 'hors ligne'}" + (
+                f" ; titre : {title!r} ; aperçu : {'oui' if info['preview'] else 'non'}" if info["live"] else "") + (
+                f" ; essais : {', '.join(tried)}" if tried else "")
+        tried.append(f"{ch} : réponse inattendue")
+    return False, "l'accès web de Kick ne répond plus comme prévu (repli sur Streamlink) : " + ", ".join(tried)
+
+
 def check_kick():
     streamlink = core.find_streamlink()
     if not streamlink:
@@ -74,7 +95,7 @@ def check_kick():
     return False, "Streamlink ne sait plus dire si une chaîne Kick est en direct : " + ", ".join(tried)
 
 
-CHECKS = {"twitch": check_twitch, "kick": check_kick}
+CHECKS = {"twitch": check_twitch, "kick-api": check_kick_api, "kick": check_kick}
 
 
 def main(argv=None):

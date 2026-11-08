@@ -6,6 +6,6 @@ branch = true
 
 [report]
 precision = 0
-# Seuil sous lequel la CI échoue (mesure du 7 novembre 2026 : 46 %)
-# Threshold below which the CI fails (measured on 7 November 2026: 46%)
-fail_under = 42
+# Seuil sous lequel la CI échoue (mesure du 8 novembre 2026 : 61 %)
+# Threshold below which the CI fails (measured on 8 November 2026: 61%)
+fail_under = 56

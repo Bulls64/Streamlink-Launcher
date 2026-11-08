@@ -131,7 +131,7 @@ DEFAULT_CONFIG = {
 LIVE_INTERVALS = [2, 5, 10, 15, 30]
 # Méthode de vérification par défaut (si platforms.json ne précise pas "live_check")
 # Default check method (if platforms.json does not set "live_check")
-LIVE_METHODS = {"twitch": "twitch", "kick": "streamlink"}
+LIVE_METHODS = {"twitch": "twitch", "kick": "kick"}
 
 # Couleurs par défaut (utilisées si platforms.json n'en donne pas)
 # Default colors (used if platforms.json does not give any)
@@ -588,7 +588,14 @@ def chat_command(path, platform, channel):
 
     Command that opens a channel's chat in Streamlink Chat (a single window: if the chat is already open,
     it gets the channel as a new tab). None if slink_chat.py has no Python to run it."""
-    target = ["--open", f"{platform}:{channel}"]
+    return chat_command_many(path, [(platform, channel)])
+
+
+def chat_command_many(path, targets):
+    """Comme chat_command, pour plusieurs chaînes [(plateforme, chaîne)] : une seule commande, un onglet par chaîne.
+
+    Like chat_command, for several channels [(platform, channel)]: a single command, one tab per channel."""
+    target = [arg for platform, channel in targets for arg in ("--open", f"{platform}:{channel}")]
     if path.lower().endswith(".py"):
         python = sys.executable if not FROZEN else (shutil.which("pythonw") or shutil.which("python")
                                                      or shutil.which("python3"))
