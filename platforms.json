@@ -1,5 +1,5 @@
 {
-  "_aide": "Une entrée par plateforme. input : channel (nom de chaîne), youtube (ID ou URL de vidéo), video (ID de vidéo), none (rien à saisir), url (n'importe quel lien). {arg} est remplacé par ce qui est saisi. args = options Streamlink ajoutées à chaque lancement. color / text_color = couleur d'accent de la plateforme et couleur du texte posé dessus (format #RRGGBB). live_check = façon de savoir si une chaîne favorite est en direct : twitch (requête rapide), streamlink (streamlink --json, plus lent) ou none.",
+  "_aide": "Une entrée par plateforme. input : channel (nom de chaîne), youtube (ID ou URL de vidéo), video (ID de vidéo), none (rien à saisir), url (n'importe quel lien). {arg} est remplacé par ce qui est saisi. args = options Streamlink ajoutées à chaque lancement. color / text_color = couleur d'accent de la plateforme et couleur du texte posé dessus (format #RRGGBB). live_check = façon de savoir si une chaîne favorite est en direct : twitch (requête rapide), kick (accès web de Kick, Streamlink en secours), streamlink (streamlink --json, plus lent) ou none.",
   "platforms": [
     {
       "id": "twitch",
@@ -49,7 +49,7 @@
       "default_quality": "best",
       "color": "#53FC18",
       "text_color": "#0B0D0A",
-      "live_check": "streamlink"
+      "live_check": "kick"
     },
     {
       "id": "youtube",

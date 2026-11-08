@@ -13,7 +13,7 @@ import tkinter as tk
 from collections import deque
 from tkinter import messagebox, simpledialog
 
-from . import core, inputs, updater, wintray
+from . import core, inputs, stats, updater, wintray
 from .app_common import APP_COLOR, GEOMETRY_RE, ICON_FILE, LOG_LIMIT, RECENTS
 from .app_desktop import DesktopMixin
 from .app_favorites import FavoritesMixin
@@ -49,6 +49,7 @@ class App(FavoritesMixin, DesktopMixin, LaunchMixin, PanelsMixin, UpdatesMixin, 
         self.t = core.I18n(self.cfg["language"])
         self.platforms, self.platforms_error = core.load_platforms()
         self.store = core.Store()
+        self.watch = stats.WatchStats()
         self.streams = core.StreamManager()
         self.painter = Painter(self)
         self.fonts = Fonts(self, self.px)
@@ -657,6 +658,8 @@ class App(FavoritesMixin, DesktopMixin, LaunchMixin, PanelsMixin, UpdatesMixin, 
 
         Stops the streams, frees the Windows resources, saves the state and closes the window."""
         self._app_cancel.set()
+        for stream in self.streams.running():
+            self.record_watch(stream)  # les streams arrêtés en quittant comptent aussi / streams stopped on quit count too
         self.streams.stop_all()
         if self._live_job:
             self.after_cancel(self._live_job)

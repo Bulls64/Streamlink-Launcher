@@ -23,11 +23,12 @@ Pure Python + Tkinter, **no third-party dependency**. From source, it starts in 
 - **One smart field**: type a channel or paste a link. The platform is detected automatically. Suggestions come from your favorites and history.
 - **Platforms**: Twitch (ads disabled), Kick, YouTube, Dailymotion and Steam TV, plus a *Direct link* entry for any site Streamlink supports. Platforms are defined in `platforms.json`, so you can add your own.
 - **Quality and player**: quality is remembered per platform (`best`, `1080p60`, `audio_only`, fallback lists such as `720p60,720p,best`). You can choose the player and its arguments.
-- **Favorites with live status**: shows which Twitch and Kick favorites are live, with a Windows notification when one goes live. Live Twitch favorites show a preview of the stream, its title and the viewer count (can be turned off). The main screen shows the favorites of the selected platform: click *Kick* to see only your Kick favorites.
+- **Favorites with live status**: shows which Twitch and Kick favorites are live, with a Windows notification when one goes live. Live favorites show their title and viewer count, and Twitch ones a preview of the stream (can be turned off). The main screen shows the favorites of the selected platform: click *Kick* to see only your Kick favorites.
 - **Smart clipboard and drag and drop**: a copied stream link is offered as soon as you come back to the window (and pre-fills the mini bar). You can also drop a link, text or a `.url` shortcut onto the window.
 - **Mini mode**: a floating Spotlight-style bar, opened with <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd> from any application. The shortcut can be changed in the settings.
 - **Notification area**: closing the window keeps it running in the tray, with streams and live checks still active. It can optionally start with Windows.
-- **Chat**: right-click a Twitch or Kick favorite › *Open the chat* opens it in [Streamlink Chat](https://github.com/Bulls64/Streamlink-Chat); an option opens it with every Twitch or Kick stream.
+- **Chat**: right-click a Twitch or Kick favorite › *Open the chat* opens it in [Streamlink Chat](https://github.com/Bulls64/Streamlink-Chat); an option opens it with every Twitch or Kick stream. *Open the chats of live favorites* (right-click, *Favorites* panel or tray menu) opens them all at once, one tab per channel.
+- **Viewing statistics**: time per channel and peak hours, over the last 30 days or since the beginning (*History › Statistics*). Kept on this computer only.
 - **Log drawer**: Streamlink output, running streams and a *Stop* button for each.
 - **Updates**: Streamlink update check, and the launcher itself can update from its GitHub releases (Settings → About): download, SHA-256 and signature checks, automatic restart. An optional setting installs updates by itself at start-up.
 - **Backup**: export your settings and favorites to a single file and import them on another computer (Settings → Backup).
@@ -159,9 +160,9 @@ Le script télécharge un Python autonome ([python-build-standalone](https://git
 python -m unittest discover -s tests -v
 ```
 
-The tests use the standard library only. They run automatically on Windows and Linux at every push, with `ruff`, interface tests under Xvfb and a coverage measurement (`.coveragerc`, minimum 42%).
+The tests use the standard library only. They run automatically on Windows and Linux at every push, with `ruff`, interface tests under Xvfb and a coverage measurement (`.coveragerc`, minimum 56%). Before each release, the manual checklist [`docs/TESTING.md`](docs/TESTING.md) is run on a real Windows PC and Linux desktop.
 
-A separate daily check, `packaging/live_check.py` (workflow *Live check*), queries the real Twitch web endpoint (live status and previews) and runs `streamlink --json` on Kick with the latest Streamlink; it opens an issue if the live status no longer works.
+A separate daily check, `packaging/live_check.py` (workflow *Live check*), queries the real Twitch and Kick web endpoints (live status, previews) and runs `streamlink --json` on Kick with the latest Streamlink; it opens an issue if the live status no longer works.
 
 ### Project structure
 
@@ -180,6 +181,7 @@ launcher/
   backup.py            Export / import of the settings and favorites
   updater.py           Streamlink version, launcher updates from the GitHub releases
   live.py              Live status and previews
+  stats.py             Viewing statistics (time per channel, peak hours)
   widgets.py           Lightweight canvas widgets, re-exported from widgets_base, widgets_controls (buttons, pills,
                        switches…), widgets_cards (cards, rows), widgets_field (field, menus, suggestions), widgets_layout
   theme.py, gfx.py     Colors, fonts, anti-aliased shapes, icons
@@ -191,14 +193,15 @@ launcher/
 lang/                  Translations
 packaging/             Executable build script, version information, winget manifests, AppImage (appimage/)
 .signpath/             Code-signing configuration (dormant, see Code signing)
-tests/                 Unit tests (standard library only) and GUI smoke test
+tests/                 Unit tests (standard library only) and GUI tests (imitations of the Windows calls)
+docs/TESTING.md        Manual checklist on a real Windows PC and Linux desktop before each release
 .github/workflows/     Tests at every push, executable built at every tag
 ```
 
 ### Network and privacy
 
 The launcher only connects to the Internet for:
-- **Live checks** (can be turned off): one request to Twitch's public web endpoint for your Twitch favorites, and `streamlink --json` for Kick favorites. This Twitch endpoint is not an official API: if Twitch changes it, live status shows as unknown until an update. With *Live previews* on, the preview image of the live Twitch favorites shown on the main screen (three at most) is downloaded from Twitch's image server at each check.
+- **Live checks** (can be turned off): one request to Twitch's public web endpoint for your Twitch favorites, and one request per Kick favorite to Kick's public web endpoint (`kick.com/api/v2/channels/…`), with `streamlink --json` as a fallback when Kick does not answer. These endpoints are not official APIs: if a site changes them, live status shows as unknown until an update. With *Live previews* on, the preview image of the live Twitch favorites shown on the main screen (three at most) is downloaded from Twitch's image server at each check.
 - **Update check** (can be turned off): one request to [PyPI](https://pypi.org/project/streamlink/) to read the latest Streamlink version, and one to `api.github.com` (`/repos/Bulls64/Streamlink-Launcher/releases/latest`) to read the latest launcher release. The launcher's own file is downloaded from `github.com` only when you click *Update*.
 
 The clipboard is only read, on this computer, to look for a stream link (you can turn this off in the settings); its content is never stored or sent.
@@ -265,11 +268,12 @@ Python et Tkinter uniquement, **sans aucune dépendance externe**. Depuis les so
 - **Un seul champ intelligent** : tape une chaîne ou colle un lien. La plateforme est reconnue toute seule. Les suggestions viennent de tes favoris et de ton historique.
 - **Plateformes** : Twitch (publicités désactivées), Kick, YouTube, Dailymotion et Steam TV, plus une entrée *Lien direct* pour tout site pris en charge par Streamlink. Les plateformes sont définies dans `platforms.json`, tu peux donc ajouter les tiennes.
 - **Qualité et lecteur** : la qualité est mémorisée par plateforme (`best`, `1080p60`, `audio_only`, listes de secours comme `720p60,720p,best`). Tu peux choisir le lecteur et ses arguments.
-- **Favoris avec statut en direct** : indique lesquels de tes favoris Twitch et Kick sont en direct, avec une notification Windows quand l'un d'eux commence un live. Les favoris Twitch en direct affichent un aperçu du stream, son titre et le nombre de spectateurs (désactivable). L'écran principal affiche les favoris de la plateforme choisie : clique sur *Kick* pour ne voir que tes favoris Kick.
+- **Favoris avec statut en direct** : indique lesquels de tes favoris Twitch et Kick sont en direct, avec une notification Windows quand l'un d'eux commence un live. Les favoris en direct affichent leur titre et le nombre de spectateurs, et ceux de Twitch un aperçu du stream (désactivable). L'écran principal affiche les favoris de la plateforme choisie : clique sur *Kick* pour ne voir que tes favoris Kick.
 - **Presse-papiers intelligent et glisser-déposer** : un lien de stream copié est proposé dès que tu reviens sur la fenêtre (et pré-remplit la barre mini). Tu peux aussi déposer un lien, du texte ou un raccourci `.url` sur la fenêtre.
 - **Mode mini** : une barre flottante façon Spotlight, ouverte avec <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd> depuis n'importe quelle application. Le raccourci se change dans les Paramètres.
 - **Zone de notification** : fermer la fenêtre laisse le lanceur actif à côté de l'horloge, avec les streams et la surveillance des lives. Il peut aussi démarrer avec Windows (option).
-- **Chat** : clic droit sur un favori Twitch ou Kick › *Ouvrir le chat* l'ouvre dans [Streamlink Chat](https://github.com/Bulls64/Streamlink-Chat) ; une option l'ouvre avec chaque stream Twitch ou Kick.
+- **Chat** : clic droit sur un favori Twitch ou Kick › *Ouvrir le chat* l'ouvre dans [Streamlink Chat](https://github.com/Bulls64/Streamlink-Chat) ; une option l'ouvre avec chaque stream Twitch ou Kick. *Ouvrir les chats des favoris en direct* (clic droit, panneau *Favoris* ou menu de l'icône) les ouvre tous d'un coup, un onglet par chaîne.
+- **Statistiques de visionnage** : temps par chaîne et heures de pointe, sur les 30 derniers jours ou depuis le début (*Historique › Statistiques*). Gardées sur ton ordinateur uniquement.
 - **Tiroir du journal** : sortie de Streamlink, streams en cours et un bouton *Arrêter* pour chacun.
 - **Mises à jour** : vérification des mises à jour de Streamlink, et le lanceur peut se mettre à jour lui-même depuis ses releases GitHub (Paramètres → À propos) : téléchargement, contrôle du SHA-256 et de la signature, redémarrage automatique. Un réglage facultatif les installe tout seul au démarrage.
 - **Sauvegarde** : exporte tes réglages et tes favoris dans un seul fichier et importe-le sur un autre ordinateur (Paramètres → Sauvegarde).
@@ -365,9 +369,9 @@ Sur GitHub Actions, chaque pull request compile l'exécutable, et pousser un tag
 python -m unittest discover -s tests -v
 ```
 
-Les tests n'utilisent que la bibliothèque standard. Ils tournent automatiquement sous Windows et Linux à chaque push, avec `ruff`, des tests de l'interface sous Xvfb et une mesure de couverture (`.coveragerc`, 42 % minimum).
+Les tests n'utilisent que la bibliothèque standard. Ils tournent automatiquement sous Windows et Linux à chaque push, avec `ruff`, des tests de l'interface sous Xvfb et une mesure de couverture (`.coveragerc`, 56 % minimum). Avant chaque release, la liste de contrôle manuelle [`docs/TESTING.md`](docs/TESTING.md) est passée sur un vrai Windows et un vrai bureau Linux.
 
-Une vérification quotidienne à part, `packaging/live_check.py` (workflow *Live check*), interroge le vrai accès web de Twitch (statut en direct et aperçus) et lance `streamlink --json` sur Kick avec la dernière version de Streamlink ; elle ouvre un ticket si le statut en direct ne marche plus.
+Une vérification quotidienne à part, `packaging/live_check.py` (workflow *Live check*), interroge les vrais accès web de Twitch et de Kick (statut en direct, aperçus) et lance `streamlink --json` sur Kick avec la dernière version de Streamlink ; elle ouvre un ticket si le statut en direct ne marche plus.
 
 ### Structure du projet
 
@@ -386,6 +390,7 @@ launcher/
   backup.py            Export / import des réglages et des favoris
   updater.py           Version de Streamlink, mise à jour du lanceur depuis les releases GitHub
   live.py              Statut en direct et aperçus
+  stats.py             Statistiques de visionnage (temps par chaîne, heures de pointe)
   widgets.py           Composants légers dessinés, réexportés depuis widgets_base, widgets_controls (boutons, pastilles,
                        interrupteurs…), widgets_cards (cartes, lignes), widgets_field (champ, menus, suggestions), widgets_layout
   theme.py, gfx.py     Couleurs, polices, formes lissées, icônes
@@ -397,14 +402,15 @@ launcher/
 lang/                  Traductions
 packaging/             Script de création de l'exécutable, informations de version, manifestes winget, AppImage (appimage/)
 .signpath/             Configuration de signature du code (en sommeil, voir Signature du code)
-tests/                 Tests unitaires (bibliothèque standard uniquement) et test de fumée de l'interface
+tests/                 Tests unitaires (bibliothèque standard uniquement) et tests de l'interface (imitations des appels Windows)
+docs/TESTING.md        Liste de contrôle manuelle sur un vrai Windows et un vrai bureau Linux avant chaque release
 .github/workflows/     Tests à chaque push, exécutable compilé à chaque tag
 ```
 
 ### Réseau et vie privée
 
 Le lanceur ne se connecte à Internet que pour :
-- **Le statut en direct** (désactivable) : une requête vers l'accès web public de Twitch pour tes favoris Twitch, et `streamlink --json` pour tes favoris Kick. Cet accès Twitch n'est pas une API officielle : si Twitch le modifie, le statut reste inconnu jusqu'à une mise à jour. Avec *Aperçu des lives* activé, l'image d'aperçu des favoris Twitch en direct affichés sur l'écran principal (trois au plus) est téléchargée depuis le serveur d'images de Twitch à chaque vérification.
+- **Le statut en direct** (désactivable) : une requête vers l'accès web public de Twitch pour tes favoris Twitch, et une requête par favori Kick vers l'accès web public de Kick (`kick.com/api/v2/channels/…`), avec `streamlink --json` en secours quand Kick ne répond pas. Ces accès ne sont pas des API officielles : si un site les modifie, le statut reste inconnu jusqu'à une mise à jour. Avec *Aperçu des lives* activé, l'image d'aperçu des favoris Twitch en direct affichés sur l'écran principal (trois au plus) est téléchargée depuis le serveur d'images de Twitch à chaque vérification.
 - **La vérification des mises à jour** (désactivable) : une requête vers [PyPI](https://pypi.org/project/streamlink/) pour lire la dernière version de Streamlink, et une vers `api.github.com` (`/repos/Bulls64/Streamlink-Launcher/releases/latest`) pour lire la dernière version du lanceur. Le fichier du lanceur n'est téléchargé depuis `github.com` que si tu cliques sur *Mettre à jour*.
 
 Le presse-papiers n'est lu que sur ton ordinateur, pour y chercher un lien de stream (désactivable dans les Paramètres) : son contenu n'est ni enregistré ni envoyé.

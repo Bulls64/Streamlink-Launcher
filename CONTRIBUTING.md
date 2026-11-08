@@ -10,12 +10,12 @@ Thanks for helping! Bug reports, translations and pull requests are welcome.
    ```
    python -m unittest discover -s tests -v     # logic tests (no display needed)
    python -m pip install ruff && python -m ruff check .
-   xvfb-run -a python -m unittest tests.test_gui   # GUI smoke test (Linux; skipped without a display)
+   xvfb-run -a python -m unittest tests.test_gui tests.test_gui_desktop   # GUI tests (Linux; skipped without a display)
    ```
 4. **Translations** live in `lang/*.json`. Every language must have exactly the same keys (a test checks it). Keep texts short: they sit in fixed-size cards.
 5. **Rules of the code base**: Windows/OLE callbacks never touch Tk (they push events to a queue); slow work goes through `App.run_in_thread`; `launcher/core.py` stays free of any UI.
 6. **Changelog**: add a line under *Unreleased* in `CHANGELOG.md`, in both English and French.
-7. Releases are cut by the maintainer (version in `launcher/__init__.py` and `packaging/version_info.txt`, then a `vX.Y.Z` tag).
+7. Releases are cut by the maintainer (version in `launcher/__init__.py` and `packaging/version_info.txt`, then a `vX.Y.Z` tag), after the manual checklist [`docs/TESTING.md`](docs/TESTING.md) on a real Windows PC and Linux desktop.
 
 ## Français
 
@@ -27,4 +27,4 @@ Merci d'aider ! Signalements de bugs, traductions et pull requests sont les bien
 4. **Traductions** : `lang/*.json`, mêmes clés dans toutes les langues (un test le vérifie). Textes courts : ils tiennent dans des cartes de taille fixe.
 5. **Règles du code** : les rappels Windows/OLE ne touchent jamais Tk (ils déposent des événements dans une file) ; le travail lent passe par `App.run_in_thread` ; `launcher/core.py` ne contient aucune interface.
 6. **Journal des modifications** : une ligne sous *Unreleased* dans `CHANGELOG.md`, en anglais et en français.
-7. Les versions sont publiées par le mainteneur (version dans `launcher/__init__.py` et `packaging/version_info.txt`, puis un tag `vX.Y.Z`).
+7. Les versions sont publiées par le mainteneur (version dans `launcher/__init__.py` et `packaging/version_info.txt`, puis un tag `vX.Y.Z`), après la liste de contrôle manuelle [`docs/TESTING.md`](docs/TESTING.md) sur un vrai Windows et un vrai bureau Linux.

@@ -208,6 +208,9 @@ class FavoritesMixin:
         platform = fav.get("platform") or (None if fav.get("script") else "twitch")  # anciens favoris : Twitch
         if platform in core.CHAT_PLATFORMS and fav.get("channel"):                    # old favorites: Twitch
             menu.add_command(label=t("menu_open_chat"), command=lambda: self.open_chat(platform, fav["channel"]))
+        live_chats = len(self.live_chat_targets())
+        if live_chats > 1:
+            menu.add_command(label=t("menu_open_live_chats", count=live_chats), command=self.open_live_chats)
         menu.add_separator()
         menu.add_command(label=t("menu_remove_favorite"), command=lambda: self.remove_favorite(fav))
         try:

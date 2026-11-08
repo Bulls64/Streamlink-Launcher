@@ -80,7 +80,8 @@ class LaunchMixin:
         detail = " · ".join(x for x in (pname if p["input"] != "none" else None, quality, player_label) if x)
         command = [streamlink, *p["args"], *opts, url, quality]
         try:
-            self.streams.start(command, {"name": name, "detail": detail, "color": p["color"], "label": name})
+            self.streams.start(command, {"name": name, "detail": detail, "color": p["color"], "label": name,
+                                         "watch": {"channel": display, "platform": p["id"]}})
         except Exception as e:
             report(t("toast_launch_failed"), "error", action=(t("action_show_log"), self.show_log))
             self.log(t("log_error", error=e), "err")
@@ -104,10 +105,46 @@ class LaunchMixin:
         Opens a Twitch or Kick channel's chat in Streamlink Chat.
 
         quiet: called when starting a stream, without a success notification (the launch one is enough)."""
+        if not self._start_chat([(platform, channel)], report):
+            return False
+        if not quiet:
+            (report or self.toast)(self.t("toast_chat_opened", name=channel), "ok")
+        return True
+
+    def live_chat_targets(self):
+        """[(plateforme, chaîne)] des favoris Twitch et Kick en direct, sans doublon, dans l'ordre des favoris.
+
+        [(platform, channel)] of the live Twitch and Kick favorites, without duplicates, in favorites order."""
+        out, seen = [], set()
+        for fav in self.store.favorites:
+            key = self.live_key(fav)
+            if not key or key[1] not in core.CHAT_PLATFORMS or not (self.live.get(key) or {}).get("live"):
+                continue
+            if key not in seen:
+                seen.add(key)
+                out.append((key[1], fav["channel"]))
+        return out
+
+    def open_live_chats(self, report=None):
+        """Ouvre d'un coup les chats de tous les favoris en direct (un onglet par chaîne).
+
+        Opens at once the chats of all the live favorites (one tab per channel)."""
+        report = report or self.toast
+        targets = self.live_chat_targets()
+        if not targets:
+            report(self.t("toast_no_live_chats"), "warn")
+            return False
+        if not self._start_chat(targets, report):
+            return False
+        report(self.t("toast_live_chats_opened_one" if len(targets) == 1 else "toast_live_chats_opened",
+                      count=len(targets), name=targets[0][1]), "ok")
+        return True
+
+    def _start_chat(self, targets, report=None):
         t = self.t
         report = report or self.toast
         path = core.find_chat(self.cfg["chat_path"])
-        command = core.chat_command(path, platform, channel) if path else None
+        command = core.chat_command_many(path, targets) if path else None
         if not command:
             report(t("toast_no_chat"), "warn", action=(t("action_download"), lambda: self.open_url(
                 core.CHAT_RELEASES_URL)))
@@ -122,9 +159,7 @@ class LaunchMixin:
             report(t("toast_chat_failed"), "error", action=(t("action_show_log"), self.show_log))
             self.log(t("log_error", error=e), "err")
             return False
-        self.log(t("log_chat_opened", name=channel, path=path))
-        if not quiet:
-            report(t("toast_chat_opened", name=channel), "ok")
+        self.log(t("log_chat_opened", name=", ".join(ch for _, ch in targets), path=path))
         return True
 
     def launch_script(self, script_name, raw, report=None):
@@ -155,6 +190,18 @@ class LaunchMixin:
         self.build_recents()
         return True
 
+    def record_watch(self, stream):
+        """Note la durée d'un stream terminé dans les statistiques (une seule fois par stream).
+
+        Records the duration of an ended stream in the statistics (only once per stream)."""
+        if stream.get("watch") and stream.get("started") and not stream.get("recorded"):
+            stream["recorded"] = True
+            try:
+                if self.watch.add(stream["watch"], stream["started"]):
+                    self._refresh_panel("stats")
+            except Exception as e:  # les statistiques ne doivent jamais gêner un stream / stats must never get in the way
+                core.log.warning("Statistiques non enregistrées : %s", e)
+
     def stop_stream(self, stream):
         stream["stopped"] = True
         self.streams.stop(stream)
@@ -173,6 +220,7 @@ class LaunchMixin:
             if kind == "line":
                 self.log(f"[{stream['label']}] {value}")
             else:
+                self.record_watch(stream)
                 failed = value not in (0, None) and not stream.get("stopped")
                 if stream.get("stopped"):
                     self.log(t("log_stream_stopped", label=stream["label"]), "dim")
