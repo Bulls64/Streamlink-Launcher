@@ -5,6 +5,19 @@
 # mirror, already seen), switches to Ubuntu's main archive and tries again.
 # Usage: bash packaging/ci_apt.sh paquet1 paquet2…
 set -u
+# Les images des runners ont déjà beaucoup de paquets (xvfb, par exemple) : seuls les manquants sont installés,
+# et apt n'est pas appelé du tout s'il ne manque rien. / Runner images already have many packages (xvfb, for
+# example): only the missing ones are installed, and apt is not called at all if nothing is missing.
+missing=()
+for pkg in "$@"; do
+  dpkg-query -W -f='${Status}' "$pkg" 2>/dev/null | grep -q "install ok installed" || missing+=("$pkg")
+done
+if [ ${#missing[@]} -eq 0 ]; then
+  echo "apt: déjà installés / already installed: $*"
+  exit 0
+fi
+echo "apt: à installer / to install: ${missing[*]}"
+set -- "${missing[@]}"
 for attempt in 1 2 3; do
   if sudo apt-get update -qq -o Acquire::Retries=3 \
      && sudo apt-get install -y -qq -o Acquire::Retries=3 "$@"; then
