@@ -11,6 +11,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+- **Website: Streamlink Launcher 1.7.0** (download links, version shown, *What's new* table, statistics, the chats of live favorites and Kick status in the documentation, in the five languages).
+
+### Changed
+- CI: apt packages are installed by `packaging/ci_apt.sh`, which only installs the missing ones, with retries and a fallback to `archive.ubuntu.com`. On 11 November, the runners' Ubuntu mirror stopped answering and blocked the 1.7.0 release for an hour.
+
 ## [1.7.0] - 2026-11-08
 
 ### Added
@@ -279,6 +285,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## Français
 
 ## [Non publié]
+
+### Ajouté
+- **Site : Streamlink Launcher 1.7.0** (liens de téléchargement, version affichée, tableau « Quoi de neuf », statistiques, chats des favoris en direct et statut Kick dans la documentation, dans les cinq langues).
+
+### Modifié
+- CI : les paquets apt sont installés par `packaging/ci_apt.sh`, qui n'installe que ceux qui manquent, avec des reprises et un repli sur `archive.ubuntu.com`. Le 11 novembre, le miroir Ubuntu des runners ne répondait plus et a bloqué la release 1.7.0 pendant une heure.
 
 ## [1.7.0] - 2026-11-08
 
