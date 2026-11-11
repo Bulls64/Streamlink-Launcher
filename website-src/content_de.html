@@ -1,6 +1,6 @@
 <div class="wrap">
   <div class="intro">
-    <div class="tag"><span class="num">DOCS</span><span>Launcher v1.6.0 · Chat v0.3.0</span></div>
+    <div class="tag"><span class="num">DOCS</span><span>Launcher v1.7.0 · Chat v0.3.0</span></div>
     <h1>Dokumentation</h1>
     <p>Alles, was du brauchst, um Streamlink zu installieren, beide Apps zu nutzen und häufige Probleme zu lösen. Die Kennzeichnungen <span class="app l">Launcher</span> und <span class="app c">Chat</span> zeigen, für welche App ein Abschnitt gilt.</p>
     <label class="search" for="q">
@@ -318,19 +318,20 @@
           <h3>Einen Favoriten starten, bearbeiten oder entfernen <span class="app l">Launcher</span></h3>
           <ul>
             <li><b>Starten</b>: Klicke auf seine Karte.</li>
-            <li><b>Weitere Optionen</b>: Rechtsklick auf die Karte, dann <em>Starten</em>, <em>Feld ausfüllen</em>, <em>Chat öffnen</em> (Twitch und Kick, in Streamlink Chat) oder <em>Aus Favoriten entfernen</em>.</li>
+            <li><b>Weitere Optionen</b>: Rechtsklick auf die Karte, dann <em>Starten</em>, <em>Feld ausfüllen</em>, <em>Chat öffnen</em> (Twitch und Kick, in Streamlink Chat) oder <em>Aus Favoriten entfernen</em>. Sind mehrere Favoriten live, öffnet <em>Chats der Live-Favoriten öffnen</em> alle auf einmal, einen Tab pro Kanal; diese Wahl gibt es auch im Bereich <em>Favoriten</em> und im Menü des Symbols.</li>
             <li><b>Im Bereich Favoriten</b>: Ein Klick auf eine Zeile füllt das Feld aus, ▶ startet, der Papierkorb entfernt.</li>
           </ul>
         </div>
         <div class="blk">
           <h3>Wer ist live? <span class="app l">Launcher</span></h3>
-          <p>Mit <em>Einstellungen › Live › Prüfen, wer live ist</em> prüft der Launcher deine Twitch- und Kick-Favoriten, solange er geöffnet ist, alle 2, 5, 10, 15 oder 30 Minuten (standardmäßig 5). <em>Live-Vorschau</em> ergänzt Vorschaubild, Titel und Zuschauerzahl der Twitch-Favoriten, die live sind, und <em>Windows-Benachrichtigung</em> sagt dir Bescheid, wenn ein Favorit live geht: Klicke auf die Benachrichtigung, um zuzuschauen.</p>
+          <p>Mit <em>Einstellungen › Live › Prüfen, wer live ist</em> prüft der Launcher deine Twitch- und Kick-Favoriten, solange er geöffnet ist, alle 2, 5, 10, 15 oder 30 Minuten (standardmäßig 5). <em>Live-Vorschau</em> ergänzt Vorschaubild, Titel und Zuschauerzahl der Twitch-Favoriten, die live sind (bei Kick: Titel und Zuschauerzahl, ohne Bild), und <em>Windows-Benachrichtigung</em> sagt dir Bescheid, wenn ein Favorit live geht: Klicke auf die Benachrichtigung, um zuzuschauen.</p>
         </div>
         <div class="blk">
           <h3>Verlauf <span class="app l">Launcher</span></h3>
           <ul>
             <li>Die letzten 200 Starts werden gespeichert. Die neuesten erscheinen unter <em>Zuletzt gesehen</em>; ▶ startet sie direkt neu.</li>
             <li><em>Gesamter Verlauf</em> öffnet den Bereich: Ein Klick füllt das Feld aus, ▶ startet neu, der Papierkorb löscht einen Eintrag, <em>Alles löschen</em> leert den Verlauf.</li>
+            <li><em>Statistiken</em>, unten im Bereich, zeigt die Zeit pro Kanal und deine Stoßzeiten, für die letzten 30 Tage oder seit Beginn. Die Dauer eines Streams wird notiert, wenn er endet (mindestens eine Minute); diese Statistiken bleiben auf deinem Computer.</li>
             <li>Die Vorschläge im Eingabefeld kommen aus deinen Favoriten, dann aus deinem Verlauf: <kbd>↓</kbd> <kbd>↑</kbd>, dann <kbd>Enter</kbd>.</li>
           </ul>
         </div>
@@ -437,7 +438,7 @@
             <thead><tr><th>Plattform</th><th>Chat: Lesen</th><th>Chat: Schreiben</th><th>Launcher: wer ist live</th></tr></thead>
             <tbody>
               <tr><td>Twitch</td><td>IRC über WebSocket, ohne Konto</td><td>IRC mit deinem Token</td><td>Öffentlicher Webzugang von Twitch (inoffiziell)</td></tr>
-              <tr><td>Kick</td><td>Echtzeit-Chat von Kick (Centrifugo), alte Pusher-Verbindung als Rückfallebene. <b>Experimentell</b></td><td>Offizielle API von Kick</td><td>Streamlink (<code>streamlink --json</code>)</td></tr>
+              <tr><td>Kick</td><td>Echtzeit-Chat von Kick (Centrifugo), alte Pusher-Verbindung als Rückfallebene. <b>Experimentell</b></td><td>Offizielle API von Kick</td><td>Web-Zugang von Kick, Streamlink (<code>streamlink --json</code>) als Rückfallebene</td></tr>
               <tr><td>Steam TV</td><td>Web-API für Steam-Übertragungen, undokumentiert</td><td>Nicht möglich</td><td>Nein</td></tr>
               <tr><td>YouTube, Dailymotion, Direktlink</td><td>—</td><td>—</td><td>Nein</td></tr>
             </tbody>
@@ -548,7 +549,7 @@ player-args=--force-window=immediate</div>
           <div class="tbl"><table>
             <thead><tr><th>App</th><th>Neueste Version</th><th>Kurz gesagt</th></tr></thead>
             <tbody>
-              <tr><td><span class="app l">Launcher</span></td><td>1.6.0 (7. November 2026)</td><td>Öffnet den Chat eines Twitch- oder Kick-Favoriten in Streamlink Chat (Rechtsklick) oder mit dem Stream.</td></tr>
+              <tr><td><span class="app l">Launcher</span></td><td>1.7.0 (11. November 2026)</td><td>Wiedergabestatistiken, die Chats aller Live-Favoriten auf einmal, schnellerer Kick-Status mit Titel und Zuschauern.</td></tr>
               <tr><td><span class="app c">Chat</span></td><td>0.3.0 (7. November 2026)</td><td>Twitch-Anmeldung ohne eigene Anwendung; öffnet sich aus einem Favoriten von Launcher 1.6.0.</td></tr>
             </tbody>
           </table></div>
@@ -652,9 +653,9 @@ player-args=--force-window=immediate</div>
           <details class="faq"><summary>Windows zeigt „Der Computer wurde durch Windows geschützt“ <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
             <p>Die ausführbaren Dateien sind noch nicht signiert, daher warnt SmartScreen beim ersten Start. Das ist keine Erkennung.</p>
             <ol>
-              <li>Prüfe die Datei: in PowerShell <code>Get-FileHash .\StreamlinkLauncher-1.6.0.exe</code>, und vergleiche mit der <code>SHA256SUMS.txt</code> der Version.</li>
+              <li>Prüfe die Datei: in PowerShell <code>Get-FileHash .\StreamlinkLauncher-1.7.0.exe</code>, und vergleiche mit der <code>SHA256SUMS.txt</code> der Version.</li>
               <li>Klicke auf <em>Weitere Informationen</em>, dann auf <em>Trotzdem ausführen</em>.</li>
-              <li>Passiert beim Doppelklick nichts: Rechtsklick › <em>Eigenschaften</em> › <em>Zulassen</em> ankreuzen, oder <code>Unblock-File .\StreamlinkLauncher-1.6.0.exe</code>.</li>
+              <li>Passiert beim Doppelklick nichts: Rechtsklick › <em>Eigenschaften</em> › <em>Zulassen</em> ankreuzen, oder <code>Unblock-File .\StreamlinkLauncher-1.7.0.exe</code>.</li>
             </ol></div></details>
           <details class="faq"><summary>Mein Virenschutz blockiert oder löscht die exe <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
             <p>Mit PyInstaller erstellte Programme werden manchmal irrtümlich gemeldet. Prüfe den SHA-256, stelle die Datei aus der Quarantäne wieder her, füge ihren Ordner zu den Ausnahmen hinzu und melde den Fehlalarm (Microsoft Defender: <a href="https://www.microsoft.com/wdsi/filesubmission" target="_blank" rel="noopener">Datei einreichen</a>, Kategorie <em>Incorrectly detected as malware</em>). Du kannst die App auch aus dem Quellcode starten.</p></div></details>

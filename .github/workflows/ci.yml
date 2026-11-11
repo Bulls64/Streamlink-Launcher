@@ -36,7 +36,7 @@ jobs:
       - name: GUI smoke test (Xvfb)
         if: matrix.os == 'ubuntu-latest'
         run: |
-          sudo apt-get update -qq && sudo apt-get install -y -qq xvfb python3-tk
+          bash packaging/ci_apt.sh xvfb python3-tk
           xvfb-run -a python -m unittest tests.test_gui tests.test_gui_desktop -v
 
   coverage:
@@ -49,7 +49,7 @@ jobs:
           python-version: "3.12"
       - name: Measure (all tests, interface included, under Xvfb)
         run: |
-          sudo apt-get update -qq && sudo apt-get install -y -qq xvfb python3-tk
+          bash packaging/ci_apt.sh xvfb python3-tk
           python -m pip install coverage==7.13.5
           xvfb-run -a python -m coverage run -m unittest discover -s tests
       - name: Report (fails under the threshold set in .coveragerc)
@@ -120,8 +120,7 @@ jobs:
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
       - name: Install the build dependencies (Tcl/Tk with Xft)
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq build-essential libx11-dev libxft-dev libxss-dev libfontconfig-dev patchelf xvfb
+          bash packaging/ci_apt.sh build-essential libx11-dev libxft-dev libxss-dev libfontconfig-dev patchelf xvfb
       - name: Build
         run: bash packaging/appimage/build_appimage.sh dist
       - name: Smoke test (starts the AppImage under Xvfb)
