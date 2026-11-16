@@ -312,13 +312,14 @@ class TestSystemInstall(unittest.TestCase):
     def test_package_keeps_data_in_the_user_folder(self):
         (system, portable, data, platforms), app, root = self.where(marker=True)
         self.assertEqual((system, portable), ("True", "False"))
-        self.assertTrue(Path(data).is_relative_to(root / "config"))
-        self.assertEqual(Path(platforms), Path(data) / "platforms.json")  # modifiable / editable
+        # resolve() : chemins courts de Windows (RUNNER~1) / Windows short paths (RUNNER~1)
+        self.assertTrue(Path(data).resolve().is_relative_to((root / "config").resolve()))
+        self.assertEqual(Path(platforms).resolve(), (Path(data) / "platforms.json").resolve())  # modifiable / editable
 
     def test_folder_without_marker_stays_portable(self):
         (system, portable, data, platforms), app, root = self.where(marker=False)
         self.assertEqual((system, portable), ("False", "True"))
-        self.assertEqual(Path(data), app)
+        self.assertEqual(Path(data).resolve(), app.resolve())
 
 
 class TestChat(unittest.TestCase):
