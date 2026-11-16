@@ -44,12 +44,22 @@ def live_method(platform):
     return method if method in ("twitch", "kick", "streamlink") else "none"
 
 
-def _http_json(url, payload, headers, timeout):
+def http_json(url, headers=None, timeout=8, payload=None, limit=8 * 1024 * 1024):
+    """Réponse JSON d'une adresse : GET, ou POST de payload en JSON. Taille plafonnée à limit octets.
+    Les en-têtes donnés s'ajoutent à l'agent et à Accept par défaut (ou les remplacent).
+
+    JSON answer of an address: GET, or POST of payload as JSON. Size capped at limit bytes.
+    The given headers are added to the default agent and Accept (or replace them)."""
     import urllib.request  # chargé seulement au besoin (économise la mémoire au démarrage)
                            # loaded only when needed (saves memory at start-up)
-    req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers=headers, method="POST")
+    body = json.dumps(payload).encode("utf-8") if payload is not None else None
+    req = urllib.request.Request(url, data=body, method="POST" if body is not None else "GET",
+                                 headers={"User-Agent": USER_AGENT, "Accept": "application/json", **(headers or {})})
     with urllib.request.urlopen(req, timeout=timeout) as resp:
-        return json.loads(resp.read().decode("utf-8"))
+        raw = resp.read(limit + 1)
+    if len(raw) > limit:
+        raise ValueError("réponse trop grande / answer too large")
+    return json.loads(raw.decode("utf-8"))
 
 
 def _offline():
@@ -66,9 +76,8 @@ def twitch_live(logins, timeout=8):
              "previewImageURL(width:%d,height:%d) game{displayName}}}}" % PREVIEW_SIZE)
     for i in range(0, len(logins), 100):
         chunk = logins[i:i + 100]
-        data = _http_json(TWITCH_GQL_URL, {"query": query, "variables": {"logins": chunk}},
-                          {"Client-ID": TWITCH_CLIENT_ID, "Content-Type": "application/json",
-                           "User-Agent": USER_AGENT}, timeout)
+        data = http_json(TWITCH_GQL_URL, {"Client-ID": TWITCH_CLIENT_ID, "Content-Type": "application/json"},
+                         timeout, payload={"query": query, "variables": {"logins": chunk}})
         users = ((data or {}).get("data") or {}).get("users")
         if users is None:
             raise ValueError("réponse Twitch inattendue")
@@ -88,13 +97,6 @@ def twitch_live(logins, timeout=8):
     return result
 
 
-def _http_get_json(url, headers, timeout):
-    import urllib.request
-    req = urllib.request.Request(url, headers=headers)
-    with urllib.request.urlopen(req, timeout=timeout) as resp:
-        return json.loads(resp.read(2 * 1024 * 1024).decode("utf-8"))
-
-
 def kick_channel_live(slug, timeout=8):
     """Statut d'une chaîne Kick par l'accès web public du site : info, ou None si la réponse est inattendue.
     Lève une exception en cas d'erreur réseau ou HTTP (403 d'une protection anti-robots, par exemple).
@@ -103,7 +105,7 @@ def kick_channel_live(slug, timeout=8):
     Raises on a network or HTTP error (a 403 from an anti-bot protection, for example)."""
     if not KICK_SLUG_RE.match(slug or ""):
         return None
-    data = _http_get_json(KICK_CHANNEL_URL.format(slug=slug.lower()), KICK_HEADERS, timeout)
+    data = http_json(KICK_CHANNEL_URL.format(slug=slug.lower()), KICK_HEADERS, timeout)
     if not isinstance(data, dict) or "livestream" not in data:
         return None
     stream = data.get("livestream")

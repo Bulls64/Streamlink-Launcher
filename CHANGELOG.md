@@ -12,6 +12,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 ### Changed
+- **Code clean-up**: one `live.http_json` function for every JSON request (Twitch, Kick, PyPI, GitHub) instead of three near-identical ones, now with a size limit everywhere; `core.chat_command` removed (the launcher only uses `chat_command_many`). No change in behavior.
+
+### Changed
 - **Website: Launcher 1.7.1 and Chat 0.3.2**: the download section also offers the `.deb` and `.rpm` packages of both apps; the documentation explains how to install and update them, and where they keep their data (five languages).
 
 ## [1.7.1] - 2026-11-16
@@ -296,6 +299,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## Français
 
 ## [Non publié]
+
+### Modifié
+- **Nettoyage du code** : une seule fonction `live.http_json` pour toutes les requêtes JSON (Twitch, Kick, PyPI, GitHub) au lieu de trois presque identiques, désormais avec une taille plafonnée partout ; `core.chat_command` supprimée (le lanceur n'utilise que `chat_command_many`). Aucun changement de comportement.
 
 ### Modifié
 - **Site : Launcher 1.7.1 et Chat 0.3.2** : la section Télécharger propose aussi les paquets `.deb` et `.rpm` des deux applis ; la documentation explique comment les installer, les mettre à jour, et où ils gardent leurs données (cinq langues).
