@@ -11,13 +11,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-### Changed
-- **Website: Streamlink Chat 0.3.1** (download links, version shown, *What's new*: Kick chats work again). The size of the launcher's exe was shown as "12.8 MB" instead of "12,8 MB" in Spanish, German and Italian.
+## [1.7.1] - 2026-11-16
 
 ### Added
+- **Linux packages**: `streamlink-launcher_<version>_amd64.deb` (Debian, Ubuntu, Linux Mint) and `streamlink-launcher-<version>-1.x86_64.rpm` (Fedora, openSUSE), made from the AppImage (same embedded Python and Tcl/Tk), installed in `/opt/streamlink-launcher` with a menu entry, the icon and the `streamlink-launcher` command. Streamlink is a recommended dependency. The CI installs and starts the `.deb` on Ubuntu 22.04 and the `.rpm` on Fedora, then attaches both to the release, with their SHA-256.
+- *Open the chat* also finds Streamlink Chat installed from its `.deb` or `.rpm` package (`streamlink-chat` command).
 - **Website: Streamlink Launcher 1.7.0** (download links, version shown, *What's new* table, statistics, the chats of live favorites and Kick status in the documentation, in the five languages).
 
+### Fixed
+- Installed in a system folder, the launcher could keep its data next to itself when started by root (who can write there): a package install now always uses `~/.config/streamlink-launcher`, like the AppImage.
+
 ### Changed
+- **Website: Streamlink Chat 0.3.1** (download links, version shown, *What's new*: Kick chats work again). The size of the launcher's exe was shown as "12.8 MB" instead of "12,8 MB" in Spanish, German and Italian.
 - CI: apt packages are installed by `packaging/ci_apt.sh`, which only installs the missing ones, with retries and a fallback to `archive.ubuntu.com`. On 11 November, the runners' Ubuntu mirror stopped answering and blocked the 1.7.0 release for an hour.
 
 ## [1.7.0] - 2026-11-08
@@ -289,13 +294,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Non publié]
 
-### Modifié
-- **Site : Streamlink Chat 0.3.1** (liens de téléchargement, version affichée, « Quoi de neuf » : les chats Kick refonctionnent). La taille de l'exe du lanceur s'affichait « 12.8 MB » au lieu de « 12,8 MB » en espagnol, allemand et italien.
+## [1.7.1] - 2026-11-16
 
 ### Ajouté
+- **Paquets Linux** : `streamlink-launcher_<version>_amd64.deb` (Debian, Ubuntu, Linux Mint) et `streamlink-launcher-<version>-1.x86_64.rpm` (Fedora, openSUSE), faits à partir de l'AppImage (même Python et Tcl/Tk embarqués), installés dans `/opt/streamlink-launcher` avec une entrée de menu, l'icône et la commande `streamlink-launcher`. Streamlink est une dépendance recommandée. La CI installe et lance le `.deb` sous Ubuntu 22.04 et le `.rpm` sous Fedora, puis les joint à la release avec leur SHA-256.
+- *Ouvrir le chat* trouve aussi Streamlink Chat installé par son paquet `.deb` ou `.rpm` (commande `streamlink-chat`).
 - **Site : Streamlink Launcher 1.7.0** (liens de téléchargement, version affichée, tableau « Quoi de neuf », statistiques, chats des favoris en direct et statut Kick dans la documentation, dans les cinq langues).
 
+### Corrigé
+- Installé dans un dossier système, le lanceur pouvait garder ses données à côté de lui s'il était lancé par root (qui peut y écrire) : une installation par paquet utilise toujours `~/.config/streamlink-launcher`, comme l'AppImage.
+
 ### Modifié
+- **Site : Streamlink Chat 0.3.1** (liens de téléchargement, version affichée, « Quoi de neuf » : les chats Kick refonctionnent). La taille de l'exe du lanceur s'affichait « 12.8 MB » au lieu de « 12,8 MB » en espagnol, allemand et italien.
 - CI : les paquets apt sont installés par `packaging/ci_apt.sh`, qui n'installe que ceux qui manquent, avec des reprises et un repli sur `archive.ubuntu.com`. Le 11 novembre, le miroir Ubuntu des runners ne répondait plus et a bloqué la release 1.7.0 pendant une heure.
 
 ## [1.7.0] - 2026-11-08

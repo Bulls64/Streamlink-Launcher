@@ -620,8 +620,8 @@ class App(FavoritesMixin, DesktopMixin, LaunchMixin, PanelsMixin, UpdatesMixin, 
     def _startup_checks(self):
         t = self.t
         core.set_issue_handler(lambda: self.after(0, self._report_data_issues))
-        if not core.PORTABLE and not core.APPIMAGE:  # AppImage : données dans ~/.config, c'est normal
-                                                     # AppImage: data in ~/.config, this is normal
+        if not (core.PORTABLE or core.APPIMAGE or core.SYSTEM_INSTALL):  # AppImage, paquet : ~/.config, c'est normal
+                                                                          # AppImage, package: ~/.config, normal
             self.log(t("log_data_folder", path=core.DATA_ROOT), "warn")
         if self.platforms_error:
             self.log(t("log_platforms_error", error=self.platforms_error), "err")

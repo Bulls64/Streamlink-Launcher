@@ -60,14 +60,20 @@ def _user_data_dir():
 # AppImage (Linux): the application folder is read-only, or extracted to a temporary folder
 # (--appimage-extract-and-run) deleted on exit: the data always goes to ~/.config.
 APPIMAGE = bool(os.environ.get("APPIMAGE")) and not FROZEN and os.name != "nt"
-PORTABLE = not APPIMAGE and _is_writable(BASE_DIR)
+# Paquet .deb ou .rpm : le lanceur est dans /opt (marqué par .system-install) ; comme l'AppImage, données dans
+# ~/.config, même lancé par root qui pourrait écrire dans /opt.
+# .deb or .rpm package: the launcher is in /opt (marked by .system-install); like the AppImage, data in
+# ~/.config, even when started by root, who could write to /opt.
+SYSTEM_INSTALL = (BASE_DIR / ".system-install").is_file() and not FROZEN
+PORTABLE = not (APPIMAGE or SYSTEM_INSTALL) and _is_writable(BASE_DIR)
 DATA_ROOT = BASE_DIR if PORTABLE else _user_data_dir()
 CONFIG_FILE = DATA_ROOT / "config.json"
 # platforms.json livré à côté du lanceur reste prioritaire, même en lecture seule (sauf dans l'AppImage,
 # où il doit rester modifiable : il est créé dans le dossier des données)
 # platforms.json shipped next to the launcher takes priority, even read-only (except in the AppImage,
 # where it must stay editable: it is created in the data folder)
-PLATFORMS_FILE = BASE_DIR / "platforms.json" if not APPIMAGE and (PORTABLE or (BASE_DIR / "platforms.json").exists()) \
+PLATFORMS_FILE = BASE_DIR / "platforms.json" if not (APPIMAGE or SYSTEM_INSTALL) and (
+    PORTABLE or (BASE_DIR / "platforms.json").exists()) \
     else DATA_ROOT / "platforms.json"
 LOG_FILE = DATA_ROOT / "launcher.log"
 LANG_DIR = BASE_DIR / "lang" if (BASE_DIR / "lang").is_dir() else RES_DIR / "lang"  # dossier lang/ modifiable prioritaire
@@ -569,16 +575,19 @@ def _chat_dirs():
 
 def find_chat(configured=""):
     """Chemin de Streamlink Chat, ou None. Sans réglage : le fichier le plus récent parmi les exe (Windows),
-    AppImage (Linux) et slink_chat.py trouvés dans les dossiers habituels.
+    AppImage (Linux) et slink_chat.py trouvés dans les dossiers habituels ; sinon, sous Linux, la commande
+    streamlink-chat du paquet .deb ou .rpm.
 
     Path of Streamlink Chat, or None. Without a setting: the most recent file among the exe (Windows),
-    AppImage (Linux) and slink_chat.py found in the usual folders."""
+    AppImage (Linux) and slink_chat.py found in the usual folders; otherwise, on Linux, the streamlink-chat
+    command of the .deb or .rpm package."""
     if configured:
         return configured if os.path.isfile(configured) else None
     patterns = ["Streamlink Chat.exe", "StreamlinkChat*.exe"] if os.name == "nt" else ["StreamlinkChat*.AppImage"]
     found = [f for d in _chat_dirs() for pat in [*patterns, "slink_chat.py"] for f in d.glob(pat) if f.is_file()]
     if not found:
-        return None
+        # Paquet .deb ou .rpm de Streamlink Chat / Streamlink Chat's .deb or .rpm package
+        return shutil.which("streamlink-chat") if os.name != "nt" else None
     return str(max(found, key=lambda f: (f.suffix != ".py", f.stat().st_mtime)))
 
 
