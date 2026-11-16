@@ -37,7 +37,12 @@ class GuiBase(TempData):
         super().setUp()
         from launcher import app as app_module
         core = app_module.core
-        core.save_config({**core.DEFAULT_CONFIG, "update_check": False, "tray": False, "language": "en"})
+        # clipboard_watch coupé : sous Windows, le presse-papiers est celui de tout le poste, et un lien qui s'y
+        # trouve ferait apparaître une notification pendant la fermeture de la fenêtre (les tests qui en ont
+        # besoin le rallument). / clipboard_watch off: on Windows, the clipboard is the whole machine's, and a link
+        # in it would show a notification while the window closes (the tests that need it turn it back on).
+        core.save_config({**core.DEFAULT_CONFIG, "update_check": False, "tray": False, "language": "en",
+                          "clipboard_watch": False})
         self.extra = [mock.patch.object(app_module.wintray, "acquire_single_instance", return_value=True)]
         for p in self.extra:
             p.start()
