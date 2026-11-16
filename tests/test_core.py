@@ -377,22 +377,22 @@ class TestChat(unittest.TestCase):
         app = self.touch(self.base / "StreamlinkChat-0.3.1-x86_64.AppImage", 1)
         with mock.patch.object(core.shutil, "which", return_value="/usr/bin/streamlink-chat"):
             self.assertEqual(core.find_chat(), app)  # une AppImage voisine passe avant / a nearby AppImage comes first
-        self.assertEqual(core.chat_command("/usr/bin/streamlink-chat", "kick", "xqc"),
+        self.assertEqual(core.chat_command_many("/usr/bin/streamlink-chat", [("kick", "xqc")]),
                          ["/usr/bin/streamlink-chat", "--open", "kick:xqc"])
 
     def test_command(self):
-        self.assertEqual(core.chat_command("C:/Chat/StreamlinkChat-0.2.3.exe", "kick", "xqc"),
+        self.assertEqual(core.chat_command_many("C:/Chat/StreamlinkChat-0.2.3.exe", [("kick", "xqc")]),
                          ["C:/Chat/StreamlinkChat-0.2.3.exe", "--open", "kick:xqc"])
-        cmd = core.chat_command("/src/slink_chat.py", "twitch", "eslcs")
+        cmd = core.chat_command_many("/src/slink_chat.py", [("twitch", "eslcs")])
         self.assertEqual(cmd[1:], ["/src/slink_chat.py", "--open", "twitch:eslcs"])
         with mock.patch.object(core, "FROZEN", True), mock.patch.object(core.shutil, "which", return_value=None):
-            self.assertIsNone(core.chat_command("/src/slink_chat.py", "twitch", "eslcs"))
+            self.assertIsNone(core.chat_command_many("/src/slink_chat.py", [("twitch", "eslcs")]))
 
     def test_chat_understands_the_command(self):
         """Le format --open plateforme:chaîne est celui que Streamlink Chat lit (chat/config.py, targets_from_argv).
 
         The --open platform:channel format is the one Streamlink Chat reads (chat/config.py, targets_from_argv)."""
-        self.assertEqual(core.chat_command("x.exe", "twitch", "eslcs")[1:], ["--open", "twitch:eslcs"])
+        self.assertEqual(core.chat_command_many("x.exe", [("twitch", "eslcs")])[1:], ["--open", "twitch:eslcs"])
         self.assertEqual(core.CHAT_PLATFORMS, ("twitch", "kick"))
 
 
@@ -616,13 +616,13 @@ class TestLivePreviews(unittest.TestCase):
     def test_twitch_request_asks_for_preview(self):
         sent = {}
 
-        def fake_http(url, payload, headers, timeout):
+        def fake_http(url, headers=None, timeout=8, payload=None):
             sent.update(payload)
             return {"data": {"users": [
                 {"login": "On", "stream": {"title": "T", "viewersCount": 42, "game": {"displayName": "G"},
                                            "previewImageURL": "https://static-cdn.jtvnw.net/p-640x360.jpg"}},
                 {"login": "off", "stream": None}]}}
-        with mock.patch.object(live, "_http_json", fake_http):
+        with mock.patch.object(live, "http_json", fake_http):
             res = live.twitch_live(["On", "off", "absent"])
         self.assertIn("previewImageURL(width:640,height:360)", sent["query"])
         self.assertEqual(res["on"], {"live": True, "title": "T", "game": "G", "viewers": 42,
@@ -630,21 +630,54 @@ class TestLivePreviews(unittest.TestCase):
         self.assertEqual(res["off"], live._offline())
         self.assertEqual(res["absent"], live._offline())
 
+    def test_http_json_get_post_and_size_limit(self):
+        """Une seule fonction pour tous les appels JSON : GET, POST, en-têtes, taille plafonnée.
+
+        A single function for all the JSON calls: GET, POST, headers, capped size."""
+        calls = []
+
+        class Resp:
+            def __init__(self, body):
+                self.body = body
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *a):
+                return False
+
+            def read(self, n):
+                return self.body[:n]
+
+        def fake_open(req, timeout):
+            calls.append((req.get_method(), req.full_url, dict(req.header_items()), req.data, timeout))
+            return Resp(b'{"ok": 1}' if "big" not in req.full_url else b"x" * 50)
+        import urllib.request
+        with mock.patch.object(urllib.request, "urlopen", fake_open):
+            self.assertEqual(live.http_json("https://a/get", timeout=3), {"ok": 1})
+            self.assertEqual(live.http_json("https://a/post", {"Client-ID": "x"}, 5, payload={"q": 1}), {"ok": 1})
+            with self.assertRaises(ValueError):
+                live.http_json("https://a/big", limit=10)
+        get, post = calls[0], calls[1]
+        self.assertEqual((get[0], get[3], get[4]), ("GET", None, 3))
+        self.assertEqual(get[2]["User-agent"], live.USER_AGENT)
+        self.assertEqual((post[0], json.loads(post[3]), post[2]["Client-id"]), ("POST", {"q": 1}, "x"))
+
     def test_kick_channel_live(self):
         live_reply = {"id": 1, "livestream": {"is_live": True, "session_title": "Salut", "viewer_count": 1234,
                                               "categories": [{"name": "Just Chatting"}],
                                               "thumbnail": {"url": "https://images.kick.com/t/720.jpg"}}}
-        with mock.patch.object(live, "_http_get_json", return_value=live_reply) as get:
+        with mock.patch.object(live, "http_json", return_value=live_reply) as get:
             self.assertEqual(live.kick_channel_live("XQC"),
                              {"live": True, "title": "Salut", "game": "Just Chatting", "viewers": 1234,
                               "preview": "https://images.kick.com/t/720.jpg"})
         self.assertEqual(get.call_args[0][0], "https://kick.com/api/v2/channels/xqc")
-        with mock.patch.object(live, "_http_get_json", return_value={"id": 1, "livestream": None}):
+        with mock.patch.object(live, "http_json", return_value={"id": 1, "livestream": None}):
             self.assertEqual(live.kick_channel_live("xqc"), live._offline())
         for odd in ({"message": "Not found"}, [], {"livestream": "?"}):
-            with mock.patch.object(live, "_http_get_json", return_value=odd):
+            with mock.patch.object(live, "http_json", return_value=odd):
                 self.assertIsNone(live.kick_channel_live("xqc"))
-        with mock.patch.object(live, "_http_get_json") as get:
+        with mock.patch.object(live, "http_json") as get:
             self.assertIsNone(live.kick_channel_live("../etc"))
         get.assert_not_called()
 
@@ -823,7 +856,7 @@ class TestAppUpdate(unittest.TestCase):
         self.assertIsNotNone(asset())
 
     def test_check_app_update(self):
-        with mock.patch.object(updater, "_http_get_json", return_value=self.api()):
+        with mock.patch.object(updater, "http_json", return_value=self.api()):
             r = updater.check_app_update("1.0.0")
             self.assertTrue(r["update"])
             self.assertEqual(r["latest"], "9.9.9")
@@ -833,12 +866,12 @@ class TestAppUpdate(unittest.TestCase):
     def test_check_app_update_errors(self):
         import urllib.error
         e404 = urllib.error.HTTPError("u", 404, "nf", {}, None)
-        with mock.patch.object(updater, "_http_get_json", side_effect=e404):
+        with mock.patch.object(updater, "http_json", side_effect=e404):
             self.assertEqual(updater.check_app_update("1.0.0")["error"], "release")
-        with mock.patch.object(updater, "_http_get_json", side_effect=OSError("down")):
+        with mock.patch.object(updater, "http_json", side_effect=OSError("down")):
             r = updater.check_app_update("1.0.0")
             self.assertEqual((r["error"], r["update"]), ("network", None))
-        with mock.patch.object(updater, "_http_get_json", return_value={"tag_name": "x"}):
+        with mock.patch.object(updater, "http_json", return_value={"tag_name": "x"}):
             self.assertEqual(updater.check_app_update("1.0.0")["error"], "release")
 
     def test_safe_redirects(self):

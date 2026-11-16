@@ -1,7 +1,6 @@
 """Mises à jour : version de Streamlink (PyPI), mise à jour du lanceur depuis les releases GitHub (téléchargement, vérification, remplacement, redémarrage).
 
 Updates: Streamlink version (PyPI), launcher update from the GitHub releases (download, checks, replacement, restart)."""
-import json
 import os
 import re
 import shutil
@@ -12,7 +11,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from .core import FROZEN, find_streamlink, log
-from .live import USER_AGENT
+from .live import USER_AGENT, http_json
 
 # ---------------------
 # Streamlink est-il à jour ?
@@ -50,19 +49,11 @@ def streamlink_version(path, timeout=20):
     return version_text((out.stdout or "") + " " + (out.stderr or ""))
 
 
-def _http_get_json(url, timeout):
-    import urllib.request  # chargé seulement au besoin
-                           # loaded only when needed
-    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
-    with urllib.request.urlopen(req, timeout=timeout) as resp:
-        return json.loads(resp.read().decode("utf-8"))
-
-
 def latest_streamlink_version(timeout=8):
     """Dernière version stable publiée (PyPI, source officielle des versions de Streamlink).
 
     Latest stable version published (PyPI, the official source of Streamlink versions)."""
-    data = _http_get_json(PYPI_URL, timeout)
+    data = http_json(PYPI_URL, timeout=timeout)
     return version_text(((data or {}).get("info") or {}).get("version"))
 
 
@@ -164,7 +155,7 @@ def check_app_update(current=None):
         from . import __version__ as current
     result = {"current": current, "latest": None, "update": None, "release": None, "error": None}
     try:
-        data = _http_get_json(RELEASES_API, 10)
+        data = http_json(RELEASES_API, timeout=10)
     except Exception as e:
         log.warning("Recherche de mise à jour du lanceur impossible : %s", e)
         result["error"] = "release" if getattr(e, "code", None) == 404 else "network"

@@ -591,19 +591,14 @@ def find_chat(configured=""):
     return str(max(found, key=lambda f: (f.suffix != ".py", f.stat().st_mtime)))
 
 
-def chat_command(path, platform, channel):
-    """Commande qui ouvre le chat d'une chaîne dans Streamlink Chat (une seule fenêtre : si le chat est déjà ouvert,
-    il reçoit la chaîne en nouvel onglet). None si slink_chat.py n'a pas de Python pour le lancer.
-
-    Command that opens a channel's chat in Streamlink Chat (a single window: if the chat is already open,
-    it gets the channel as a new tab). None if slink_chat.py has no Python to run it."""
-    return chat_command_many(path, [(platform, channel)])
-
-
 def chat_command_many(path, targets):
-    """Comme chat_command, pour plusieurs chaînes [(plateforme, chaîne)] : une seule commande, un onglet par chaîne.
+    """Commande qui ouvre les chats de plusieurs chaînes [(plateforme, chaîne)] dans Streamlink Chat : une seule
+    fenêtre, un onglet par chaîne (si le chat est déjà ouvert, il reçoit les chaînes en nouveaux onglets).
+    None si slink_chat.py n'a pas de Python pour le lancer.
 
-    Like chat_command, for several channels [(platform, channel)]: a single command, one tab per channel."""
+    Command that opens the chats of several channels [(platform, channel)] in Streamlink Chat: a single window,
+    one tab per channel (if the chat is already open, it gets the channels as new tabs).
+    None if slink_chat.py has no Python to run it."""
     target = [arg for platform, channel in targets for arg in ("--open", f"{platform}:{channel}")]
     if path.lower().endswith(".py"):
         python = sys.executable if not FROZEN else (shutil.which("pythonw") or shutil.which("python")
