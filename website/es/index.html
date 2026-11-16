@@ -138,7 +138,8 @@
 <div>
 <dl class="feats">
 <div class="feat" data-i18n="lf1"><dt>Campo inteligente</dt><dd>Un nombre de canal o cualquier enlace. Las sugerencias vienen de tus favoritos y de tu historial.</dd></div>
-<div class="feat" data-i18n="lf2"><dt>Favoritos en directo</dt><dd>Vista previa del stream, título y espectadores. Una notificación de Windows cuando un favorito empieza un directo.</dd></div>
+<div class="feat" data-i18n="lf2"><dt>Favoritos en directo</dt><dd>Título y espectadores (Twitch y Kick), vista previa del stream (Twitch). Una notificación de Windows cuando un favorito empieza un directo.</dd></div>
+<div class="feat" data-i18n="lf7"><dt>Estadísticas</dt><dd>Tiempo por canal y horas punta, en 30 días o desde el principio. Se quedan en tu ordenador.</dd></div>
 <div class="feat" data-i18n="lf3"><dt>Calidad recordada</dt><dd>Por plataforma: <code>best</code>, <code>1080p60</code>, <code>audio_only</code>, o una lista de alternativas como <code>720p60,720p,best</code>.</dd></div>
 <div class="feat" data-i18n="lf4"><dt>Portapapeles</dt><dd>Un enlace copiado se te propone en cuanto vuelves a la ventana. También puedes arrastrar y soltar un enlace o un acceso directo <code>.url</code>.</dd></div>
 <div class="feat" data-i18n="lf5"><dt>Área de notificación</dt><dd>Al cerrar la ventana, el lanzador se queda junto al reloj, con tus streams y la vigilancia de directos.</dd></div>
@@ -212,9 +213,9 @@
 <h2 data-i18n="t_h2">El reproductor a la izquierda, el chat a la derecha.</h2>
 </div>
 <div class="pair">
-<div data-i18n="t1"><h3>Un clic para ver</h3><p>En el chat, ▶ inicia el stream con el mismo Streamlink que el lanzador. En el lanzador, tus favoritos te dicen quién está en directo.</p></div>
+<div data-i18n="t1"><h3>Un clic para ver</h3><p>En el lanzador, tus favoritos te dicen quién está en directo, y un clic abre sus chats, una pestaña cada uno. En el chat, ▶ inicia el stream con el mismo Streamlink.</p></div>
 <div data-i18n="t2"><h3>Un mismo aspecto</h3><p>Los mismos componentes dibujados, los mismos colores de plataforma, tema claro, oscuro o automático según Windows.</p></div>
-<div data-i18n="t3"><h3>Se actualizan solas</h3><p>Cada aplicación busca su nueva versión en GitHub, comprueba su tamaño y su SHA-256, sustituye el ejecutable y se reinicia.</p></div>
+<div data-i18n="t3"><h3>Se actualizan solas</h3><p>Cada aplicación busca su nueva versión en GitHub. En Windows, comprueba su tamaño y su SHA-256, sustituye el ejecutable y se reinicia; en Linux, te abre la página de la versión.</p></div>
 </div>
 </div>
 </section>
@@ -235,7 +236,7 @@
 <a class="file" href="https://github.com/Bulls64/Streamlink-Launcher/releases/download/v1.7.1/streamlink-launcher-1.7.1-1.x86_64.rpm" rel="noopener" target="_blank"><span class="os">.rpm</span><b>streamlink-launcher-1.7.1-1.x86_64.rpm</b><span data-i18n="size_l_rpm">19,7 MB</span></a>
 </div>
 <ol class="steps">
-<li><span><span data-i18n="step_chmod">En Linux, haz ejecutable la AppImage y luego iníciala:</span><span class="cmd"><code>chmod +x StreamlinkLauncher-1.7.1-x86_64.AppImage</code><button data-copy="chmod +x StreamlinkLauncher-1.7.1-x86_64.AppImage" type="button">Copier</button></span></span></li>
+<li><span><span data-i18n="step_chmod">En Linux, instala el paquete <code>.deb</code> o <code>.rpm</code> con tu gestor de paquetes, o haz ejecutable la AppImage y luego iníciala:</span><span class="cmd"><code>chmod +x StreamlinkLauncher-1.7.1-x86_64.AppImage</code><button data-copy="chmod +x StreamlinkLauncher-1.7.1-x86_64.AppImage" type="button">Copier</button></span></span></li>
 <li><span data-i18n="step_l2">En el primer inicio, el lanzador encuentra Streamlink por sí solo, o te explica cómo instalarlo.</span></li>
 </ol>
 <div class="links"><a data-i18n="src" href="https://github.com/Bulls64/Streamlink-Launcher" rel="noopener" target="_blank">Código fuente</a><a data-i18n="notes" href="https://github.com/Bulls64/Streamlink-Launcher/releases/latest" rel="noopener" target="_blank">Notas de la versión</a></div>
@@ -249,7 +250,7 @@
 <a class="file" href="https://github.com/Bulls64/Streamlink-Chat/releases/download/v0.3.2/streamlink-chat-0.3.2-1.x86_64.rpm" rel="noopener" target="_blank"><span class="os">.rpm</span><b>streamlink-chat-0.3.2-1.x86_64.rpm</b><span data-i18n="size_c_rpm">19,7 MB</span></a>
 </div>
 <ol class="steps">
-<li><span><span data-i18n="step_chmod">En Linux, haz ejecutable la AppImage y luego iníciala:</span><span class="cmd"><code>chmod +x StreamlinkChat-0.3.2-x86_64.AppImage</code><button data-copy="chmod +x StreamlinkChat-0.3.2-x86_64.AppImage" type="button">Copier</button></span></span></li>
+<li><span><span data-i18n="step_chmod">En Linux, instala el paquete <code>.deb</code> o <code>.rpm</code> con tu gestor de paquetes, o haz ejecutable la AppImage y luego iníciala:</span><span class="cmd"><code>chmod +x StreamlinkChat-0.3.2-x86_64.AppImage</code><button data-copy="chmod +x StreamlinkChat-0.3.2-x86_64.AppImage" type="button">Copier</button></span></span></li>
 <li><span data-i18n="step_c2">Escribe el nombre de un canal o pega un enlace de Twitch, Kick o Steam TV. Para escribir, conecta tu cuenta en <em>Ajustes › Cuentas</em>.</span></li>
 </ol>
 <div class="links"><a data-i18n="src" href="https://github.com/Bulls64/Streamlink-Chat" rel="noopener" target="_blank">Código fuente</a><a data-i18n="notes" href="https://github.com/Bulls64/Streamlink-Chat/releases/latest" rel="noopener" target="_blank">Notas de la versión</a></div>
