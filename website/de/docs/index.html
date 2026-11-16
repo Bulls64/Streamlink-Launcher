@@ -85,7 +85,7 @@
 <main id="docroot">
 <div class="d-wrap">
   <div class="intro">
-    <div class="tag"><span class="d-num">DOCS</span><span>Launcher v1.7.0 · Chat v0.3.1</span></div>
+    <div class="tag"><span class="d-num">DOCS</span><span>Launcher v1.7.1 · Chat v0.3.2</span></div>
     <h1>Dokumentation</h1>
     <p>Alles, was du brauchst, um Streamlink zu installieren, beide Apps zu nutzen und häufige Probleme zu lösen. Die Kennzeichnungen <span class="d-app l">Launcher</span> und <span class="d-app c">Chat</span> zeigen, für welche App ein Abschnitt gilt.</p>
     <label class="search" for="dq">
@@ -155,7 +155,7 @@
           <h3>Systemvoraussetzungen</h3>
           <ul>
             <li><b>Windows 10 oder 11</b>: eine einzelne <code>.exe</code>-Datei, ohne Installation.</li>
-            <li><b>Linux x86_64</b>: ein AppImage mit eigenem Python. Es braucht glibc 2.35 oder neuer (Ubuntu 22.04, Debian 12, Fedora 36, Linux Mint 21 oder neuer).</li>
+            <li><b>Linux x86_64</b>: ein AppImage mit eigenem Python. Es braucht glibc 2.35 oder neuer (Ubuntu 22.04, Debian 12, Fedora 36, Linux Mint 21 oder neuer). Oder ein <code>.deb</code>- (Debian, Ubuntu, Mint) bzw. <code>.rpm</code>-Paket (Fedora, openSUSE) mit gleichem Inhalt und Menüeintrag.</li>
             <li><b>Aus dem Quellcode</b>: Python 3.10 oder neuer mit Tcl/Tk, keine weitere Abhängigkeit.</li>
             <li>Zum Ansehen: <a href="#installation">Streamlink</a> und ein Videoplayer, standardmäßig VLC.</li>
           </ul>
@@ -294,6 +294,9 @@
           <div class="d-term"><span class="d-pr">$ </span>chmod +x StreamlinkLauncher-*-x86_64.AppImage
 <span class="d-pr">$ </span>./StreamlinkLauncher-*-x86_64.AppImage</div>
           <p>Für einen Eintrag im Anwendungsmenü nutze ein Werkzeug wie <a href="https://flathub.org/apps/it.mijorus.gearlever" target="_blank" rel="noopener">Gear Lever</a> oder AppImageLauncher.</p>
+          <p>Oder installiere das <code>.deb</code>- oder <code>.rpm</code>-Paket der Version: Menüeintrag und Befehl <code>streamlink-launcher</code> (<code>streamlink-chat</code> für den Chat). Zum Aktualisieren installierst du das neue Paket auf dieselbe Weise.</p>
+          <div class="d-term"><span class="d-pr">$ </span>sudo apt install ./streamlink-launcher_*_amd64.deb     <span class="d-cm"># Debian, Ubuntu, Mint</span>
+<span class="d-pr">$ </span>sudo dnf install ./streamlink-launcher-*.x86_64.rpm   <span class="d-cm"># Fedora</span></div>
         </div>
         <div class="blk">
           <h3>Dein erster Stream <span class="d-app l">Launcher</span></h3>
@@ -433,8 +436,8 @@
           <div class="d-tbl"><table>
             <thead><tr><th>App</th><th>Dateien</th><th>Ordner</th></tr></thead>
             <tbody>
-              <tr><td><span class="d-app l">Launcher</span></td><td><code>streams/favorites.json</code>, <code>streams/history.json</code>, <code>config.json</code>, <code>platforms.json</code>, <code>launcher.log</code></td><td>Neben der <code>.exe</code>; sonst <span class="path">%APPDATA%\Streamlink Launcher</span> oder <span class="path">~/.config/streamlink-launcher</span> (beim AppImage immer)</td></tr>
-              <tr><td><span class="d-app c">Chat</span></td><td><code>chat.json</code> (geöffnete Chats, Einstellungen, Konten), <code>cache/emotes/</code>, <code>chat.log</code></td><td>Neben der <code>.exe</code>; sonst <span class="path">%APPDATA%\Streamlink Chat</span> oder <span class="path">~/.config/streamlink-chat</span> (beim AppImage immer)</td></tr>
+              <tr><td><span class="d-app l">Launcher</span></td><td><code>streams/favorites.json</code>, <code>streams/history.json</code>, <code>config.json</code>, <code>platforms.json</code>, <code>launcher.log</code></td><td>Neben der <code>.exe</code>; sonst <span class="path">%APPDATA%\Streamlink Launcher</span> oder <span class="path">~/.config/streamlink-launcher</span> (beim AppImage und den <code>.deb</code>- und <code>.rpm</code>-Paketen immer)</td></tr>
+              <tr><td><span class="d-app c">Chat</span></td><td><code>chat.json</code> (geöffnete Chats, Einstellungen, Konten), <code>cache/emotes/</code>, <code>chat.log</code></td><td>Neben der <code>.exe</code>; sonst <span class="path">%APPDATA%\Streamlink Chat</span> oder <span class="path">~/.config/streamlink-chat</span> (beim AppImage und den <code>.deb</code>- und <code>.rpm</code>-Paketen immer)</td></tr>
             </tbody>
           </table></div>
           <p>Jede Datei hat eine <code>.bak</code>-Kopie ihrer vorherigen Version: Wird eine Datei beschädigt, stellt die App sie wieder her. Im <span class="d-app l">Launcher</span> öffnet <em>Einstellungen › Über › Datenordner öffnen</em> den richtigen Ordner.</p>
@@ -624,7 +627,7 @@ player-args=--force-window=immediate</div>
           <h3>Der Chat <span class="d-app c">Chat</span></h3>
           <p>Gleiches Prinzip unter <em>Einstellungen › Updates</em>: <em>Prüfen</em>, dann <em>Aktualisieren</em>. Der Chat startet mit deinen geöffneten Chats neu. Ein Punkt auf der Einstellungsschaltfläche weist auf eine neue Version hin, und <em>Automatische Updates</em> (standardmäßig aus) erledigt alles von selbst beim Start.</p>
         </div>
-        <p class="note"><b>AppImage oder Quellcode:</b> Das Update per Klick gilt nur für die Windows-<code>.exe</code> in einem beschreibbaren Ordner (nicht <span class="path">C:\Program Files</span>). Beim AppImage öffnet <em>Aktualisieren</em> die Versionsseite: Lade das neue AppImage herunter und ersetze das alte. Aus dem Quellcode führst du <code>git pull</code> aus.</p>
+        <p class="note"><b>AppImage oder Quellcode:</b> Das Update per Klick gilt nur für die Windows-<code>.exe</code> in einem beschreibbaren Ordner (nicht <span class="path">C:\Program Files</span>). Beim AppImage öffnet <em>Aktualisieren</em> die Versionsseite: Lade das neue AppImage herunter und ersetze das alte. Mit einem <code>.deb</code>- oder <code>.rpm</code>-Paket installierst du das neue Paket auf dieselbe Weise. Aus dem Quellcode führst du <code>git pull</code> aus.</p>
         <div class="blk">
           <h3>Streamlink selbst aktualisieren</h3>
           <p>Der Launcher vergleicht deine Streamlink-Version mit der neuesten veröffentlichten. Ist deine älter, bietet die Karte <em>Einstellungen › Streamlink</em> <em>Aktualisieren</em> an: Beim Windows-Installationsprogramm öffnet sie die Download-Seite, bei pip kopiert sie den Befehl <code>pip install -U streamlink</code>. Mit winget, Chocolatey, Scoop oder deiner Linux-Distribution nutzt du deren üblichen Update-Befehl (zum Beispiel <code>winget upgrade streamlink</code>).</p>
@@ -634,8 +637,8 @@ player-args=--force-window=immediate</div>
           <div class="d-tbl"><table>
             <thead><tr><th>App</th><th>Neueste Version</th><th>Kurz gesagt</th></tr></thead>
             <tbody>
-              <tr><td><span class="d-app l">Launcher</span></td><td>1.7.0 (11. November 2026)</td><td>Wiedergabestatistiken, die Chats aller Live-Favoriten auf einmal, schnellerer Kick-Status mit Titel und Zuschauern.</td></tr>
-              <tr><td><span class="d-app c">Chat</span></td><td>0.3.1 (16. November 2026)</td><td>Kick-Chats funktionieren wieder, nachdem Kick seine Verbindung geändert hat.</td></tr>
+              <tr><td><span class="d-app l">Launcher</span></td><td>1.7.1 (16. November 2026)</td><td>.deb- und .rpm-Pakete für Linux, zusätzlich zum AppImage.</td></tr>
+              <tr><td><span class="d-app c">Chat</span></td><td>0.3.2 (16. November 2026)</td><td>.deb- und .rpm-Pakete für Linux; Kick-Chats funktionieren seit 0.3.1 wieder.</td></tr>
             </tbody>
           </table></div>
           <p>Die Details jeder Version stehen im Änderungsprotokoll, auf Englisch und Französisch: <a href="https://github.com/Bulls64/Streamlink-Launcher/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Chat</a>. Die Downloads findest du auf den Versionsseiten: <a href="https://github.com/Bulls64/Streamlink-Launcher/releases" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/releases" target="_blank" rel="noopener">Chat</a>.</p>

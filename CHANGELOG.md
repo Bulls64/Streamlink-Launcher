@@ -11,6 +11,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+- **Website: Launcher 1.7.1 and Chat 0.3.2**: the download section also offers the `.deb` and `.rpm` packages of both apps; the documentation explains how to install and update them, and where they keep their data (five languages).
+
 ## [1.7.1] - 2026-11-16
 
 ### Added
@@ -293,6 +296,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## Français
 
 ## [Non publié]
+
+### Modifié
+- **Site : Launcher 1.7.1 et Chat 0.3.2** : la section Télécharger propose aussi les paquets `.deb` et `.rpm` des deux applis ; la documentation explique comment les installer, les mettre à jour, et où ils gardent leurs données (cinq langues).
 
 ## [1.7.1] - 2026-11-16
 
