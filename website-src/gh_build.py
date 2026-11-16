@@ -292,7 +292,7 @@ def home_script(cur, lang):
     s = re.sub(r"  for \(const l in T_TR\) \{.*?\}\n", lambda m: extra, s, count=1, flags=re.S)
     assert "T_TR" not in s and "HOME_TR" not in s
     sub('  let lang = "fr";', "  let lang = document.documentElement.lang;")
-    imgs = {l: {k: f"{up(cur)}assets/img/site/{l}/{k}.webp" for k in ("l_main", "l_mini", "l_set", "l_light", "c_tw", "c_kick", "c_light")} for l in ("fr", "en")}
+    imgs = {l: {k: f"{up(cur)}assets/img/site/{l}/{k}.webp" for k in ("l_main", "l_mini", "l_set", "l_stats", "l_light", "c_tw", "c_kick", "c_light")} for l in ("fr", "en")}
     imgs = {l: imgs[IMG_DIR[l]] for l in LANGS}
     return s.replace("{{IMG_JSON}}", json.dumps({lang: imgs[lang]})), imgs
 

@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 ### Changed
-- **Website home page** brought up to date (five languages): viewing statistics, opening the chats of all live favorites, Kick title and viewers, `.deb`/`.rpm` packages in the Linux install step, and in-app updates described per system (Windows: replaced in place; Linux: release page).
+- **Website home page** brought up to date (five languages): viewing statistics, opening the chats of all live favorites, Kick title and viewers, `.deb`/`.rpm` packages in the Linux install step, and in-app updates described per system (Windows: replaced in place; Linux: release page); a *Statistics* view in the launcher's screenshot gallery (fictitious data, French and English).
 
 ### Changed
 - **Code clean-up**: one `live.http_json` function for every JSON request (Twitch, Kick, PyPI, GitHub) instead of three near-identical ones, now with a size limit everywhere; `core.chat_command` removed (the launcher only uses `chat_command_many`). No change in behavior.
@@ -304,7 +304,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Non publié]
 
 ### Modifié
-- **Page d'accueil du site** remise à jour (cinq langues) : statistiques de visionnage, ouverture des chats de tous les favoris en direct, titre et spectateurs pour Kick, paquets `.deb`/`.rpm` dans l'étape d'installation sous Linux, et mise à jour intégrée décrite selon le système (Windows : remplacée sur place ; Linux : page de la release).
+- **Page d'accueil du site** remise à jour (cinq langues) : statistiques de visionnage, ouverture des chats de tous les favoris en direct, titre et spectateurs pour Kick, paquets `.deb`/`.rpm` dans l'étape d'installation sous Linux, et mise à jour intégrée décrite selon le système (Windows : remplacée sur place ; Linux : page de la release) ; une vue *Statistiques* dans la galerie de captures du lanceur (données fictives, en français et en anglais).
 
 ### Modifié
 - **Nettoyage du code** : une seule fonction `live.http_json` pour toutes les requêtes JSON (Twitch, Kick, PyPI, GitHub) au lieu de trois presque identiques, désormais avec une taille plafonnée partout ; `core.chat_command` supprimée (le lanceur n'utilise que `chat_command_many`). Aucun changement de comportement.
