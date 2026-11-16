@@ -11,6 +11,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+- **Website: Streamlink Chat 0.3.1** (download links, version shown, *What's new*: Kick chats work again). The size of the launcher's exe was shown as "12.8 MB" instead of "12,8 MB" in Spanish, German and Italian.
+
 ### Added
 - **Website: Streamlink Launcher 1.7.0** (download links, version shown, *What's new* table, statistics, the chats of live favorites and Kick status in the documentation, in the five languages).
 
@@ -285,6 +288,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## Français
 
 ## [Non publié]
+
+### Modifié
+- **Site : Streamlink Chat 0.3.1** (liens de téléchargement, version affichée, « Quoi de neuf » : les chats Kick refonctionnent). La taille de l'exe du lanceur s'affichait « 12.8 MB » au lieu de « 12,8 MB » en espagnol, allemand et italien.
 
 ### Ajouté
 - **Site : Streamlink Launcher 1.7.0** (liens de téléchargement, version affichée, tableau « Quoi de neuf », statistiques, chats des favoris en direct et statut Kick dans la documentation, dans les cinq langues).
