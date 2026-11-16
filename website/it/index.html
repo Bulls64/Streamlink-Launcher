@@ -132,13 +132,15 @@
 <button aria-pressed="true" data-i18n="v_main" data-shot="l_main" type="button">Schermata principale</button>
 <button aria-pressed="false" data-i18n="v_mini" data-shot="l_mini" type="button">Modalità mini</button>
 <button aria-pressed="false" data-i18n="v_set" data-shot="l_set" type="button">Impostazioni</button>
+<button aria-pressed="false" data-i18n="v_stats" data-shot="l_stats" type="button">Statistiche</button>
 <button aria-pressed="false" data-i18n="v_light" data-shot="l_light" type="button">Tema chiaro</button>
 </div>
 </div>
 <div>
 <dl class="feats">
 <div class="feat" data-i18n="lf1"><dt>Campo intelligente</dt><dd>Un nome di canale o qualsiasi link. I suggerimenti vengono dai tuoi preferiti e dalla cronologia.</dd></div>
-<div class="feat" data-i18n="lf2"><dt>Preferiti in diretta</dt><dd>Anteprima dello stream, titolo e spettatori. Una notifica di Windows quando un preferito va in diretta.</dd></div>
+<div class="feat" data-i18n="lf2"><dt>Preferiti in diretta</dt><dd>Titolo e spettatori (Twitch e Kick), anteprima dello stream (Twitch). Una notifica di Windows quando un preferito va in diretta.</dd></div>
+<div class="feat" data-i18n="lf7"><dt>Statistiche</dt><dd>Tempo per canale e ore di punta, negli ultimi 30 giorni o dall'inizio. Restano sul tuo computer.</dd></div>
 <div class="feat" data-i18n="lf3"><dt>Qualità ricordata</dt><dd>Per piattaforma: <code>best</code>, <code>1080p60</code>, <code>audio_only</code>, o un elenco di riserva come <code>720p60,720p,best</code>.</dd></div>
 <div class="feat" data-i18n="lf4"><dt>Appunti</dt><dd>Un link copiato ti viene proposto appena torni alla finestra. Puoi anche trascinare un link o un collegamento <code>.url</code>.</dd></div>
 <div class="feat" data-i18n="lf5"><dt>Area di notifica</dt><dd>Chiudendo la finestra, il launcher resta accanto all'orologio, con i tuoi stream e il controllo delle dirette.</dd></div>
@@ -212,9 +214,9 @@
 <h2 data-i18n="t_h2">Il lettore a sinistra, la chat a destra.</h2>
 </div>
 <div class="pair">
-<div data-i18n="t1"><h3>Un clic per guardare</h3><p>Nella chat, ▶ avvia lo stream con lo stesso Streamlink del launcher. Nel launcher, i tuoi preferiti ti dicono chi è in diretta.</p></div>
+<div data-i18n="t1"><h3>Un clic per guardare</h3><p>Nel launcher, i tuoi preferiti ti dicono chi è in diretta, e un clic apre le loro chat, una scheda ciascuna. Nella chat, ▶ avvia lo stream con lo stesso Streamlink.</p></div>
 <div data-i18n="t2"><h3>Un unico stile</h3><p>Gli stessi componenti disegnati, gli stessi colori delle piattaforme, tema chiaro, scuro o automatico che segue Windows.</p></div>
-<div data-i18n="t3"><h3>Si aggiornano da sole</h3><p>Ogni app cerca la nuova versione su GitHub, ne verifica dimensione e SHA-256, sostituisce l'eseguibile e si riavvia.</p></div>
+<div data-i18n="t3"><h3>Si aggiornano da sole</h3><p>Ogni app cerca la nuova versione su GitHub. Su Windows ne controlla dimensione e SHA-256, sostituisce l'eseguibile e si riavvia; su Linux ti apre la pagina della versione.</p></div>
 </div>
 </div>
 </section>
@@ -235,7 +237,7 @@
 <a class="file" href="https://github.com/Bulls64/Streamlink-Launcher/releases/download/v1.7.1/streamlink-launcher-1.7.1-1.x86_64.rpm" rel="noopener" target="_blank"><span class="os">.rpm</span><b>streamlink-launcher-1.7.1-1.x86_64.rpm</b><span data-i18n="size_l_rpm">19,7 MB</span></a>
 </div>
 <ol class="steps">
-<li><span><span data-i18n="step_chmod">Su Linux, rendi eseguibile l'AppImage, poi avviala:</span><span class="cmd"><code>chmod +x StreamlinkLauncher-1.7.1-x86_64.AppImage</code><button data-copy="chmod +x StreamlinkLauncher-1.7.1-x86_64.AppImage" type="button">Copier</button></span></span></li>
+<li><span><span data-i18n="step_chmod">Su Linux, installa il pacchetto <code>.deb</code> o <code>.rpm</code> con il tuo gestore di pacchetti, oppure rendi eseguibile l'AppImage, poi avviala:</span><span class="cmd"><code>chmod +x StreamlinkLauncher-1.7.1-x86_64.AppImage</code><button data-copy="chmod +x StreamlinkLauncher-1.7.1-x86_64.AppImage" type="button">Copier</button></span></span></li>
 <li><span data-i18n="step_l2">Al primo avvio, il launcher trova Streamlink da solo, o ti spiega come installarlo.</span></li>
 </ol>
 <div class="links"><a data-i18n="src" href="https://github.com/Bulls64/Streamlink-Launcher" rel="noopener" target="_blank">Codice sorgente</a><a data-i18n="notes" href="https://github.com/Bulls64/Streamlink-Launcher/releases/latest" rel="noopener" target="_blank">Note di rilascio</a></div>
@@ -249,7 +251,7 @@
 <a class="file" href="https://github.com/Bulls64/Streamlink-Chat/releases/download/v0.3.2/streamlink-chat-0.3.2-1.x86_64.rpm" rel="noopener" target="_blank"><span class="os">.rpm</span><b>streamlink-chat-0.3.2-1.x86_64.rpm</b><span data-i18n="size_c_rpm">19,7 MB</span></a>
 </div>
 <ol class="steps">
-<li><span><span data-i18n="step_chmod">Su Linux, rendi eseguibile l'AppImage, poi avviala:</span><span class="cmd"><code>chmod +x StreamlinkChat-0.3.2-x86_64.AppImage</code><button data-copy="chmod +x StreamlinkChat-0.3.2-x86_64.AppImage" type="button">Copier</button></span></span></li>
+<li><span><span data-i18n="step_chmod">Su Linux, installa il pacchetto <code>.deb</code> o <code>.rpm</code> con il tuo gestore di pacchetti, oppure rendi eseguibile l'AppImage, poi avviala:</span><span class="cmd"><code>chmod +x StreamlinkChat-0.3.2-x86_64.AppImage</code><button data-copy="chmod +x StreamlinkChat-0.3.2-x86_64.AppImage" type="button">Copier</button></span></span></li>
 <li><span data-i18n="step_c2">Scrivi il nome di un canale o incolla un link di Twitch, Kick o Steam TV. Per scrivere, collega il tuo account in <em>Impostazioni › Account</em>.</span></li>
 </ol>
 <div class="links"><a data-i18n="src" href="https://github.com/Bulls64/Streamlink-Chat" rel="noopener" target="_blank">Codice sorgente</a><a data-i18n="notes" href="https://github.com/Bulls64/Streamlink-Chat/releases/latest" rel="noopener" target="_blank">Note di rilascio</a></div>
@@ -266,6 +268,6 @@
 <span data-i18n="foot2">Progetti indipendenti, senza legami con Streamlink, Twitch, Kick, YouTube, Dailymotion o Valve.</span>
 </div>
 </footer>
-<script src="../assets/js/home.it.js?v=49a12eb0e3"></script>
+<script src="../assets/js/home.it.js?v=126235036b"></script>
 </body>
 </html>
