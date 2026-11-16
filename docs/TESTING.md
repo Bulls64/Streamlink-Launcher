@@ -54,6 +54,7 @@ Les tests automatiques imitent Windows (zone de notification, glisser-déposer, 
 - [ ] A Twitch stream starts in mpv or VLC; live status and Kick status work.
 - [ ] *Open the chat* with the Streamlink Chat AppImage in the same folder or in `~/Applications`.
 - [ ] Statistics and the update check (*Settings › About*) work.
+- [ ] The `.deb` (Ubuntu/Debian/Mint: `sudo apt install ./streamlink-launcher_x.y.z_amd64.deb`) or the `.rpm` (Fedora: `sudo dnf install ./streamlink-launcher-x.y.z-1.x86_64.rpm`) installs; *Streamlink Launcher* appears in the menu with its icon, starts, keeps its data in `~/.config/streamlink-launcher`, and uninstalls cleanly.
 
 ---
 
@@ -103,3 +104,4 @@ Les tests automatiques imitent Windows (zone de notification, glisser-déposer, 
 - [ ] Un stream Twitch démarre dans mpv ou VLC ; le statut en direct et celui de Kick marchent.
 - [ ] *Ouvrir le chat* avec l'AppImage de Streamlink Chat dans le même dossier ou dans `~/Applications`.
 - [ ] Les statistiques et la recherche de mise à jour (*Paramètres › À propos*) marchent.
+- [ ] Le `.deb` (Ubuntu/Debian/Mint : `sudo apt install ./streamlink-launcher_x.y.z_amd64.deb`) ou le `.rpm` (Fedora : `sudo dnf install ./streamlink-launcher-x.y.z-1.x86_64.rpm`) s'installe ; *Streamlink Launcher* apparaît dans le menu avec son icône, démarre, garde ses données dans `~/.config/streamlink-launcher`, et se désinstalle proprement.

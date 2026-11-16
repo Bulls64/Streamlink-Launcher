@@ -153,10 +153,90 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  linux-packages:
+    name: Build the .deb and .rpm packages
+    # Même contenu que l'AppImage, installé dans /opt ; testés en vrai sur Ubuntu 22.04 (.deb) et Fedora (.rpm)
+    # Same content as the AppImage, installed in /opt; really tested on Ubuntu 22.04 (.deb) and Fedora (.rpm)
+    if: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    needs: appimage
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - name: Version
+        run: echo "VERSION=$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' launcher/__init__.py)" >> "$GITHUB_ENV"
+      - name: Download the AppImage
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333  # v8
+        with:
+          name: StreamlinkLauncher-${{ env.VERSION }}-x86_64.AppImage
+          path: linux
+      - name: Install rpmbuild and Xvfb
+        run: bash packaging/ci_apt.sh rpm xvfb
+      - name: Build
+        run: |
+          chmod +x "linux/StreamlinkLauncher-$VERSION-x86_64.AppImage"
+          bash packaging/linux/build_packages.sh "linux/StreamlinkLauncher-$VERSION-x86_64.AppImage" dist
+          dpkg-deb -I "dist/streamlink-launcher_${VERSION}_amd64.deb"
+          rpm -qpi "dist/streamlink-launcher-$VERSION-1.x86_64.rpm"
+          rpm -qpR "dist/streamlink-launcher-$VERSION-1.x86_64.rpm"
+      - name: Install and start the .deb (Ubuntu 22.04)
+        run: |
+          sudo apt-get install -y -qq --no-install-recommends "./dist/streamlink-launcher_${VERSION}_amd64.deb"
+          export HOME="$RUNNER_TEMP/home" XDG_CONFIG_HOME="$RUNNER_TEMP/home/.config"
+          mkdir -p "$HOME"
+          touch "$RUNNER_TEMP/stamp"
+          set +e
+          xvfb-run -a timeout 8 streamlink-launcher > run.log 2>&1
+          code=$?
+          set -e
+          cat run.log
+          fail() { echo "::error::$1"; sed 's/^/::error::  /' run.log | head -40; exit 1; }
+          [ "$code" = "124" ] || fail "The .deb's launcher exited early (code $code)"
+          ! grep -q "Traceback" run.log || fail "Python traceback at start-up"
+          [ -f "$XDG_CONFIG_HOME/streamlink-launcher/platforms.json" ] || fail "No data written to ~/.config"
+          [ -z "$(find /opt/streamlink-launcher -newer "$RUNNER_TEMP/stamp")" ] || fail "Data written to /opt"
+          sudo apt-get remove -y -qq streamlink-launcher
+          [ ! -e /usr/bin/streamlink-launcher ] || fail "The .deb did not uninstall cleanly"
+      - name: Install and start the .rpm (Fedora 42)
+        run: |
+          docker run --rm -v "$PWD/dist:/dist:ro" fedora:42 bash -euc '
+            dnf install -y -q --setopt=install_weak_deps=False "/dist/streamlink-launcher-'"$VERSION"'-1.x86_64.rpm" \
+              xorg-x11-server-Xvfb >/dev/null
+            Xvfb :99 -screen 0 1000x760x24 >/dev/null 2>&1 &
+            sleep 2
+            export DISPLAY=:99 HOME=/tmp/h XDG_CONFIG_HOME=/tmp/h/.config
+            mkdir -p "$HOME"
+            set +e
+            timeout 8 streamlink-launcher > /tmp/run.log 2>&1
+            code=$?
+            set -e
+            cat /tmp/run.log
+            [ "$code" = 124 ] || { echo "::error::The .rpm launcher exited early (code $code)"; exit 1; }
+            ! grep -q Traceback /tmp/run.log || { echo "::error::Python traceback at start-up"; exit 1; }
+            [ -f /tmp/h/.config/streamlink-launcher/platforms.json ] || { echo "::error::No data in ~/.config"; exit 1; }
+            # Lancé ici par root, qui peut écrire dans /opt : les données doivent quand même aller dans ~/.config
+            # Started here by root, who can write to /opt: the data must still go to ~/.config
+            [ ! -e /opt/streamlink-launcher/app/config.json ] || { echo "::error::Data written to /opt"; exit 1; }
+            dnf remove -y -q streamlink-launcher >/dev/null
+            [ ! -e /usr/bin/streamlink-launcher ] || { echo "::error::The .rpm did not uninstall cleanly"; exit 1; }'
+      - name: Upload the .deb
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7
+        with:
+          path: dist/streamlink-launcher_${{ env.VERSION }}_amd64.deb
+          archive: false
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload the .rpm
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7
+        with:
+          path: dist/streamlink-launcher-${{ env.VERSION }}-1.x86_64.rpm
+          archive: false
+          if-no-files-found: error
+          retention-days: 7
+
   release:
     name: Sign and publish the release
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [build, appimage]
+    needs: [build, appimage, linux-packages]
     runs-on: windows-latest
     permissions:
       contents: write
@@ -165,6 +245,8 @@ jobs:
       VERSION: ${{ needs.build.outputs.version }}
       EXE: StreamlinkLauncher-${{ needs.build.outputs.version }}.exe
       APPIMAGE: StreamlinkLauncher-${{ needs.build.outputs.version }}-x86_64.AppImage
+      DEB: streamlink-launcher_${{ needs.build.outputs.version }}_amd64.deb
+      RPM: streamlink-launcher-${{ needs.build.outputs.version }}-1.x86_64.rpm
       # Signature activée dès que la variable SIGNPATH_ORGANIZATION_ID existe (Settings > Secrets and variables > Actions)
       SIGN: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
     steps:
@@ -181,6 +263,16 @@ jobs:
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333  # v8
         with:
           name: ${{ env.APPIMAGE }}
+          path: linux
+      - name: Download the .deb
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333  # v8
+        with:
+          name: ${{ env.DEB }}
+          path: linux
+      - name: Download the .rpm
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333  # v8
+        with:
+          name: ${{ env.RPM }}
           path: linux
       - name: Sign with SignPath (SignPath Foundation certificate)
         if: env.SIGN == 'true'
@@ -208,8 +300,8 @@ jobs:
         run: |
           mkdir -p dist
           if [ "$SIGN" = "true" ]; then cp "signed/$EXE" dist/; else cp "unsigned/$EXE" dist/; fi
-          cp "linux/$APPIMAGE" dist/
-          cd dist && sha256sum "$EXE" "$APPIMAGE" > SHA256SUMS.txt && cat SHA256SUMS.txt
+          cp "linux/$APPIMAGE" "linux/$DEB" "linux/$RPM" dist/
+          cd dist && sha256sum "$EXE" "$APPIMAGE" "$DEB" "$RPM" > SHA256SUMS.txt && cat SHA256SUMS.txt
       - name: Release notes from CHANGELOG.md
         shell: bash
         run: |
@@ -228,9 +320,15 @@ jobs:
             echo
             echo "**Linux:** \`$APPIMAGE\` — \`chmod +x\` then run it (glibc 2.35+, e.g. Ubuntu 22.04, Debian 12, Fedora 36 or newer; Streamlink must be installed). *Linux : rendre le fichier exécutable puis le lancer.*"
             echo
+            echo "**Packages:** \`$DEB\` (Debian, Ubuntu, Mint: \`sudo apt install ./$DEB\`) and \`$RPM\` (Fedora, openSUSE: \`sudo dnf install ./$RPM\`), same content as the AppImage, with a menu entry and the \`streamlink-launcher\` command. *Paquets : même contenu que l'AppImage, avec une entrée de menu et la commande streamlink-launcher.*"
+            echo
             echo "SHA-256 \`$EXE\` \`$HASH\`"
             echo
             echo "SHA-256 \`$APPIMAGE\` \`$HASH_LINUX\`"
+            echo
+            echo "SHA-256 \`$DEB\` \`$(sha256sum "dist/$DEB" | cut -d' ' -f1)\`"
+            echo
+            echo "SHA-256 \`$RPM\` \`$(sha256sum "dist/$RPM" | cut -d' ' -f1)\`"
           } >> release_notes.md
       - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65  # v2
         with:
@@ -239,4 +337,6 @@ jobs:
           files: |
             dist/${{ env.EXE }}
             dist/${{ env.APPIMAGE }}
+            dist/${{ env.DEB }}
+            dist/${{ env.RPM }}
             dist/SHA256SUMS.txt

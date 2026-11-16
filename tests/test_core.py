@@ -284,6 +284,44 @@ class TestLinks(unittest.TestCase):
         self.assertTrue(core.DEFAULT_CONFIG["clipboard_watch"])
 
 
+class TestSystemInstall(unittest.TestCase):
+    """Paquet .deb ou .rpm : le dossier de l'appli (/opt) porte .system-install ; les données vont dans ~/.config,
+    même si le dossier est modifiable (lancé par root).
+
+    .deb or .rpm package: the app folder (/opt) carries .system-install; the data goes to ~/.config,
+    even if the folder is writable (started by root)."""
+
+    def where(self, marker):
+        import shutil
+        import subprocess
+        root = Path(tempfile.mkdtemp())
+        app = root / "opt" / "app"
+        shutil.copytree(ROOT / "launcher", app / "launcher")
+        shutil.copy(ROOT / "platforms.json", app / "platforms.json")
+        if marker:
+            (app / ".system-install").write_text("streamlink-launcher 1.7.1", encoding="utf-8")
+        env = {k: v for k, v in os.environ.items() if k != "APPIMAGE"}
+        env["XDG_CONFIG_HOME"] = str(root / "config")
+        env["APPDATA"] = str(root / "config")
+        code = ("from launcher import core; print(core.SYSTEM_INSTALL, core.PORTABLE, core.DATA_ROOT, "
+                "core.PLATFORMS_FILE, sep='|')")
+        out = subprocess.run([sys.executable, "-c", code], cwd=app, env=env, capture_output=True, text=True,
+                             check=True).stdout.strip().split("|")
+        return out, app, root
+
+    def test_package_keeps_data_in_the_user_folder(self):
+        (system, portable, data, platforms), app, root = self.where(marker=True)
+        self.assertEqual((system, portable), ("True", "False"))
+        # resolve() : chemins courts de Windows (RUNNER~1) / Windows short paths (RUNNER~1)
+        self.assertTrue(Path(data).resolve().is_relative_to((root / "config").resolve()))
+        self.assertEqual(Path(platforms).resolve(), (Path(data) / "platforms.json").resolve())  # modifiable / editable
+
+    def test_folder_without_marker_stays_portable(self):
+        (system, portable, data, platforms), app, root = self.where(marker=False)
+        self.assertEqual((system, portable), ("False", "True"))
+        self.assertEqual(Path(data).resolve(), app.resolve())
+
+
 class TestChat(unittest.TestCase):
     """Streamlink Chat : où le trouver et comment lui demander d'ouvrir un chat.
 
@@ -294,7 +332,8 @@ class TestChat(unittest.TestCase):
         self.base = self.root / "Streamlink Launcher"
         self.base.mkdir()
         self.patches = [mock.patch.object(core, "BASE_DIR", self.base), mock.patch.object(core, "APPIMAGE", False),
-                        mock.patch.object(Path, "home", lambda: self.root / "home")]
+                        mock.patch.object(Path, "home", lambda: self.root / "home"),
+                        mock.patch.object(core.shutil, "which", return_value=None)]
         for p in self.patches:
             p.start()
 
@@ -326,6 +365,20 @@ class TestChat(unittest.TestCase):
         os.remove(old)
         os.remove(new)
         self.assertEqual(core.find_chat(), script)               # dépôt voisin / sibling repository
+
+    @unittest.skipIf(os.name == "nt", "paquets .deb et .rpm : Linux seulement")
+    def test_system_package(self):
+        """Sans AppImage ni sources, la commande streamlink-chat du paquet .deb ou .rpm.
+
+        Without an AppImage nor sources, the streamlink-chat command of the .deb or .rpm package."""
+        with mock.patch.object(core.shutil, "which", return_value="/usr/bin/streamlink-chat") as which:
+            self.assertEqual(core.find_chat(), "/usr/bin/streamlink-chat")
+        which.assert_called_with("streamlink-chat")
+        app = self.touch(self.base / "StreamlinkChat-0.3.1-x86_64.AppImage", 1)
+        with mock.patch.object(core.shutil, "which", return_value="/usr/bin/streamlink-chat"):
+            self.assertEqual(core.find_chat(), app)  # une AppImage voisine passe avant / a nearby AppImage comes first
+        self.assertEqual(core.chat_command("/usr/bin/streamlink-chat", "kick", "xqc"),
+                         ["/usr/bin/streamlink-chat", "--open", "kick:xqc"])
 
     def test_command(self):
         self.assertEqual(core.chat_command("C:/Chat/StreamlinkChat-0.2.3.exe", "kick", "xqc"),

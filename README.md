@@ -65,6 +65,15 @@ The executable is not code-signed (see [Code signing](#code-signing)), so Window
 
 It includes its own Python and Tcl/Tk, so nothing else is needed besides Streamlink and a player (`sudo apt install streamlink mpv`, `pipx install streamlink`…). It needs glibc 2.35 or newer (Ubuntu 22.04, Debian 12, Fedora 36, Linux Mint 21 or newer). If your system has no FUSE (`libfuse2`), run it with `--appimage-extract-and-run`. Settings and favorites are stored in `~/.config/streamlink-launcher`. To get a menu entry, use a tool such as [Gear Lever](https://flathub.org/apps/it.mijorus.gearlever) or AppImageLauncher. Updates: download the new AppImage from the releases page (the in-app update card opens it).
 
+**Or as a package**, with a menu entry and the `streamlink-launcher` command (same content as the AppImage, installed in `/opt/streamlink-launcher`; settings in `~/.config/streamlink-launcher` too). Download the `.deb` or `.rpm` file from the [latest release](https://github.com/Bulls64/Streamlink-Launcher/releases/latest), then:
+
+```bash
+sudo apt install ./streamlink-launcher_<version>_amd64.deb        # Debian, Ubuntu, Linux Mint
+sudo dnf install ./streamlink-launcher-<version>-1.x86_64.rpm      # Fedora (openSUSE: sudo zypper install ./…rpm)
+```
+
+To update, install the new package the same way; to remove it, `sudo apt remove streamlink-launcher` or `sudo dnf remove streamlink-launcher`. Streamlink itself is recommended by the `.deb` (installed along with it by default) and by the `.rpm`.
+
 #### Option 3: from source
 
 Requirements: Python 3.10 or newer, with Tcl/Tk (included by default in the python.org installer). Tested with Python 3.12.
@@ -145,6 +154,15 @@ bash packaging/appimage/build_appimage.sh        # -> dist/StreamlinkLauncher-<v
 
 The script downloads a standalone Python ([python-build-standalone](https://github.com/astral-sh/python-build-standalone)) and [appimagetool](https://github.com/AppImage/appimagetool), both pinned with their SHA-256, and recompiles Tcl/Tk with Xft (the bundled one only has the basic X11 fonts: no smoothing, no system fonts). The CI builds it on Ubuntu 22.04 for every pull request and attaches it to every release.
 
+### Building the .deb and .rpm packages (Linux)
+
+```sh
+sudo apt install rpm                             # rpmbuild (dpkg-deb is already there)
+bash packaging/linux/build_packages.sh dist/StreamlinkLauncher-<version>-x86_64.AppImage
+```
+
+The packages are made from the AppImage, so their content is the same. The CI installs and starts the `.deb` on Ubuntu 22.04 and the `.rpm` on Fedora, then attaches both to every release.
+
 ### Créer l'AppImage (Linux)
 
 ```sh
@@ -153,6 +171,15 @@ bash packaging/appimage/build_appimage.sh        # -> dist/StreamlinkLauncher-<v
 ```
 
 Le script télécharge un Python autonome ([python-build-standalone](https://github.com/astral-sh/python-build-standalone)) et [appimagetool](https://github.com/AppImage/appimagetool), tous deux figés avec leur SHA-256, et recompile Tcl/Tk avec Xft (celui fourni n'a que les polices X11 de base : texte non lissé, sans les polices du système). La CI la construit sous Ubuntu 22.04 à chaque pull request et la joint à chaque release.
+
+### Créer les paquets .deb et .rpm (Linux)
+
+```sh
+sudo apt install rpm                             # rpmbuild (dpkg-deb est déjà là)
+bash packaging/linux/build_packages.sh dist/StreamlinkLauncher-<version>-x86_64.AppImage
+```
+
+Les paquets sont faits à partir de l'AppImage : même contenu. La CI installe et lance le `.deb` sous Ubuntu 22.04 et le `.rpm` sous Fedora, puis les joint tous deux à chaque release.
 
 ### Tests
 
@@ -191,7 +218,7 @@ launcher/
   wintray.py           Tray icon, global shortcut, single instance, start with Windows (ctypes)
   winnotify.py         Windows notifications, taskbar flashing
 lang/                  Translations
-packaging/             Executable build script, version information, winget manifests, AppImage (appimage/)
+packaging/             Executable build script, version information, winget manifests, AppImage (appimage/), .deb and .rpm packages (linux/)
 .signpath/             Code-signing configuration (dormant, see Code signing)
 tests/                 Unit tests (standard library only) and GUI tests (imitations of the Windows calls)
 docs/TESTING.md        Manual checklist on a real Windows PC and Linux desktop before each release
@@ -310,6 +337,15 @@ L'exécutable n'est pas signé (voir [Signature du code](#signature-du-code)), d
 
 Elle embarque son propre Python et Tcl/Tk : il suffit d'avoir Streamlink et un lecteur (`sudo apt install streamlink mpv`, `pipx install streamlink`…). Il faut la glibc 2.35 ou plus récente (Ubuntu 22.04, Debian 12, Fedora 36, Linux Mint 21 ou plus récents). Si ton système n'a pas FUSE (`libfuse2`), lance-la avec `--appimage-extract-and-run`. Les réglages et favoris sont dans `~/.config/streamlink-launcher`. Pour une entrée dans le menu, utilise un outil comme [Gear Lever](https://flathub.org/apps/it.mijorus.gearlever) ou AppImageLauncher. Mises à jour : télécharge la nouvelle AppImage depuis la page des releases (la carte de mise à jour l'ouvre).
 
+**Ou en paquet**, avec une entrée dans le menu et la commande `streamlink-launcher` (même contenu que l'AppImage, installé dans `/opt/streamlink-launcher` ; réglages aussi dans `~/.config/streamlink-launcher`). Télécharge le fichier `.deb` ou `.rpm` depuis la [dernière release](https://github.com/Bulls64/Streamlink-Launcher/releases/latest), puis :
+
+```bash
+sudo apt install ./streamlink-launcher_<version>_amd64.deb        # Debian, Ubuntu, Linux Mint
+sudo dnf install ./streamlink-launcher-<version>-1.x86_64.rpm      # Fedora (openSUSE : sudo zypper install ./…rpm)
+```
+
+Pour mettre à jour, installe le nouveau paquet de la même façon ; pour le désinstaller, `sudo apt remove streamlink-launcher` ou `sudo dnf remove streamlink-launcher`. Streamlink est recommandé par le `.deb` (installé avec lui par défaut) et par le `.rpm`.
+
 #### Option 3 : depuis les sources
 
 Prérequis : Python 3.10 ou plus récent, avec Tcl/Tk (inclus par défaut dans l'installateur de python.org). Testé avec Python 3.12.
@@ -400,7 +436,7 @@ launcher/
   wintray.py           Icône de notification, raccourci global, instance unique, démarrage avec Windows (ctypes)
   winnotify.py         Notifications Windows, clignotement de la barre des tâches
 lang/                  Traductions
-packaging/             Script de création de l'exécutable, informations de version, manifestes winget, AppImage (appimage/)
+packaging/             Script de création de l'exécutable, informations de version, manifestes winget, AppImage (appimage/), paquets .deb et .rpm (linux/)
 .signpath/             Configuration de signature du code (en sommeil, voir Signature du code)
 tests/                 Tests unitaires (bibliothèque standard uniquement) et tests de l'interface (imitations des appels Windows)
 docs/TESTING.md        Liste de contrôle manuelle sur un vrai Windows et un vrai bureau Linux avant chaque release
