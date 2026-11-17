@@ -1,0 +1,3 @@
+# Conversion de l'icône PNG en .icns par PyInstaller (version figée)
+# PNG to .icns icon conversion by PyInstaller (pinned version)
+pillow==11.3.0

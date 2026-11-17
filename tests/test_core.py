@@ -322,6 +322,52 @@ class TestSystemInstall(unittest.TestCase):
         self.assertEqual(Path(data).resolve(), app.resolve())
 
 
+@unittest.skipIf(os.name == "nt", "simulation de macOS : pas sous Windows")
+class TestMacApp(unittest.TestCase):
+    """Application macOS (.app) simulée : données dans ~/Library/Application Support (jamais dans le bundle, même
+    modifiable), PATH complété pour Homebrew, Streamlink Chat.app trouvé à côté.
+
+    Simulated macOS application (.app): data in ~/Library/Application Support (never in the bundle, even writable),
+    PATH completed for Homebrew, Streamlink Chat.app found next to it."""
+
+    def test_bundle(self):
+        import subprocess
+        root = Path(tempfile.mkdtemp())
+        apps = root / "Applications"
+        exe = apps / "Streamlink Launcher.app" / "Contents" / "MacOS" / "Streamlink Launcher"
+        chat = apps / "Streamlink Chat.app" / "Contents" / "MacOS" / "Streamlink Chat"
+        for f in (exe, chat):
+            f.parent.mkdir(parents=True)
+            f.write_text("")
+        code = ("import os, sys; sys.platform = 'darwin'; sys.frozen = True; sys.executable = sys.argv[1]; "
+                "from launcher import core; "
+                "print(core.MAC_APP, core.PORTABLE, core.DATA_ROOT, '/opt/homebrew/bin' in os.environ['PATH'], "
+                "core.find_chat(), sep='|')")
+        env = {k: v for k, v in os.environ.items() if k not in ("APPIMAGE", "XDG_CONFIG_HOME")}
+        env["HOME"] = str(root / "home")
+        out = subprocess.run([sys.executable, "-c", code, str(exe)], cwd=ROOT, env=env, capture_output=True,
+                             text=True, check=True).stdout.strip().split("|")
+        self.assertEqual(out[:2], ["True", "False"])
+        self.assertEqual(Path(out[2]), root / "home" / "Library" / "Application Support" / "Streamlink Launcher")
+        self.assertEqual(out[3], "True")
+        self.assertEqual(Path(out[4]).resolve(), chat.resolve())
+
+    def test_language_and_theme(self):
+        from launcher import theme
+        reply = mock.Mock(stdout='(\n    "fr-FR",\n    "en-FR"\n)\n')
+        with mock.patch.object(core.subprocess, "run", return_value=reply):
+            self.assertEqual(core._macos_language(), "fr")
+        with mock.patch.object(core.subprocess, "run", side_effect=OSError("no defaults")):
+            self.assertEqual(core._macos_language(), "")
+        import subprocess
+        with mock.patch.object(theme.sys, "platform", "darwin"), \
+                mock.patch.object(subprocess, "run", return_value=mock.Mock(stdout="Dark\n")):
+            self.assertEqual(theme.system_theme(), "dark")
+        with mock.patch.object(theme.sys, "platform", "darwin"), \
+                mock.patch.object(subprocess, "run", return_value=mock.Mock(stdout="")):
+            self.assertEqual(theme.system_theme(), "light")  # clé absente : mode clair / no key: light mode
+
+
 class TestChat(unittest.TestCase):
     """Streamlink Chat : où le trouver et comment lui demander d'ouvrir un chat.
 

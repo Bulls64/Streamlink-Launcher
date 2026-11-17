@@ -233,10 +233,68 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  macos:
+    name: Build the macOS app (.dmg)
+    # Apple Silicon (arm64) ; l'app est démarrée pour de vrai et l'image disque montée pour vérification
+    # Apple Silicon (arm64); the app is really started and the disk image mounted to check it
+    if: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    needs: tests
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        with:
+          python-version: "3.12"
+      - name: Version
+        run: echo "VERSION=$(python3 -c 'import launcher; print(launcher.__version__)')" >> "$GITHUB_ENV"
+      - name: Build the .app and the .dmg
+        run: bash packaging/macos/build_dmg.sh
+      - name: Start the app
+        run: |
+          export HOME="$RUNNER_TEMP/home"
+          mkdir -p "$HOME"
+          APP="dist/Streamlink Launcher.app"
+          "$APP/Contents/MacOS/Streamlink Launcher" > run.log 2>&1 &
+          pid=$!
+          sleep 12
+          alive=0; kill -0 "$pid" 2>/dev/null && alive=1
+          screencapture -x shot.png 2>/dev/null || true
+          kill "$pid" 2>/dev/null || true
+          wait "$pid" 2>/dev/null || true
+          cat run.log
+          fail() { echo "::error::$1"; exit 1; }
+          [ "$alive" = 1 ] || fail "The app exited early"
+          ! grep -q "Traceback" run.log || fail "Python traceback at start-up"
+          [ -f "$HOME/Library/Application Support/Streamlink Launcher/platforms.json" ] || fail "No data in ~/Library/Application Support"
+          # Rien n'a été écrit dans le bundle : sa signature est intacte / Nothing written to the bundle: signature intact
+          codesign --verify --deep --strict "$APP" || fail "The app bundle was modified"
+      - name: Check the disk image
+        run: |
+          hdiutil attach -nobrowse -readonly -mountpoint "$RUNNER_TEMP/dmg" "dist/StreamlinkLauncher-$VERSION-macOS-arm64.dmg"
+          ls -la "$RUNNER_TEMP/dmg"
+          test -x "$RUNNER_TEMP/dmg/Streamlink Launcher.app/Contents/MacOS/Streamlink Launcher"
+          test -L "$RUNNER_TEMP/dmg/Applications"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$RUNNER_TEMP/dmg/Streamlink Launcher.app/Contents/Info.plist" | grep -qx "$VERSION"
+          hdiutil detach "$RUNNER_TEMP/dmg"
+      - name: Upload the screenshot
+        if: always() && hashFiles('shot.png') != ''
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7
+        with:
+          name: macos-screenshot
+          path: shot.png
+          retention-days: 7
+      - name: Upload the .dmg
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7
+        with:
+          path: dist/StreamlinkLauncher-${{ env.VERSION }}-macOS-arm64.dmg
+          archive: false
+          if-no-files-found: error
+          retention-days: 7
+
   release:
     name: Sign and publish the release
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [build, appimage, linux-packages]
+    needs: [build, appimage, linux-packages, macos]
     runs-on: windows-latest
     permissions:
       contents: write
@@ -247,6 +305,7 @@ jobs:
       APPIMAGE: StreamlinkLauncher-${{ needs.build.outputs.version }}-x86_64.AppImage
       DEB: streamlink-launcher_${{ needs.build.outputs.version }}_amd64.deb
       RPM: streamlink-launcher-${{ needs.build.outputs.version }}-1.x86_64.rpm
+      DMG: StreamlinkLauncher-${{ needs.build.outputs.version }}-macOS-arm64.dmg
       # Signature activée dès que la variable SIGNPATH_ORGANIZATION_ID existe (Settings > Secrets and variables > Actions)
       SIGN: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
     steps:
@@ -274,6 +333,11 @@ jobs:
         with:
           name: ${{ env.RPM }}
           path: linux
+      - name: Download the .dmg
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333  # v8
+        with:
+          name: ${{ env.DMG }}
+          path: macos
       - name: Sign with SignPath (SignPath Foundation certificate)
         if: env.SIGN == 'true'
         uses: signpath/github-action-submit-signing-request@f6d04783b4569d051e0c80105fe66e82819d0092  # v3
@@ -300,8 +364,8 @@ jobs:
         run: |
           mkdir -p dist
           if [ "$SIGN" = "true" ]; then cp "signed/$EXE" dist/; else cp "unsigned/$EXE" dist/; fi
-          cp "linux/$APPIMAGE" "linux/$DEB" "linux/$RPM" dist/
-          cd dist && sha256sum "$EXE" "$APPIMAGE" "$DEB" "$RPM" > SHA256SUMS.txt && cat SHA256SUMS.txt
+          cp "linux/$APPIMAGE" "linux/$DEB" "linux/$RPM" "macos/$DMG" dist/
+          cd dist && sha256sum "$EXE" "$APPIMAGE" "$DEB" "$RPM" "$DMG" > SHA256SUMS.txt && cat SHA256SUMS.txt
       - name: Release notes from CHANGELOG.md
         shell: bash
         run: |
@@ -322,6 +386,8 @@ jobs:
             echo
             echo "**Packages:** \`$DEB\` (Debian, Ubuntu, Mint: \`sudo apt install ./$DEB\`) and \`$RPM\` (Fedora, openSUSE: \`sudo dnf install ./$RPM\`), same content as the AppImage, with a menu entry and the \`streamlink-launcher\` command. *Paquets : même contenu que l'AppImage, avec une entrée de menu et la commande streamlink-launcher.*"
             echo
+            echo "**macOS (Apple Silicon):** \`$DMG\` — open it and drag *Streamlink Launcher* onto *Applications*. The app is not notarized by Apple: the first time, open it, then allow it in *System Settings › Privacy & Security › Open Anyway*. *macOS (puces Apple) : ouvrir l'image, glisser l'app sur Applications ; au premier lancement, l'autoriser dans Réglages Système › Confidentialité et sécurité › Ouvrir quand même.*"
+            echo
             echo "SHA-256 \`$EXE\` \`$HASH\`"
             echo
             echo "SHA-256 \`$APPIMAGE\` \`$HASH_LINUX\`"
@@ -329,6 +395,8 @@ jobs:
             echo "SHA-256 \`$DEB\` \`$(sha256sum "dist/$DEB" | cut -d' ' -f1)\`"
             echo
             echo "SHA-256 \`$RPM\` \`$(sha256sum "dist/$RPM" | cut -d' ' -f1)\`"
+            echo
+            echo "SHA-256 \`$DMG\` \`$(sha256sum "dist/$DMG" | cut -d' ' -f1)\`"
           } >> release_notes.md
       - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65  # v2
         with:
@@ -339,4 +407,5 @@ jobs:
             dist/${{ env.APPIMAGE }}
             dist/${{ env.DEB }}
             dist/${{ env.RPM }}
+            dist/${{ env.DMG }}
             dist/SHA256SUMS.txt

@@ -2,4 +2,4 @@
 
 Streamlink Launcher: a lightweight interface to start streams with Streamlink."""
 
-__version__ = "1.7.1"
+__version__ = "1.8.0"

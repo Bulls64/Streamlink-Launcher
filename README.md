@@ -14,7 +14,7 @@ A lightweight Windows and Linux launcher for [Streamlink](https://streamlink.git
 
 **Website and documentation:** [bulls64.github.io/Streamlink-Launcher/en](https://bulls64.github.io/Streamlink-Launcher/en) · [en français](https://bulls64.github.io/Streamlink-Launcher)
 
-> **New in 1.5.0: Linux AppImage.** One file, no installation, with its own Python: download `StreamlinkLauncher-<version>-x86_64.AppImage` from the [latest release](https://github.com/Bulls64/Streamlink-Launcher/releases/latest), `chmod +x` it and run it. See [Option 2](#option-2-linux-appimage).
+> **New in 1.8.0: macOS app** for Apple Silicon Macs (`.dmg`), besides Windows and Linux (AppImage, `.deb`, `.rpm`). See [Option 4](#option-4-macos-dmg).
 
 Pure Python + Tkinter, **no third-party dependency**. From source, it starts in about 0.25 s and uses around 30 MB of RAM (the single-file `.exe` takes a little longer to start, as it unpacks itself first).
 
@@ -40,7 +40,7 @@ Pure Python + Tkinter, **no third-party dependency**. From source, it starts in 
 
 ### Requirements
 
-- Windows 10 or 11, or Linux (AppImage, see below). On Linux, the tray icon, global shortcut, start-up option, drag and drop, go-live notifications, preview images and in-app updates are not available.
+- Windows 10 or 11, Linux (AppImage, `.deb` or `.rpm`), or macOS 11 or newer on an Apple Silicon Mac (`.dmg`); see below. On Linux and macOS, the tray icon, global shortcut, start-up option, drag and drop, go-live notifications, preview images and in-app updates are not available.
 - [Streamlink](https://streamlink.github.io/install.html) installed. The launcher finds it automatically, or you can set its path in the settings.
 - A video player supported by Streamlink (VLC by default).
 
@@ -85,6 +85,12 @@ pythonw slink_launcher.py
 ```
 
 Use `python` instead of `pythonw` if you want to see a console. The `--tray` argument starts the launcher minimized in the notification area.
+
+#### Option 4: macOS (.dmg)
+
+For Macs with an Apple chip (M1 or newer), macOS 11 or newer. Download `StreamlinkLauncher-<version>-macOS-arm64.dmg` from the [latest release](https://github.com/Bulls64/Streamlink-Launcher/releases/latest), open it and drag **Streamlink Launcher** onto **Applications**.
+
+The app is not notarized by Apple (that needs a paid developer account), so macOS blocks it the first time: open it once, then go to **System Settings › Privacy & Security** and click **Open Anyway** (on macOS 14 and older, right-click the app › **Open** also works). It includes its own Python and Tcl/Tk; install Streamlink and a player with [Homebrew](https://brew.sh): `brew install streamlink mpv` (or `brew install --cask vlc`). The launcher finds them in `/opt/homebrew/bin` even when opened from the Finder. Settings and favorites are stored in `~/Library/Application Support/Streamlink Launcher`. Updates: the in-app update card opens the release page; replace the app with the new one.
 
 ### Usage
 
@@ -131,7 +137,7 @@ Example `platforms.json` entry:
 }
 ```
 
-`input` accepts `channel`, `youtube`, `video`, `none` (nothing to type) or `url` (any link). `live_check` accepts `twitch`, `streamlink` or `none`.
+`input` accepts `channel`, `youtube`, `video`, `none` (nothing to type) or `url` (any link). `live_check` accepts `twitch`, `kick`, `streamlink` or `none`.
 
 ### Building the executable
 
@@ -154,6 +160,16 @@ bash packaging/appimage/build_appimage.sh        # -> dist/StreamlinkLauncher-<v
 
 The script downloads a standalone Python ([python-build-standalone](https://github.com/astral-sh/python-build-standalone)) and [appimagetool](https://github.com/AppImage/appimagetool), both pinned with their SHA-256, and recompiles Tcl/Tk with Xft (the bundled one only has the basic X11 fonts: no smoothing, no system fonts). The CI builds it on Ubuntu 22.04 for every pull request and attaches it to every release.
 
+### Building the macOS app (.dmg)
+
+On an Apple Silicon Mac, with a Python 3.12 that has Tcl/Tk (python.org installer):
+
+```sh
+bash packaging/macos/build_dmg.sh      # -> dist/StreamlinkLauncher-<version>-macOS-arm64.dmg
+```
+
+PyInstaller builds `Streamlink Launcher.app` (ad-hoc signed), then `hdiutil` puts it in a disk image with a shortcut to Applications. The CI builds it on macOS 15 for every pull request, starts the app, mounts the image to check it, then attaches it to every release.
+
 ### Building the .deb and .rpm packages (Linux)
 
 ```sh
@@ -162,24 +178,6 @@ bash packaging/linux/build_packages.sh dist/StreamlinkLauncher-<version>-x86_64.
 ```
 
 The packages are made from the AppImage, so their content is the same. The CI installs and starts the `.deb` on Ubuntu 22.04 and the `.rpm` on Fedora, then attaches both to every release.
-
-### Créer l'AppImage (Linux)
-
-```sh
-sudo apt install build-essential libx11-dev libxft-dev libxss-dev libfontconfig-dev patchelf
-bash packaging/appimage/build_appimage.sh        # -> dist/StreamlinkLauncher-<version>-x86_64.AppImage
-```
-
-Le script télécharge un Python autonome ([python-build-standalone](https://github.com/astral-sh/python-build-standalone)) et [appimagetool](https://github.com/AppImage/appimagetool), tous deux figés avec leur SHA-256, et recompile Tcl/Tk avec Xft (celui fourni n'a que les polices X11 de base : texte non lissé, sans les polices du système). La CI la construit sous Ubuntu 22.04 à chaque pull request et la joint à chaque release.
-
-### Créer les paquets .deb et .rpm (Linux)
-
-```sh
-sudo apt install rpm                             # rpmbuild (dpkg-deb est déjà là)
-bash packaging/linux/build_packages.sh dist/StreamlinkLauncher-<version>-x86_64.AppImage
-```
-
-Les paquets sont faits à partir de l'AppImage : même contenu. La CI installe et lance le `.deb` sous Ubuntu 22.04 et le `.rpm` sous Fedora, puis les joint tous deux à chaque release.
 
 ### Tests
 
@@ -218,7 +216,7 @@ launcher/
   wintray.py           Tray icon, global shortcut, single instance, start with Windows (ctypes)
   winnotify.py         Windows notifications, taskbar flashing
 lang/                  Translations
-packaging/             Executable build script, version information, winget manifests, AppImage (appimage/), .deb and .rpm packages (linux/)
+packaging/             Executable build script, version information, winget manifests, AppImage (appimage/), .deb and .rpm packages (linux/), macOS app (macos/)
 .signpath/             Code-signing configuration (dormant, see Code signing)
 tests/                 Unit tests (standard library only) and GUI tests (imitations of the Windows calls)
 docs/TESTING.md        Manual checklist on a real Windows PC and Linux desktop before each release
@@ -286,7 +284,7 @@ Un lanceur léger pour Windows et Linux pour [Streamlink](https://streamlink.git
 
 **Site et documentation :** [bulls64.github.io/Streamlink-Launcher](https://bulls64.github.io/Streamlink-Launcher) · [in English](https://bulls64.github.io/Streamlink-Launcher/en)
 
-> **Nouveau en 1.5.0 : AppImage pour Linux.** Un seul fichier, sans installation, avec son propre Python : télécharge `StreamlinkLauncher-<version>-x86_64.AppImage` depuis la [dernière release](https://github.com/Bulls64/Streamlink-Launcher/releases/latest), rends-la exécutable (`chmod +x`) et lance-la. Voir l'[option 2](#option-2--linux-appimage).
+> **Nouveau en 1.8.0 : application macOS** pour les Mac à puce Apple (`.dmg`), en plus de Windows et de Linux (AppImage, `.deb`, `.rpm`). Voir l'[option 4](#option-4--macos-dmg).
 
 Python et Tkinter uniquement, **sans aucune dépendance externe**. Depuis les sources : démarrage en environ 0,25 s, environ 30 Mo de mémoire (l'`.exe` en un seul fichier démarre un peu plus lentement, car il se décompresse d'abord).
 
@@ -312,7 +310,7 @@ Python et Tkinter uniquement, **sans aucune dépendance externe**. Depuis les so
 
 ### Prérequis
 
-- Windows 10 ou 11, ou Linux (AppImage, voir plus bas). Sous Linux, l'icône de notification, le raccourci global, le démarrage automatique, le glisser-déposer, les notifications de début de live, les images d'aperçu et la mise à jour intégrée ne sont pas disponibles.
+- Windows 10 ou 11, Linux (AppImage, `.deb` ou `.rpm`), ou macOS 11 ou plus récent sur un Mac à puce Apple (`.dmg`) ; voir plus bas. Sous Linux et macOS, l'icône de notification, le raccourci global, le démarrage automatique, le glisser-déposer, les notifications de début de live, les images d'aperçu et la mise à jour intégrée ne sont pas disponibles.
 - [Streamlink](https://streamlink.github.io/install.html) installé. Le lanceur le trouve tout seul, ou tu peux indiquer son chemin dans les Paramètres.
 - Un lecteur vidéo pris en charge par Streamlink (VLC par défaut).
 
@@ -358,6 +356,12 @@ pythonw slink_launcher.py
 
 Utilise `python` au lieu de `pythonw` si tu veux voir une console. L'argument `--tray` démarre le lanceur réduit dans la zone de notification.
 
+#### Option 4 : macOS (.dmg)
+
+Pour les Mac à puce Apple (M1 ou plus récent), macOS 11 ou plus récent. Télécharge `StreamlinkLauncher-<version>-macOS-arm64.dmg` depuis la [dernière release](https://github.com/Bulls64/Streamlink-Launcher/releases/latest), ouvre-le et glisse **Streamlink Launcher** sur **Applications**.
+
+L'app n'est pas notarisée par Apple (il faudrait un compte développeur payant) : macOS la bloque la première fois. Ouvre-la une fois, puis va dans **Réglages Système › Confidentialité et sécurité** et clique sur **Ouvrir quand même** (jusqu'à macOS 14, clic droit sur l'app › **Ouvrir** marche aussi). Elle embarque son propre Python et Tcl/Tk ; installe Streamlink et un lecteur avec [Homebrew](https://brew.sh) : `brew install streamlink mpv` (ou `brew install --cask vlc`). Le lanceur les trouve dans `/opt/homebrew/bin`, même ouvert depuis le Finder. Les réglages et favoris sont dans `~/Library/Application Support/Streamlink Launcher`. Mises à jour : la carte de mise à jour ouvre la page de la release ; remplace l'app par la nouvelle.
+
 ### Utilisation
 
 | Action | Comment |
@@ -385,7 +389,7 @@ Tous les fichiers sont rangés à côté de `slink_launcher.py` ou du `.exe`. Si
 | `launcher.log` | Journal des erreurs, utile pour signaler un problème |
 | `*.bak` | Version précédente de chaque fichier, utilisée pour récupérer un fichier endommagé |
 
-Les champs de `platforms.json` sont décrits dans la partie anglaise ci-dessus (exemple d'entrée Twitch). `input` accepte `channel`, `youtube`, `video`, `none` (rien à saisir) ou `url` (n'importe quel lien). `live_check` accepte `twitch`, `streamlink` ou `none`.
+Les champs de `platforms.json` sont décrits dans la partie anglaise ci-dessus (exemple d'entrée Twitch). `input` accepte `channel`, `youtube`, `video`, `none` (rien à saisir) ou `url` (n'importe quel lien). `live_check` accepte `twitch`, `kick`, `streamlink` ou `none`.
 
 ### Créer l'exécutable
 
@@ -398,6 +402,34 @@ packaging\build_exe.bat
 Le script installe [PyInstaller](https://pyinstaller.org/) (version figée dans `packaging/requirements-build.txt`) et produit `dist\Streamlink Launcher.exe` : un seul fichier, sans console, avec l'icône et les informations de version intégrées.
 
 Sur GitHub Actions, chaque pull request compile l'exécutable, et pousser un tag `v*` (par exemple `v1.4.2`) le compile et le publie (la signature est facultative, voir [Signature du code](#signature-du-code)) avec son `SHA256SUMS.txt`. La CI recompile le chargeur de PyInstaller depuis ses sources (`BUILD_BOOTLOADER=1`) : le chargeur précompilé est partagé par d'innombrables programmes, malveillants compris, et c'est la première cause de faux positifs antivirus.
+
+### Créer l'AppImage (Linux)
+
+```sh
+sudo apt install build-essential libx11-dev libxft-dev libxss-dev libfontconfig-dev patchelf
+bash packaging/appimage/build_appimage.sh        # -> dist/StreamlinkLauncher-<version>-x86_64.AppImage
+```
+
+Le script télécharge un Python autonome ([python-build-standalone](https://github.com/astral-sh/python-build-standalone)) et [appimagetool](https://github.com/AppImage/appimagetool), tous deux figés avec leur SHA-256, et recompile Tcl/Tk avec Xft (celui fourni n'a que les polices X11 de base : texte non lissé, sans les polices du système). La CI la construit sous Ubuntu 22.04 à chaque pull request et la joint à chaque release.
+
+### Créer l'application macOS (.dmg)
+
+Sur un Mac à puce Apple, avec un Python 3.12 qui a Tcl/Tk (installateur de python.org) :
+
+```sh
+bash packaging/macos/build_dmg.sh      # -> dist/StreamlinkLauncher-<version>-macOS-arm64.dmg
+```
+
+PyInstaller crée `Streamlink Launcher.app` (signée ad hoc), puis `hdiutil` la met dans une image disque avec un raccourci vers Applications. La CI la construit sous macOS 15 à chaque pull request, lance l'app, monte l'image pour la vérifier, puis la joint à chaque release.
+
+### Créer les paquets .deb et .rpm (Linux)
+
+```sh
+sudo apt install rpm                             # rpmbuild (dpkg-deb est déjà là)
+bash packaging/linux/build_packages.sh dist/StreamlinkLauncher-<version>-x86_64.AppImage
+```
+
+Les paquets sont faits à partir de l'AppImage : même contenu. La CI installe et lance le `.deb` sous Ubuntu 22.04 et le `.rpm` sous Fedora, puis les joint tous deux à chaque release.
 
 ### Tests
 
@@ -436,7 +468,7 @@ launcher/
   wintray.py           Icône de notification, raccourci global, instance unique, démarrage avec Windows (ctypes)
   winnotify.py         Notifications Windows, clignotement de la barre des tâches
 lang/                  Traductions
-packaging/             Script de création de l'exécutable, informations de version, manifestes winget, AppImage (appimage/), paquets .deb et .rpm (linux/)
+packaging/             Script de création de l'exécutable, informations de version, manifestes winget, AppImage (appimage/), paquets .deb et .rpm (linux/), application macOS (macos/)
 .signpath/             Configuration de signature du code (en sommeil, voir Signature du code)
 tests/                 Tests unitaires (bibliothèque standard uniquement) et tests de l'interface (imitations des appels Windows)
 docs/TESTING.md        Liste de contrôle manuelle sur un vrai Windows et un vrai bureau Linux avant chaque release
