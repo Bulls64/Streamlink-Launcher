@@ -24,6 +24,7 @@ from pathlib import Path
 # Version empaquetée (.exe) : les données restent à côté de l'exécutable, les ressources sont embarquées.
 # Packaged version (.exe): the data stays next to the executable, the resources are embedded.
 FROZEN = bool(getattr(sys, "frozen", False))
+MACOS = sys.platform == "darwin"
 BASE_DIR = Path(sys.executable).resolve().parent if FROZEN else Path(__file__).resolve().parent.parent
 RES_DIR = Path(getattr(sys, "_MEIPASS", BASE_DIR))
 
@@ -48,6 +49,8 @@ def _user_data_dir():
     if os.name == "nt":
         root = os.environ.get("APPDATA") or str(Path.home() / "AppData" / "Roaming")
         return Path(root) / "Streamlink Launcher"
+    if MACOS:
+        return Path.home() / "Library" / "Application Support" / "Streamlink Launcher"
     return Path(os.environ.get("XDG_CONFIG_HOME") or Path.home() / ".config") / "streamlink-launcher"
 
 
@@ -65,14 +68,19 @@ APPIMAGE = bool(os.environ.get("APPIMAGE")) and not FROZEN and os.name != "nt"
 # .deb or .rpm package: the launcher is in /opt (marked by .system-install); like the AppImage, data in
 # ~/.config, even when started by root, who could write to /opt.
 SYSTEM_INSTALL = (BASE_DIR / ".system-install").is_file() and not FROZEN
-PORTABLE = not (APPIMAGE or SYSTEM_INSTALL) and _is_writable(BASE_DIR)
+# Application macOS (.app) : ne jamais écrire dans le bundle (cela casserait sa signature) ; données dans
+# ~/Library/Application Support/Streamlink Launcher.
+# macOS application (.app): never write into the bundle (it would break its signature); data in
+# ~/Library/Application Support/Streamlink Launcher.
+MAC_APP = FROZEN and MACOS
+PORTABLE = not (APPIMAGE or SYSTEM_INSTALL or MAC_APP) and _is_writable(BASE_DIR)
 DATA_ROOT = BASE_DIR if PORTABLE else _user_data_dir()
 CONFIG_FILE = DATA_ROOT / "config.json"
 # platforms.json livré à côté du lanceur reste prioritaire, même en lecture seule (sauf dans l'AppImage,
 # où il doit rester modifiable : il est créé dans le dossier des données)
 # platforms.json shipped next to the launcher takes priority, even read-only (except in the AppImage,
 # where it must stay editable: it is created in the data folder)
-PLATFORMS_FILE = BASE_DIR / "platforms.json" if not (APPIMAGE or SYSTEM_INSTALL) and (
+PLATFORMS_FILE = BASE_DIR / "platforms.json" if not (APPIMAGE or SYSTEM_INSTALL or MAC_APP) and (
     PORTABLE or (BASE_DIR / "platforms.json").exists()) \
     else DATA_ROOT / "platforms.json"
 LOG_FILE = DATA_ROOT / "launcher.log"
@@ -179,8 +187,9 @@ DEFAULT_PLATFORMS = [
 PLAYERS = ["default", "mpv", "vlc", "potplayer", "custom"]
 PLAYER_NAMES = {"vlc": "VLC", "mpv": "mpv", "potplayer": "PotPlayer"}
 PLAYER_CANDIDATES = {
-    "vlc": ["vlc", r"C:\Program Files\VideoLAN\VLC\vlc.exe", r"C:\Program Files (x86)\VideoLAN\VLC\vlc.exe"],
-    "mpv": ["mpv", r"C:\Program Files\mpv\mpv.exe"],
+    "vlc": ["vlc", r"C:\Program Files\VideoLAN\VLC\vlc.exe", r"C:\Program Files (x86)\VideoLAN\VLC\vlc.exe",
+            "/Applications/VLC.app/Contents/MacOS/VLC"],
+    "mpv": ["mpv", r"C:\Program Files\mpv\mpv.exe", "/Applications/mpv.app/Contents/MacOS/mpv"],
     "potplayer": ["PotPlayerMini64", r"C:\Program Files\DAUM\PotPlayer\PotPlayerMini64.exe",
                   r"C:\Program Files (x86)\DAUM\PotPlayer\PotPlayerMini.exe"],
 }
@@ -189,7 +198,16 @@ STREAMLINK_CANDIDATES = [
     r"C:\Program Files\Streamlink\bin\streamlink.exe",
     r"C:\Program Files (x86)\Streamlink\bin\streamlink.exe",
     os.path.expandvars(r"%LOCALAPPDATA%\Programs\Streamlink\bin\streamlink.exe"),
+    os.path.expanduser("~/.local/bin/streamlink"),  # pipx
 ]
+# macOS : une appli ouverte depuis le Finder n'hérite pas du PATH du terminal ; on y ajoute les dossiers de
+# Homebrew et de pipx, pour Streamlink comme pour les lecteurs (mpv) qu'il lance.
+# macOS: an app opened from the Finder does not inherit the terminal's PATH; Homebrew's and pipx's folders are
+# added to it, for Streamlink as for the players (mpv) it starts.
+MAC_PATHS = ["/opt/homebrew/bin", "/usr/local/bin", os.path.expanduser("~/.local/bin")]
+if MACOS:
+    _path = os.environ.get("PATH", "").split(os.pathsep)
+    os.environ["PATH"] = os.pathsep.join(_path + [d for d in MAC_PATHS if d not in _path])
 
 
 # ---------------------
@@ -346,6 +364,19 @@ def save_config(cfg):
 # Langues
 # Languages
 # ---------------------
+def _macos_language():
+    """Première langue préférée de macOS (« fr-FR »…), ou "".
+
+    macOS's first preferred language ("fr-FR"…), or ""."""
+    try:
+        out = subprocess.run(["defaults", "read", "-g", "AppleLanguages"], capture_output=True, text=True,
+                             timeout=3).stdout
+        found = re.search(r'"?([A-Za-z]{2})[-_A-Za-z]*"?', out.replace("(", " "))
+        return found.group(1) if found else ""
+    except (OSError, subprocess.SubprocessError):
+        return ""
+
+
 def detect_system_language():
     try:
         name = locale.getlocale()[0] or ""
@@ -356,6 +387,9 @@ def detect_system_language():
         if os.name == "nt":
             import ctypes
             name = locale.windows_locale.get(ctypes.windll.kernel32.GetUserDefaultUILanguage(), name)
+        elif MACOS:  # langue choisie dans Réglages Système (une appli du Finder n'a pas LANG)
+                     # language chosen in System Settings (a Finder app has no LANG)
+            name = _macos_language() or name
         code = name.lower()[:2]
         return code if code in ("fr", "es", "de", "it") else "en"
     except Exception:
@@ -569,21 +603,26 @@ def _chat_dirs():
     Folders where Streamlink Chat is looked for: the launcher's (or its AppImage's), a sibling repository,
     ~/Applications."""
     base = Path(os.environ["APPIMAGE"]).resolve().parent if APPIMAGE else BASE_DIR
-    dirs = [base, base.parent / "Streamlink-Chat", base.parent / "streamlink-chat", Path.home() / "Applications"]
+    if MAC_APP:  # …/Streamlink Launcher.app/Contents/MacOS -> dossier qui contient l'app / folder holding the app
+        base = BASE_DIR.parents[2]
+    dirs = [base, base.parent / "Streamlink-Chat", base.parent / "streamlink-chat", Path.home() / "Applications",
+            Path("/Applications")]
     return [d for d in dirs if d.is_dir()]
 
 
 def find_chat(configured=""):
     """Chemin de Streamlink Chat, ou None. Sans réglage : le fichier le plus récent parmi les exe (Windows),
-    AppImage (Linux) et slink_chat.py trouvés dans les dossiers habituels ; sinon, sous Linux, la commande
+    AppImage (Linux), Streamlink Chat.app (macOS) et slink_chat.py trouvés dans les dossiers habituels ; sinon, sous Linux, la commande
     streamlink-chat du paquet .deb ou .rpm.
 
     Path of Streamlink Chat, or None. Without a setting: the most recent file among the exe (Windows),
-    AppImage (Linux) and slink_chat.py found in the usual folders; otherwise, on Linux, the streamlink-chat
+    AppImage (Linux), Streamlink Chat.app (macOS) and slink_chat.py found in the usual folders; otherwise, on Linux, the streamlink-chat
     command of the .deb or .rpm package."""
     if configured:
         return configured if os.path.isfile(configured) else None
-    patterns = ["Streamlink Chat.exe", "StreamlinkChat*.exe"] if os.name == "nt" else ["StreamlinkChat*.AppImage"]
+    patterns = (["Streamlink Chat.exe", "StreamlinkChat*.exe"] if os.name == "nt"
+                else ["Streamlink Chat.app/Contents/MacOS/Streamlink Chat"] if MACOS
+                else ["StreamlinkChat*.AppImage"])
     found = [f for d in _chat_dirs() for pat in [*patterns, "slink_chat.py"] for f in d.glob(pat) if f.is_file()]
     if not found:
         # Paquet .deb ou .rpm de Streamlink Chat / Streamlink Chat's .deb or .rpm package

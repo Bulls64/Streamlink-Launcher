@@ -11,13 +11,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-11-17
+
+### Added
+- **macOS app** for Apple Silicon Macs (macOS 11 or newer): `StreamlinkLauncher-<version>-macOS-arm64.dmg`, with `Streamlink Launcher.app` (embedded Python and Tcl/Tk, ad-hoc signed, not notarized: allow it once in *System Settings › Privacy & Security*). Built by `packaging/macos/build_dmg.sh`; the CI builds it on macOS 15, starts the app, mounts the image to check it, then attaches it to the release.
+- On macOS: data in `~/Library/Application Support/Streamlink Launcher` (never inside the app bundle), Homebrew's and pipx's folders added to the `PATH` (an app opened from the Finder does not have the terminal's), VLC and mpv found in `/Applications`, language and light/dark theme read from System Settings, Streamlink Chat found as `Streamlink Chat.app`. Like on Linux, the tray icon, global shortcut, drag and drop, notifications, previews and in-app updates are Windows only.
+
 ### Changed
 - **Website home page** brought up to date (five languages): viewing statistics, opening the chats of all live favorites, Kick title and viewers, `.deb`/`.rpm` packages in the Linux install step, and in-app updates described per system (Windows: replaced in place; Linux: release page); a *Statistics* view in the launcher's screenshot gallery (fictitious data, French and English).
-
-### Changed
+- README: the French build sections were in the English part; `live_check` also accepts `kick`.
 - **Code clean-up**: one `live.http_json` function for every JSON request (Twitch, Kick, PyPI, GitHub) instead of three near-identical ones, now with a size limit everywhere; `core.chat_command` removed (the launcher only uses `chat_command_many`). No change in behavior.
-
-### Changed
 - **Website: Launcher 1.7.1 and Chat 0.3.2**: the download section also offers the `.deb` and `.rpm` packages of both apps; the documentation explains how to install and update them, and where they keep their data (five languages).
 
 ## [1.7.1] - 2026-11-16
@@ -303,13 +306,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Non publié]
 
+## [1.8.0] - 2026-11-17
+
+### Ajouté
+- **Application macOS** pour les Mac à puce Apple (macOS 11 ou plus récent) : `StreamlinkLauncher-<version>-macOS-arm64.dmg`, avec `Streamlink Launcher.app` (Python et Tcl/Tk embarqués, signée ad hoc, non notarisée : à autoriser une fois dans *Réglages Système › Confidentialité et sécurité*). Construite par `packaging/macos/build_dmg.sh` ; la CI la construit sous macOS 15, lance l'app, monte l'image pour la vérifier, puis la joint à la release.
+- Sous macOS : données dans `~/Library/Application Support/Streamlink Launcher` (jamais dans le bundle de l'app), dossiers de Homebrew et de pipx ajoutés au `PATH` (une app ouverte depuis le Finder n'a pas celui du terminal), VLC et mpv trouvés dans `/Applications`, langue et thème clair/sombre lus dans Réglages Système, Streamlink Chat trouvé sous la forme `Streamlink Chat.app`. Comme sous Linux, l'icône de notification, le raccourci global, le glisser-déposer, les notifications, les aperçus et la mise à jour intégrée restent propres à Windows.
+
 ### Modifié
 - **Page d'accueil du site** remise à jour (cinq langues) : statistiques de visionnage, ouverture des chats de tous les favoris en direct, titre et spectateurs pour Kick, paquets `.deb`/`.rpm` dans l'étape d'installation sous Linux, et mise à jour intégrée décrite selon le système (Windows : remplacée sur place ; Linux : page de la release) ; une vue *Statistiques* dans la galerie de captures du lanceur (données fictives, en français et en anglais).
-
-### Modifié
+- README : les sections de construction en français étaient dans la partie anglaise ; `live_check` accepte aussi `kick`.
 - **Nettoyage du code** : une seule fonction `live.http_json` pour toutes les requêtes JSON (Twitch, Kick, PyPI, GitHub) au lieu de trois presque identiques, désormais avec une taille plafonnée partout ; `core.chat_command` supprimée (le lanceur n'utilise que `chat_command_many`). Aucun changement de comportement.
-
-### Modifié
 - **Site : Launcher 1.7.1 et Chat 0.3.2** : la section Télécharger propose aussi les paquets `.deb` et `.rpm` des deux applis ; la documentation explique comment les installer, les mettre à jour, et où ils gardent leurs données (cinq langues).
 
 ## [1.7.1] - 2026-11-16
