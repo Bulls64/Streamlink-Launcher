@@ -35,26 +35,26 @@ def absu(kind, lang): return BASE + PATHS[(kind, lang)]
 # Google Search Console, propriété « Préfixe de l'URL » (validation par balise HTML)
 GOOGLE_SITE_VERIFICATION = "CNNycSFV-w4cvtyv4_P8k8AITTl89dwfBTBh9jasFlM"
 
-LAUNCHER, CHAT = "1.7.1", "0.3.2"
+LAUNCHER, CHAT = "1.8.0", "0.4.0"
 META = {
     ("home", "fr"): ("Streamlink Launcher & Chat : Twitch et Kick dans VLC ou mpv",
-                     "Applis libres pour Windows et Linux : regarde Twitch, Kick, YouTube et Steam TV dans VLC, mpv ou PotPlayer, avec les chats dans une fenêtre à part."),
+                     "Applis libres pour Windows, macOS et Linux : regarde Twitch, Kick, YouTube et Steam TV dans VLC, mpv ou PotPlayer, avec les chats dans une fenêtre à part."),
     ("home", "en"): ("Streamlink Launcher & Chat: Twitch and Kick in VLC or mpv",
-                     "Free apps for Windows and Linux: watch Twitch, Kick, YouTube and Steam TV in VLC, mpv or PotPlayer, with the chats in a separate window."),
+                     "Free apps for Windows, macOS and Linux: watch Twitch, Kick, YouTube and Steam TV in VLC, mpv or PotPlayer, with the chats in a separate window."),
     ("docs", "fr"): ("Documentation · Streamlink Launcher & Chat",
                      "Installer Streamlink, lancer un premier stream, écrire dans le chat Twitch ou Kick, raccourcis, réglages et dépannage : le guide complet des deux applis."),
     ("docs", "en"): ("Documentation · Streamlink Launcher & Chat",
                      "Install Streamlink, open your first stream, write in Twitch or Kick chat, shortcuts, settings and troubleshooting: the complete guide to both apps."),
     ("home", "es"): ("Streamlink Launcher y Chat: Twitch y Kick en VLC o mpv",
-                     "Aplicaciones libres para Windows y Linux: mira Twitch, Kick, YouTube y Steam TV en VLC, mpv o PotPlayer, con los chats en una ventana aparte."),
+                     "Aplicaciones libres para Windows, macOS y Linux: mira Twitch, Kick, YouTube y Steam TV en VLC, mpv o PotPlayer, con los chats en una ventana aparte."),
     ("docs", "es"): ("Documentación · Streamlink Launcher y Chat",
                      "Instalar Streamlink, abrir tu primer stream, escribir en el chat de Twitch o Kick, atajos, ajustes y solución de problemas: la guía completa de las dos aplicaciones."),
     ("home", "de"): ("Streamlink Launcher & Chat: Twitch und Kick in VLC oder mpv",
-                     "Freie Apps für Windows und Linux: Twitch, Kick, YouTube und Steam TV in VLC, mpv oder PotPlayer ansehen, mit den Chats in einem eigenen Fenster."),
+                     "Freie Apps für Windows, macOS und Linux: Twitch, Kick, YouTube und Steam TV in VLC, mpv oder PotPlayer ansehen, mit den Chats in einem eigenen Fenster."),
     ("docs", "de"): ("Dokumentation · Streamlink Launcher & Chat",
                      "Streamlink installieren, den ersten Stream öffnen, im Twitch- oder Kick-Chat schreiben, Tastenkürzel, Einstellungen und Fehlerbehebung: das vollständige Handbuch der beiden Apps."),
     ("home", "it"): ("Streamlink Launcher e Chat: Twitch e Kick in VLC o mpv",
-                     "App libere per Windows e Linux: guarda Twitch, Kick, YouTube e Steam TV in VLC, mpv o PotPlayer, con le chat in una finestra a parte."),
+                     "App libere per Windows, macOS e Linux: guarda Twitch, Kick, YouTube e Steam TV in VLC, mpv o PotPlayer, con le chat in una finestra a parte."),
     ("docs", "it"): ("Documentazione · Streamlink Launcher e Chat",
                      "Installare Streamlink, aprire il primo stream, scrivere nella chat di Twitch o Kick, scorciatoie, impostazioni e risoluzione dei problemi: la guida completa delle due app."),
 }
@@ -149,7 +149,7 @@ APP_DESC = {
 def apps(lang):
     def app(name, ver, repo, desc, shot):
         return {"@type": "SoftwareApplication", "name": name, "softwareVersion": ver,
-                "applicationCategory": "MultimediaApplication", "operatingSystem": "Windows 10, Windows 11, Linux",
+                "applicationCategory": "MultimediaApplication", "operatingSystem": "Windows 10, Windows 11, macOS 11, Linux",
                 "description": desc, "url": absu("home", lang) + ("#launcher" if "Launcher" in name else "#chat"),
                 "downloadUrl": f"https://github.com/Bulls64/{repo}/releases/latest",
                 "screenshot": BASE + f"assets/img/site/{IMG_DIR[lang]}/{shot}.webp",

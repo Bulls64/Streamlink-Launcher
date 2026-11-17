@@ -11,6 +11,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+- **Website: Launcher 1.8.0 and Chat 0.4.0 for macOS** (five languages): `.dmg` download links and a Mac install step on the home page; in the documentation, macOS requirements, installing Streamlink with Homebrew, first launch of a non-notarized app, data folders in `~/Library/Application Support`, updating and uninstalling on a Mac, and a troubleshooting entry for *“unidentified developer”*.
+
 ## [1.8.0] - 2026-11-17
 
 ### Added
@@ -305,6 +308,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## Français
 
 ## [Non publié]
+
+### Modifié
+- **Site : Launcher 1.8.0 et Chat 0.4.0 pour macOS** (cinq langues) : liens de téléchargement `.dmg` et étape d'installation sur Mac en page d'accueil ; dans la documentation, configuration requise sous macOS, installation de Streamlink avec Homebrew, premier lancement d'une app non notarisée, dossiers de données dans `~/Library/Application Support`, mise à jour et désinstallation sur Mac, et une entrée de dépannage pour *« développeur non identifié »*.
 
 ## [1.8.0] - 2026-11-17
 

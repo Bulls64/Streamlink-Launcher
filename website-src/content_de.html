@@ -1,6 +1,6 @@
 <div class="wrap">
   <div class="intro">
-    <div class="tag"><span class="num">DOCS</span><span>Launcher v1.7.1 · Chat v0.3.2</span></div>
+    <div class="tag"><span class="num">DOCS</span><span>Launcher v1.8.0 · Chat v0.4.0</span></div>
     <h1>Dokumentation</h1>
     <p>Alles, was du brauchst, um Streamlink zu installieren, beide Apps zu nutzen und häufige Probleme zu lösen. Die Kennzeichnungen <span class="app l">Launcher</span> und <span class="app c">Chat</span> zeigen, für welche App ein Abschnitt gilt.</p>
     <label class="search" for="q">
@@ -71,10 +71,11 @@
           <ul>
             <li><b>Windows 10 oder 11</b>: eine einzelne <code>.exe</code>-Datei, ohne Installation.</li>
             <li><b>Linux x86_64</b>: ein AppImage mit eigenem Python. Es braucht glibc 2.35 oder neuer (Ubuntu 22.04, Debian 12, Fedora 36, Linux Mint 21 oder neuer). Oder ein <code>.deb</code>- (Debian, Ubuntu, Mint) bzw. <code>.rpm</code>-Paket (Fedora, openSUSE) mit gleichem Inhalt und Menüeintrag.</li>
+            <li><b>macOS 11 oder neuer, Mac mit Apple-Chip</b>: ein <code>.dmg</code>-Image; zieh die App in <em>Programme</em>. Sie ist nicht von Apple notarisiert: Erlaube sie beim ersten Start unter <em>Systemeinstellungen › Datenschutz &amp; Sicherheit</em>.</li>
             <li><b>Aus dem Quellcode</b>: Python 3.10 oder neuer mit Tcl/Tk, keine weitere Abhängigkeit.</li>
             <li>Zum Ansehen: <a href="#installation">Streamlink</a> und ein Videoplayer, standardmäßig VLC.</li>
           </ul>
-          <p class="note"><b>Unter Linux</b> hat der Launcher kein Symbol im Infobereich, keine globale Tastenkombination, keinen Autostart, kein Drag-and-drop, keine Live-Benachrichtigungen, keine Stream-Vorschau und kein integriertes Update.</p>
+          <p class="note"><b>Unter Linux und macOS</b> hat der Launcher kein Symbol im Infobereich, keine globale Tastenkombination, keinen Autostart, kein Drag-and-drop, keine Live-Benachrichtigungen, keine Stream-Vorschau und kein integriertes Update.</p>
         </div>
         <div class="blk">
           <h3>Sprachen</h3>
@@ -152,6 +153,7 @@
           <div class="tabs" role="tablist" aria-label="System" data-group="os">
             <button type="button" role="tab" aria-selected="true" data-tab="win">Windows</button>
             <button type="button" role="tab" aria-selected="false" data-tab="linux">Linux</button>
+            <button type="button" role="tab" aria-selected="false" data-tab="mac">macOS</button>
             <button type="button" role="tab" aria-selected="false" data-tab="pip">Python (pip)</button>
           </div>
         </div>
@@ -181,6 +183,14 @@
 <span class="pr">$ </span>sudo apt update &amp;&amp; sudo apt install streamlink</div>
           <p class="note"><b>Ubuntu und Ableger:</b> Die Streamlink-Website rät vom Ubuntu-Paket ab, da es nicht gepflegt wird. Nutze die Installation mit Python (nächster Tab) oder das Streamlink-AppImage, das auf derselben Seite angeboten wird.</p>
           <p>Du brauchst außerdem einen Player, zum Beispiel <code>sudo apt install mpv</code> oder <code>sudo dnf install vlc</code>.</p>
+        </div>
+        <div class="pane blk" data-group="os" data-pane="mac">
+          <h3>macOS: mit Homebrew</h3>
+          <p>Installiere zuerst <a href="https://brew.sh" target="_blank" rel="noopener">Homebrew</a>, dann Streamlink und einen Player:</p>
+          <div class="term"><span class="pr">$ </span>brew install streamlink mpv
+<span class="cm"># oder VLC</span>
+<span class="pr">$ </span>brew install --cask vlc</div>
+          <p>Die Apps finden Streamlink und mpv in <span class="path">/opt/homebrew/bin</span>, auch wenn sie im Finder geöffnet werden, und VLC in <span class="path">/Applications</span>.</p>
         </div>
         <div class="pane blk" data-group="os" data-pane="pip">
           <h3>Mit Python (jedes System)</h3>
@@ -212,6 +222,7 @@
           <p>Oder installiere das <code>.deb</code>- oder <code>.rpm</code>-Paket der Version: Menüeintrag und Befehl <code>streamlink-launcher</code> (<code>streamlink-chat</code> für den Chat). Zum Aktualisieren installierst du das neue Paket auf dieselbe Weise.</p>
           <div class="term"><span class="pr">$ </span>sudo apt install ./streamlink-launcher_*_amd64.deb     <span class="cm"># Debian, Ubuntu, Mint</span>
 <span class="pr">$ </span>sudo dnf install ./streamlink-launcher-*.x86_64.rpm   <span class="cm"># Fedora</span></div>
+          <p>Auf einem Mac öffnest du das <code>.dmg</code>-Image und ziehst die App in <em>Programme</em>. Sie ist nicht von Apple notarisiert: Öffne sie beim ersten Mal und klicke dann unter <em>Systemeinstellungen › Datenschutz &amp; Sicherheit</em> auf <em>Dennoch öffnen</em>. Zum Aktualisieren ersetzt du die App durch die neue.</p>
         </div>
         <div class="blk">
           <h3>Dein erster Stream <span class="app l">Launcher</span></h3>
@@ -351,8 +362,8 @@
           <div class="tbl"><table>
             <thead><tr><th>App</th><th>Dateien</th><th>Ordner</th></tr></thead>
             <tbody>
-              <tr><td><span class="app l">Launcher</span></td><td><code>streams/favorites.json</code>, <code>streams/history.json</code>, <code>config.json</code>, <code>platforms.json</code>, <code>launcher.log</code></td><td>Neben der <code>.exe</code>; sonst <span class="path">%APPDATA%\Streamlink Launcher</span> oder <span class="path">~/.config/streamlink-launcher</span> (beim AppImage und den <code>.deb</code>- und <code>.rpm</code>-Paketen immer)</td></tr>
-              <tr><td><span class="app c">Chat</span></td><td><code>chat.json</code> (geöffnete Chats, Einstellungen, Konten), <code>cache/emotes/</code>, <code>chat.log</code></td><td>Neben der <code>.exe</code>; sonst <span class="path">%APPDATA%\Streamlink Chat</span> oder <span class="path">~/.config/streamlink-chat</span> (beim AppImage und den <code>.deb</code>- und <code>.rpm</code>-Paketen immer)</td></tr>
+              <tr><td><span class="app l">Launcher</span></td><td><code>streams/favorites.json</code>, <code>streams/history.json</code>, <code>config.json</code>, <code>platforms.json</code>, <code>launcher.log</code></td><td>Neben der <code>.exe</code>; sonst <span class="path">%APPDATA%\Streamlink Launcher</span> oder <span class="path">~/.config/streamlink-launcher</span> (beim AppImage und den <code>.deb</code>- und <code>.rpm</code>-Paketen immer); macOS: <span class="path">~/Library/Application Support/Streamlink Launcher</span></td></tr>
+              <tr><td><span class="app c">Chat</span></td><td><code>chat.json</code> (geöffnete Chats, Einstellungen, Konten), <code>cache/emotes/</code>, <code>chat.log</code></td><td>Neben der <code>.exe</code>; sonst <span class="path">%APPDATA%\Streamlink Chat</span> oder <span class="path">~/.config/streamlink-chat</span> (beim AppImage und den <code>.deb</code>- und <code>.rpm</code>-Paketen immer); macOS: <span class="path">~/Library/Application Support/Streamlink Chat</span></td></tr>
             </tbody>
           </table></div>
           <p>Jede Datei hat eine <code>.bak</code>-Kopie ihrer vorherigen Version: Wird eine Datei beschädigt, stellt die App sie wieder her. Im <span class="app l">Launcher</span> öffnet <em>Einstellungen › Über › Datenordner öffnen</em> den richtigen Ordner.</p>
@@ -397,7 +408,7 @@
           <h3>Wo werden die Tokens gespeichert? <span class="app c">Chat</span></h3>
           <ul>
             <li>In <code>chat.json</code>. Unter Windows sind sie mit DPAPI verschlüsselt: Nur dein Windows-Konto auf diesem PC kann sie wieder lesen.</li>
-            <li>Unter Linux liegen sie unverschlüsselt in deinem Home-Ordner. Gib diese Datei nicht weiter.</li>
+            <li>Unter Linux und macOS liegen sie unverschlüsselt in deinem Home-Ordner. Gib diese Datei nicht weiter.</li>
             <li>Wenn du <code>chat.json</code> auf einen anderen PC kopierst, können die Tokens dort nicht gelesen werden: Melde dich erneut an.</li>
           </ul>
         </div>
@@ -471,6 +482,7 @@ player-args=--force-window=immediate</div>
             <tbody>
               <tr><td>Windows</td><td><span class="path">%APPDATA%\streamlink\config</span></td></tr>
               <tr><td>Linux</td><td><span class="path">~/.config/streamlink/config</span></td></tr>
+              <tr><td>macOS</td><td><span class="path">~/Library/Application Support/streamlink/config</span></td></tr>
             </tbody>
           </table></div>
           <p>Ist mpv nicht im <code>PATH</code>, gib nach <code>player=</code> den vollständigen Pfad an. Der <span class="app l">Launcher</span> nutzt diese Datei ebenfalls, wenn <em>Einstellungen › Videoplayer</em> auf <em>Standard (Streamlink-Einstellung)</em> steht.</p>
@@ -542,7 +554,7 @@ player-args=--force-window=immediate</div>
           <h3>Der Chat <span class="app c">Chat</span></h3>
           <p>Gleiches Prinzip unter <em>Einstellungen › Updates</em>: <em>Prüfen</em>, dann <em>Aktualisieren</em>. Der Chat startet mit deinen geöffneten Chats neu. Ein Punkt auf der Einstellungsschaltfläche weist auf eine neue Version hin, und <em>Automatische Updates</em> (standardmäßig aus) erledigt alles von selbst beim Start.</p>
         </div>
-        <p class="note"><b>AppImage oder Quellcode:</b> Das Update per Klick gilt nur für die Windows-<code>.exe</code> in einem beschreibbaren Ordner (nicht <span class="path">C:\Program Files</span>). Beim AppImage öffnet <em>Aktualisieren</em> die Versionsseite: Lade das neue AppImage herunter und ersetze das alte. Mit einem <code>.deb</code>- oder <code>.rpm</code>-Paket installierst du das neue Paket auf dieselbe Weise. Aus dem Quellcode führst du <code>git pull</code> aus.</p>
+        <p class="note"><b>AppImage, macOS oder Quellcode:</b> Das Update per Klick gilt nur für die Windows-<code>.exe</code> in einem beschreibbaren Ordner (nicht <span class="path">C:\Program Files</span>). Beim AppImage öffnet <em>Aktualisieren</em> die Versionsseite: Lade das neue AppImage herunter und ersetze das alte. Mit einem <code>.deb</code>- oder <code>.rpm</code>-Paket installierst du das neue Paket auf dieselbe Weise. Auf einem Mac ziehst du die neue App in <em>Programme</em> und ersetzt die alte. Aus dem Quellcode führst du <code>git pull</code> aus.</p>
         <div class="blk">
           <h3>Streamlink selbst aktualisieren</h3>
           <p>Der Launcher vergleicht deine Streamlink-Version mit der neuesten veröffentlichten. Ist deine älter, bietet die Karte <em>Einstellungen › Streamlink</em> <em>Aktualisieren</em> an: Beim Windows-Installationsprogramm öffnet sie die Download-Seite, bei pip kopiert sie den Befehl <code>pip install -U streamlink</code>. Mit winget, Chocolatey, Scoop oder deiner Linux-Distribution nutzt du deren üblichen Update-Befehl (zum Beispiel <code>winget upgrade streamlink</code>).</p>
@@ -552,8 +564,8 @@ player-args=--force-window=immediate</div>
           <div class="tbl"><table>
             <thead><tr><th>App</th><th>Neueste Version</th><th>Kurz gesagt</th></tr></thead>
             <tbody>
-              <tr><td><span class="app l">Launcher</span></td><td>1.7.1 (16. November 2026)</td><td>.deb- und .rpm-Pakete für Linux, zusätzlich zum AppImage.</td></tr>
-              <tr><td><span class="app c">Chat</span></td><td>0.3.2 (16. November 2026)</td><td>.deb- und .rpm-Pakete für Linux; Kick-Chats funktionieren seit 0.3.1 wieder.</td></tr>
+              <tr><td><span class="app l">Launcher</span></td><td>1.8.0 (17. November 2026)</td><td>macOS-App (<code>.dmg</code>) für Macs mit Apple-Chip.</td></tr>
+              <tr><td><span class="app c">Chat</span></td><td>0.4.0 (17. November 2026)</td><td>macOS-App (<code>.dmg</code>) für Macs mit Apple-Chip.</td></tr>
             </tbody>
           </table></div>
           <p>Die Details jeder Version stehen im Änderungsprotokoll, auf Englisch und Französisch: <a href="https://github.com/Bulls64/Streamlink-Launcher/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Chat</a>. Die Downloads findest du auf den Versionsseiten: <a href="https://github.com/Bulls64/Streamlink-Launcher/releases" target="_blank" rel="noopener">Launcher</a>, <a href="https://github.com/Bulls64/Streamlink-Chat/releases" target="_blank" rel="noopener">Chat</a>.</p>
@@ -628,7 +640,7 @@ player-args=--force-window=immediate</div>
           <h3>Was auf deinem PC bleibt</h3>
           <ul>
             <li><b>Einstellungen, Favoriten, Verlauf, geöffnete Chats</b>: in den unter <a href="#favoriten">Wo liegen die Dateien</a> beschriebenen Dateien, nirgendwo sonst.</li>
-            <li><b>Anmelde-Tokens</b> (Chat): unter Windows mit DPAPI verschlüsselt, unter Linux unverschlüsselt in deinem Home-Ordner.</li>
+            <li><b>Anmelde-Tokens</b> (Chat): unter Windows mit DPAPI verschlüsselt, unter Linux und macOS unverschlüsselt in deinem Home-Ordner.</li>
             <li><b>Zwischenablage</b> (Launcher): wird nur gelesen, um einen Stream-Link zu erkennen; weder gespeichert noch gesendet.</li>
             <li><b>Protokolle</b>: <code>launcher.log</code> und <code>chat.log</code> halten Fehler fest (zwei Dateien mit jeweils höchstens 512 KB). Sie bleiben auf deinem PC, es sei denn, du hängst sie an ein Issue an.</li>
             <li><b>Windows-Registrierung</b> (Launcher): ein einziger Wert, <code>StreamlinkLauncher</code> in <span class="path">HKCU\Software\Microsoft\Windows\CurrentVersion\Run</span>, und nur, wenn <em>Mit Windows starten</em> aktiviert ist.</li>
@@ -659,6 +671,13 @@ player-args=--force-window=immediate</div>
               <li>Prüfe die Datei: in PowerShell <code>Get-FileHash .\StreamlinkLauncher-1.7.0.exe</code>, und vergleiche mit der <code>SHA256SUMS.txt</code> der Version.</li>
               <li>Klicke auf <em>Weitere Informationen</em>, dann auf <em>Trotzdem ausführen</em>.</li>
               <li>Passiert beim Doppelklick nichts: Rechtsklick › <em>Eigenschaften</em> › <em>Zulassen</em> ankreuzen, oder <code>Unblock-File .\StreamlinkLauncher-1.7.0.exe</code>.</li>
+            </ol></div></details>
+          <details class="faq"><summary>macOS öffnet die App nicht („nicht verifizierter Entwickler“) <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
+            <p>Die Apps sind ohne Apple-Entwicklerkonto signiert und daher nicht notarisiert: macOS blockiert sie beim ersten Mal. Das ist keine Erkennung.</p>
+            <ol>
+              <li>Prüfe die Datei: im Terminal <code>shasum -a 256 StreamlinkLauncher-*.dmg</code>, und vergleiche mit der <code>SHA256SUMS.txt</code> der Version.</li>
+              <li>Öffne die App einmal, geh dann zu <em>Systemeinstellungen › Datenschutz &amp; Sicherheit</em> und klicke auf <em>Dennoch öffnen</em>.</li>
+              <li>Oder entferne die Quarantäne im Terminal: <code>xattr -dr com.apple.quarantine "/Applications/Streamlink Launcher.app"</code>.</li>
             </ol></div></details>
           <details class="faq"><summary>Mein Virenschutz blockiert oder löscht die exe <span class="app l">Launcher</span> <span class="app c">Chat</span></summary><div class="a">
             <p>Mit PyInstaller erstellte Programme werden manchmal irrtümlich gemeldet. Prüfe den SHA-256, stelle die Datei aus der Quarantäne wieder her, füge ihren Ordner zu den Ausnahmen hinzu und melde den Fehlalarm (Microsoft Defender: <a href="https://www.microsoft.com/wdsi/filesubmission" target="_blank" rel="noopener">Datei einreichen</a>, Kategorie <em>Incorrectly detected as malware</em>). Du kannst die App auch aus dem Quellcode starten.</p></div></details>
@@ -729,6 +748,11 @@ player-args=--force-window=immediate</div>
           <p>Lösche das AppImage, dann die Datenordner:</p>
           <div class="term"><span class="pr">$ </span>rm -r ~/.config/streamlink-launcher ~/.config/streamlink-chat</div>
           <p>Hast du mit Gear Lever oder AppImageLauncher einen Menüeintrag angelegt, entferne ihn in diesem Werkzeug.</p>
+        </div>
+        <div class="blk">
+          <h3>Unter macOS <span class="app l">Launcher</span> <span class="app c">Chat</span></h3>
+          <p>Zieh die Apps aus <em>Programme</em> in den Papierkorb und lösche dann ihre Daten:</p>
+          <div class="term"><span class="pr">$ </span>rm -r ~/Library/Application\ Support/Streamlink\ Launcher ~/Library/Application\ Support/Streamlink\ Chat</div>
         </div>
         <div class="blk">
           <h3>Und Streamlink?</h3>
