@@ -51,10 +51,14 @@ class GuiBase(TempData):
 
     def tearDown(self):
         try:
-            # Tâches différées encore prévues (vérifications de démarrage…) : annulées avant de fermer
-            # Delayed tasks still planned (start-up checks…): cancelled before closing
+            # Tâches différées encore prévues (vérifications de démarrage…) : annulées avant de fermer, par Tcl
+            # directement. after_cancel() effacerait aussi leur commande Python, inconnue de la fenêtre qui l'a
+            # créée : destroy() essaierait ensuite de l'effacer une seconde fois (« can't delete Tcl command »).
+            # Delayed tasks still planned (start-up checks…): cancelled before closing, through Tcl directly.
+            # after_cancel() would also delete their Python command, unknown to the widget that created it:
+            # destroy() would then try to delete it a second time ("can't delete Tcl command").
             for job in self.app.tk.splitlist(self.app.tk.call("after", "info")):
-                self.app.after_cancel(job)
+                self.app.tk.call("after", "cancel", job)
             self.app.destroy()
         finally:
             for p in self.extra:
